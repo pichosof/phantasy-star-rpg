@@ -13,8 +13,9 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "prepare": "husky",
-    "test": "vitest",
-    "test:cov": "vitest run --coverage",
+    "test": "cross-env NODE_ENV=test DATABASE_URL=./data/test.db vitest",
+    "test:run": "cross-env NODE_ENV=test DATABASE_URL=./data/test.db vitest run",
+    "test:cov": "cross-env NODE_ENV=test DATABASE_URL=./data/test.db vitest run --coverage",
     "check": "npm run lint && npm run build && npm run test"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
     "@vitest/coverage-v8": "^3.2.4",
+    "cross-env": "^10.0.0",
     "drizzle-kit": "^0.30.0",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
