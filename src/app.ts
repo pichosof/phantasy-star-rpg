@@ -7,6 +7,7 @@ fs.mkdirSync('uploads', { recursive: true });
 
 async function main() {
   const app = await buildServer();
+  app.ready().then(() => app.printRoutes());
   await app.listen({ port: env.PORT, host: '0.0.0.0' });
   console.log(`API up on :${env.PORT}`);
 }

@@ -4,10 +4,13 @@ import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
+import type { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 import { env } from '../config/env.js';
 
+import { authPlugin } from './plugins/auth';
 import { errorHandlerPlugin } from './plugins/error-handler.js';
+import swaggerPlugin from './plugins/swagger';
 import { cityRoutes } from './routes/city.routes.js';
 import { loreRoutes } from './routes/lore.routes.js';
 import { mapMarkerRoutes } from './routes/map-marker.routes.js';
@@ -32,7 +35,7 @@ export async function buildServer() {
               ? { target: 'pino-pretty', options: { colorize: true } }
               : undefined,
         },
-  });
+  }).withTypeProvider<ZodTypeProvider>();
 
   await app.register(cors, { origin: env.CORS_ORIGIN || '*' });
   await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB
@@ -43,7 +46,10 @@ export async function buildServer() {
   });
 
   app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
-
+  await app.register(authPlugin);
+  if (process.env.NODE_ENV !== 'production') {
+    await app.register(swaggerPlugin);
+  }
   await app.register(playerRoutes);
   await app.register(questRoutes);
   await app.register(uploadRoutes);
