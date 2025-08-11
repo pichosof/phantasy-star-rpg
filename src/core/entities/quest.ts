@@ -1,7 +1,9 @@
+import type { QuestStatus } from '../../infra/db/schema';
+
 export interface QuestProps {
   id?: number;
   title: string;
-  status?: 'active' | 'completed' | 'failed';
+  status?: QuestStatus;
   description?: string | null;
   reward?: string | null;
   createdAt?: Date;
@@ -26,6 +28,7 @@ export class Quest {
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
+  
 
   static create(props: Omit<QuestProps, 'id' | 'createdAt' | 'updatedAt'>) {
     if (!props.title?.trim()) throw new Error('Title is required');

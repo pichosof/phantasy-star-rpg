@@ -8,14 +8,15 @@ export const createPlayerInput = z.object({
   background: z.string().nullable().optional(),
 });
 
-export type CreatePlayerInput = z.infer<typeof createPlayerInput>;
+export type CreatePlayerInput = z.input<typeof createPlayerInput>;
+export type CreatePlayerData = z.output<typeof createPlayerInput>;
 
 export class CreatePlayer {
   constructor(private repo: IPlayerRepository) {}
 
   async execute(input: CreatePlayerInput) {
-    const data = createPlayerInput.parse(input);
-    const player = Player.create(data);
+    const data: CreatePlayerData = createPlayerInput.parse(input);
+    const player = Player.create(data); // ok: level preenchido
     return this.repo.create(player);
   }
 }

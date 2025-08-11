@@ -14,10 +14,13 @@ export const players = sqliteTable('players', {
     .default(sql`(unixepoch('now') * 1000)`),
 });
 
+export const questStatus = ['active', 'completed', 'failed'] as const;
+export type QuestStatus = typeof questStatus[number];
+
 export const quests = sqliteTable('quests', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   title: text('title').notNull(),
-  status: text('status').notNull().default('active'), // active|completed|failed
+  status: text('status', { enum: questStatus }).notNull().default('active'),
   description: text('description'),
   reward: text('reward'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
