@@ -1,5 +1,8 @@
 import { buildServer } from './infra/http/server.js';
 import { env } from './infra/config/env.js';
+import fs from 'node:fs';
+
+fs.mkdirSync('uploads', { recursive: true });
 
 async function main() {
   const app = await buildServer();
