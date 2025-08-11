@@ -1,9 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 
-import { createPlayerInput } from '../../../core/use-cases/player/create-player'; // Zod já existe
 import { PlayerController } from '../controllers/player.controller';
-import { created, ok, PlayerModel, PlayersModel } from '../schemas';
-// se usar withGM:
+
 export async function playerRoutes(app: FastifyInstance) {
   const ctrl = new PlayerController();
 
@@ -12,7 +10,16 @@ export async function playerRoutes(app: FastifyInstance) {
     {
       schema: {
         tags: ['Players'],
-        response: ok(PlayersModel),
+        // resposta genérica (evita 500 no /docs)
+        response: {
+          200: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: true, // <- genérico, sem travar
+            },
+          },
+        },
       },
     },
     ctrl.list.bind(ctrl),
@@ -23,8 +30,23 @@ export async function playerRoutes(app: FastifyInstance) {
     app.withGM({
       schema: {
         tags: ['Players'],
-        body: createPlayerInput, // Zod de ENTRADA
-        response: created(PlayerModel), // Zod de SAÍDA
+        security: [{ ApiKeyAuth: [] }],
+        body: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            name: { type: 'string' },
+            level: { type: 'number', default: 1 },
+            background: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          },
+          additionalProperties: false,
+        },
+        response: {
+          201: {
+            type: 'object',
+            additionalProperties: true,
+          },
+        },
       },
     }),
     ctrl.create.bind(ctrl),

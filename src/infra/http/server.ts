@@ -4,8 +4,6 @@ import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
-import type { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
 
 import { env } from '../config/env.js';
 
@@ -36,11 +34,7 @@ export async function buildServer() {
               ? { target: 'pino-pretty', options: { colorize: true } }
               : undefined,
         },
-  }).withTypeProvider<ZodTypeProvider>();
-
-  // 🔧 Diz pro Fastify usar Zod em vez de AJV
-  app.setValidatorCompiler(validatorCompiler);
-  app.setSerializerCompiler(serializerCompiler);
+  });
 
   await app.register(cors, { origin: env.CORS_ORIGIN || '*' });
   await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
