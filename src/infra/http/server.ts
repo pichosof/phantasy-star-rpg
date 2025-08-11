@@ -5,6 +5,7 @@ import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 import type { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { validatorCompiler, serializerCompiler } from 'fastify-type-provider-zod';
 
 import { env } from '../config/env.js';
 
@@ -37,11 +38,15 @@ export async function buildServer() {
         },
   }).withTypeProvider<ZodTypeProvider>();
 
+  // 🔧 Diz pro Fastify usar Zod em vez de AJV
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
+
   await app.register(cors, { origin: env.CORS_ORIGIN || '*' });
-  await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB
+  await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
   await app.register(fastifyStatic, {
     root: path.resolve('data', 'uploads'),
-    prefix: '/files/', // serve /files/<nome>
+    prefix: '/files/',
     decorateReply: false,
   });
 
@@ -50,6 +55,8 @@ export async function buildServer() {
   if (process.env.NODE_ENV !== 'production') {
     await app.register(swaggerPlugin);
   }
+
+  // rotas...
   await app.register(playerRoutes);
   await app.register(questRoutes);
   await app.register(uploadRoutes);
@@ -60,6 +67,7 @@ export async function buildServer() {
   await app.register(monsterRoutes);
   await app.register(mapMarkerRoutes);
   await app.register(timelineRoutes);
+
   await app.register(errorHandlerPlugin);
 
   return app;
