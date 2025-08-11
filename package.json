@@ -9,9 +9,9 @@
     "start": "node dist/app.js",
     "drizzle:generate": "drizzle-kit generate",
     "drizzle:migrate": "drizzle-kit migrate",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write .",
     "prepare": "husky",
     "test": "vitest",
     "test:cov": "vitest run --coverage",
@@ -30,21 +30,25 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.9",
     "@types/node": "^20.14.9",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "@vitest/coverage-v8": "^3.2.4",
     "drizzle-kit": "^0.30.0",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2",
     "tsx": "^4.16.2",
     "typescript": "^5.5.4",
     "vitest": "^3.2.4"
   },
   "lint-staged": {
     "*.{ts,tsx,js,json,md}": [
-      "prettier --write",
-      "eslint --fix"
+      "prettier --write"
     ],
     "*.{ts,tsx}": [
-      null,
       "eslint --fix"
     ]
   }

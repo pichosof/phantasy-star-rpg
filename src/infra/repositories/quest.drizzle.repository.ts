@@ -5,12 +5,15 @@ import { eq } from 'drizzle-orm';
 
 export class QuestDrizzleRepository implements IQuestRepository {
   async create(quest: Quest): Promise<Quest> {
-    const [row] = await db.insert(schema.quests).values({
-      title: quest['title'],
-      status: quest['status'],
-      description: quest['description'] ?? null,
-      reward: quest['reward'] ?? null,
-    }).returning();
+    const [row] = await db
+      .insert(schema.quests)
+      .values({
+        title: quest['title'],
+        status: quest['status'],
+        description: quest['description'] ?? null,
+        reward: quest['reward'] ?? null,
+      })
+      .returning();
     return Quest.rehydrate(row);
   }
   async list(): Promise<Quest[]> {
@@ -18,8 +21,6 @@ export class QuestDrizzleRepository implements IQuestRepository {
     return rows.map((r) => Quest.rehydrate(r));
   }
   async complete(id: number): Promise<void> {
-    await db.update(schema.quests)
-      .set({ status: 'completed' })
-      .where(eq(schema.quests.id, id));
+    await db.update(schema.quests).set({ status: 'completed' }).where(eq(schema.quests.id, id));
   }
 }

@@ -5,15 +5,15 @@ import { playerRoutes } from './routes/player.routes.js';
 import { questRoutes } from './routes/quest.routes.js';
 import { errorHandlerPlugin } from './plugins/error-handler.js';
 
-
 export async function buildServer() {
   const app = Fastify({
-    logger: env.NODE_ENV === 'production'
-      ? { level: 'info' }
-      : {
-          level: 'debug',
-          transport: { target: 'pino-pretty', options: { colorize: true } },
-        },
+    logger:
+      env.NODE_ENV === 'production'
+        ? { level: 'info' }
+        : {
+            level: 'debug',
+            transport: { target: 'pino-pretty', options: { colorize: true } },
+          },
   });
 
   await app.register(cors, { origin: env.CORS_ORIGIN || '*' });

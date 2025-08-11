@@ -1,11 +1,11 @@
-import { z } from "zod";
-import { Player } from "../entities/player";
-import { IPlayerRepository } from "../repositories/player.repository";
+import { z } from 'zod';
+import { Player } from '../entities/player';
+import { IPlayerRepository } from '../repositories/player.repository';
 
 export const createPlayerInput = z.object({
   name: z.string().min(1),
   level: z.number().int().min(1).default(1),
-  background: z.string().nullable().optional()
+  background: z.string().nullable().optional(),
 });
 
 export type CreatePlayerInput = z.infer<typeof createPlayerInput>;

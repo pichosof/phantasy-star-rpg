@@ -4,6 +4,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     coverage: { reporter: ['text', 'html'] },
-    include: ['tests/**/*.test.ts']
-  }
+    include: ['tests/**/*.test.ts'],
+  },
 });
