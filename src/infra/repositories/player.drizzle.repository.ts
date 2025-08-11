@@ -1,7 +1,6 @@
-import { eq } from 'drizzle-orm';
-import { db, schema } from '../db/index.js';
 import { Player } from '../../core/entities/player.js';
-import { IPlayerRepository } from '../../core/repositories/player.repository.js';
+import type { IPlayerRepository } from '../../core/repositories/player.repository.js';
+import { db, schema } from '../db/index.js';
 
 export class PlayerDrizzleRepository implements IPlayerRepository {
   async create(player: Player): Promise<Player> {

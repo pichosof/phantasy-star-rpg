@@ -1,7 +1,8 @@
-import { db, schema } from '../db/index.js';
-import { Quest } from '../../core/entities/quest.js';
-import { IQuestRepository } from '../../core/repositories/quest.repository.js';
 import { eq } from 'drizzle-orm';
+
+import { Quest } from '../../core/entities/quest.js';
+import type { IQuestRepository } from '../../core/repositories/quest.repository.js';
+import { db, schema } from '../db/index.js';
 
 export class QuestDrizzleRepository implements IQuestRepository {
   async create(quest: Quest): Promise<Quest> {

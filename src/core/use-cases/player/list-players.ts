@@ -1,4 +1,4 @@
-import { IPlayerRepository } from '../repositories/player.repository';
+import type { IPlayerRepository } from '../repositories/player.repository';
 
 export class ListPlayers {
   constructor(private repo: IPlayerRepository) {}

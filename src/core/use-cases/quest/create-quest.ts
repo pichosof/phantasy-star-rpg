@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { IQuestRepository } from '../repositories/quest.repository';
-import { Quest } from '../entities/quest';
+
+import { Quest } from '../../entities/quest';
+import type { IQuestRepository } from '../../repositories/quest.repository';
 
 export const createQuestInput = z.object({
   title: z.string().min(1),

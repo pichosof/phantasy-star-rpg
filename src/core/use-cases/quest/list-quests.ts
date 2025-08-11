@@ -1,4 +1,4 @@
-import { IQuestRepository } from '../repositories/quest.repository';
+import type { IQuestRepository } from '../repositories/quest.repository';
 
 export class ListQuests {
   constructor(private repo: IQuestRepository) {}

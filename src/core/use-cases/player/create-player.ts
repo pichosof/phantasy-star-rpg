@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { Player } from '../entities/player';
-import { IPlayerRepository } from '../repositories/player.repository';
+
+import { Player } from '../../entities/player';
+import type { IPlayerRepository } from '../../repositories/player.repository';
 
 export const createPlayerInput = z.object({
   name: z.string().min(1),

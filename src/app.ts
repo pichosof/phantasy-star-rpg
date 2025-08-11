@@ -1,6 +1,7 @@
-import { buildServer } from './infra/http/server.js';
-import { env } from './infra/config/env.js';
 import fs from 'node:fs';
+
+import { env } from './infra/config/env.js';
+import { buildServer } from './infra/http/server.js';
 
 fs.mkdirSync('uploads', { recursive: true });
 

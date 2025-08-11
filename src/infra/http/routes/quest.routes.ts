@@ -1,4 +1,5 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
+
 import { QuestController } from '../controllers/quest.controller.js';
 
 export async function questRoutes(app: FastifyInstance) {

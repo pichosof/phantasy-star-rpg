@@ -1,0 +1,23 @@
+import type { LoreCategory } from '../../infra/db/schema';
+
+export interface LoreProps {
+  id?: number;
+  title: string;
+  category?: LoreCategory | null; // <-- aceita null
+  content?: string | null;
+  createdAt?: Date;
+}
+
+export class Lore {
+  private constructor(readonly props: LoreProps) {}
+
+  static create(p: Omit<LoreProps, 'id' | 'createdAt'>) {
+    if (!p.title?.trim()) throw new Error('Title required');
+    // se quiser normalizar: const category = p.category ?? null;
+    return new Lore(p);
+  }
+
+  static rehydrate(p: LoreProps) {
+    return new Lore(p); // agora compatível com null
+  }
+}

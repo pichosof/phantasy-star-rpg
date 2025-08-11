@@ -1,8 +1,19 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyError } from 'fastify';
 import { ZodError } from 'zod';
 
+type AjvIssue = { instancePath?: string; dataPath?: string; message?: string };
+
+function hasValidation(err: unknown): err is FastifyError & { validation: AjvIssue[] } {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    'validation' in (err as Record<string, unknown>) &&
+    Array.isArray((err as { validation?: unknown }).validation)
+  );
+}
+
 export async function errorHandlerPlugin(app: FastifyInstance) {
-  app.setErrorHandler((err, req, reply) => {
+  app.setErrorHandler((err, _req, reply) => {
     // Zod
     if (err instanceof ZodError) {
       const issues = err.issues.map((i) => ({
@@ -11,17 +22,14 @@ export async function errorHandlerPlugin(app: FastifyInstance) {
         message: i.message,
       }));
       app.log.warn({ issues }, 'Validation error');
-      return reply.status(400).send({
-        error: 'ValidationError',
-        issues,
-      });
+      return reply.status(400).send({ error: 'ValidationError', issues });
     }
 
-    // Fastify schema validation
-    if ((err as any).validation) {
-      const issues = (err as any).validation.map((v: any) => ({
-        path: v.instancePath || v.dataPath || '',
-        message: v.message,
+    // Fastify (AJV) schema validation
+    if (hasValidation(err)) {
+      const issues = err.validation.map((v) => ({
+        path: v.instancePath || '',
+        message: v.message ?? 'Invalid value',
       }));
       app.log.warn({ issues }, 'Schema validation error');
       return reply.status(400).send({ error: 'SchemaValidationError', issues });
@@ -29,7 +37,7 @@ export async function errorHandlerPlugin(app: FastifyInstance) {
 
     const status = err.statusCode && err.statusCode >= 400 ? err.statusCode : 500;
     app.log.error({ err }, 'Unhandled error');
-    reply.status(status).send({
+    return reply.status(status).send({
       error: err.name || 'Error',
       message: envSafeMessage(err, process.env.NODE_ENV),
     });
@@ -37,6 +45,5 @@ export async function errorHandlerPlugin(app: FastifyInstance) {
 }
 
 function envSafeMessage(err: Error, nodeEnv?: string) {
-  if (nodeEnv === 'production') return 'Internal server error';
-  return err.message;
+  return nodeEnv === 'production' ? 'Internal server error' : err.message;
 }

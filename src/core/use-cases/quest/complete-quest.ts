@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { IQuestRepository } from '../repositories/quest.repository';
+
+import type { IQuestRepository } from '../../repositories/quest.repository';
 
 export const completeQuestInput = z.object({
   id: z.number().int().positive(),

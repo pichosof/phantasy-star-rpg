@@ -1,4 +1,4 @@
-import { Quest } from '../entities/quest';
+import type { Quest } from '../entities/quest';
 
 export interface IQuestRepository {
   create(quest: Quest): Promise<Quest>;
