@@ -51,4 +51,32 @@ export async function playerRoutes(app: FastifyInstance) {
     }),
     ctrl.create.bind(ctrl),
   );
+
+  // PATCH imagem do player
+  app.patch(
+    '/api/players/:id/image',
+    app.withGM({
+      schema: {
+        tags: ['Players'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    ctrl.updateImage.bind(ctrl),
+  );
+
+  // PATCH ficha (PDF) do player
+  app.patch(
+    '/api/players/:id/sheet',
+    app.withGM({
+      schema: {
+        tags: ['Players'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    ctrl.updateSheet.bind(ctrl),
+  );
 }

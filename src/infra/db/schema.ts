@@ -6,6 +6,13 @@ export const players = sqliteTable('players', {
   name: text('name').notNull(),
   level: integer('level').notNull().default(1),
   background: text('background'),
+  imageUrl: text('image_url'),
+  imageAlt: text('image_alt'),
+  imageMime: text('image_mime'),
+  imageSize: integer('image_size'),
+  sheetUrl: text('sheet_url'),
+  sheetMime: text('sheet_mime'),
+  sheetSize: integer('sheet_size'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),

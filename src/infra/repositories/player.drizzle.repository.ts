@@ -32,4 +32,32 @@ export class PlayerDrizzleRepository implements IPlayerRepository {
       })
       .where(eq(schema.players.id, id));
   }
+
+  async updateImage(
+    id: number,
+    data: { url: string; alt?: string | null; mime?: string | null; size?: number | null },
+  ) {
+    await db
+      .update(schema.players)
+      .set({
+        imageUrl: data.url,
+        imageAlt: data.alt ?? null,
+        imageMime: data.mime ?? null,
+        imageSize: data.size ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.players.id, id));
+  }
+
+  async updateSheet(id: number, data: { url: string; mime?: string | null; size?: number | null }) {
+    await db
+      .update(schema.players)
+      .set({
+        sheetUrl: data.url,
+        sheetMime: data.mime ?? null,
+        sheetSize: data.size ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.players.id, id));
+  }
 }

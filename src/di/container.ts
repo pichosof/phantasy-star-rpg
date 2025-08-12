@@ -30,6 +30,8 @@ import { CreatePlayer } from '../core/use-cases/player/create-player';
 import { ListPlayers } from '../core/use-cases/player/list-players';
 import { SetPlayerQuestStatus } from '../core/use-cases/player/set-player-quest-status';
 import { UpdatePlayer } from '../core/use-cases/player/update-player';
+import { UpdatePlayerImage } from '../core/use-cases/player/update-player-image';
+import { UpdatePlayerSheet } from '../core/use-cases/player/update-player-sheet';
 import { CompleteQuest } from '../core/use-cases/quest/complete-quest';
 import { CreateQuest } from '../core/use-cases/quest/create-quest';
 import { LinkQuestToCity } from '../core/use-cases/quest/link-quest-to-city';
@@ -66,6 +68,8 @@ export type Registry = {
   createPlayer: CreatePlayer;
   listPlayers: ListPlayers;
   updatePlayer: UpdatePlayer;
+  updatePlayerImage: UpdatePlayerImage;
+  updatePlayerSheet: UpdatePlayerSheet;
 
   // Quest
   questRepo: QuestDrizzleRepository;
@@ -155,6 +159,8 @@ class Container {
     createPlayer: (c) => new CreatePlayer(c.resolve('playerRepo')),
     listPlayers: (c) => new ListPlayers(c.resolve('playerRepo')),
     updatePlayer: (c) => new UpdatePlayer(c.resolve('playerRepo')),
+    updatePlayerImage: (c) => new UpdatePlayerImage(c.resolve('playerRepo')),
+    updatePlayerSheet: (c) => new UpdatePlayerSheet(c.resolve('playerRepo')),
 
     // Quest
     questRepo: () => new QuestDrizzleRepository(),
