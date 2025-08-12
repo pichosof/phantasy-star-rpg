@@ -8,6 +8,7 @@ export interface MapMarkerProps {
   description?: string | null;
   discovered?: boolean;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class MapMarker {

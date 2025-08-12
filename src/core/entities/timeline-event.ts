@@ -4,6 +4,7 @@ export interface TimelineEventProps {
   date: string;
   description?: string | null;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 export class TimelineEvent {
   private constructor(readonly props: TimelineEventProps) {}

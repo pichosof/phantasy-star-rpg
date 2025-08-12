@@ -26,4 +26,26 @@ export class SessionDrizzleRepository {
   async delete(id: number) {
     await db.delete(schema.sessions).where(eq(schema.sessions.id, id));
   }
+
+  async update(
+    id: number,
+    data: { title?: string; date?: Date | string; summary?: string | null },
+  ) {
+    const dateValue =
+      data.date instanceof Date
+        ? data.date.toISOString()
+        : typeof data.date === 'string'
+          ? new Date(data.date).toISOString()
+          : undefined;
+
+    await db
+      .update(schema.sessions)
+      .set({
+        ...(data.title !== undefined ? { title: data.title } : {}),
+        ...(dateValue !== undefined ? { date: dateValue } : {}),
+        ...(data.summary !== undefined ? { summary: data.summary } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.sessions.id, id));
+  }
 }

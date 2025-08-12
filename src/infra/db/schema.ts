@@ -58,6 +58,9 @@ export const sessions = sqliteTable('sessions', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
 });
 
 // Lore (enciclopédia do mundo)

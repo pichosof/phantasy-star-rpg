@@ -39,6 +39,7 @@ import { UpdateQuest } from '../core/use-cases/quest/update-quest';
 import { CreateSession } from '../core/use-cases/session/create-session';
 import { DeleteSession } from '../core/use-cases/session/delete-session';
 import { ListSessions } from '../core/use-cases/session/list-sessions';
+import { UpdateSession } from '../core/use-cases/session/update-session';
 import { CreateTimelineEvent } from '../core/use-cases/timeline/create-timeline-event';
 import { DeleteTimelineEvent } from '../core/use-cases/timeline/delete-timeline-event';
 import { ListTimelineEvents } from '../core/use-cases/timeline/list-timeline-events';
@@ -86,6 +87,7 @@ export type Registry = {
   createSession: CreateSession;
   listSessions: ListSessions;
   deleteSession: DeleteSession;
+  updateSession: UpdateSession;
 
   // Lore
   loreRepo: LoreDrizzleRepository;
@@ -174,6 +176,7 @@ class Container {
     createSession: (c) => new CreateSession(c.resolve('sessionRepo')),
     listSessions: (c) => new ListSessions(c.resolve('sessionRepo')),
     deleteSession: (c) => new DeleteSession(c.resolve('sessionRepo')),
+    updateSession: (c) => new UpdateSession(c.resolve('sessionRepo')),
 
     // Lore
     loreRepo: () => new LoreDrizzleRepository(),

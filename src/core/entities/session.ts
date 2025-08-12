@@ -4,6 +4,7 @@ export interface SessionProps {
   date: string; // ISO ou in-game
   summary?: string | null;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 export class Session {
   private constructor(readonly props: SessionProps) {}

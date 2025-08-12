@@ -11,6 +11,7 @@ export interface MonsterProps {
   imageMime?: string | null;
   imageSize?: number | null;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 export class Monster {
   private constructor(readonly props: MonsterProps) {}
