@@ -4,7 +4,53 @@ import { TimelineController } from '../controllers/timeline.controller.js';
 
 export async function timelineRoutes(app: FastifyInstance) {
   const c = new TimelineController();
-  app.get('/api/timeline', c.list.bind(c));
-  app.post('/api/timeline', c.create.bind(c));
-  app.delete('/api/timeline/:id', c.delete.bind(c));
+
+  // GET público
+  app.get(
+    '/api/timeline',
+    {
+      schema: {
+        tags: ['Timeline'],
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    },
+    c.list.bind(c),
+  );
+
+  // POST protegido
+  app.post(
+    '/api/timeline',
+    app.withGM({
+      schema: {
+        tags: ['Timeline'],
+        security: [{ ApiKeyAuth: [] }],
+        body: {
+          type: 'object',
+          required: ['title', 'occurredAt'],
+          properties: {
+            title: { type: 'string' },
+            occurredAt: { type: 'string' }, // ISO date string
+            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          },
+          additionalProperties: false,
+        },
+        response: { 201: { type: 'object', additionalProperties: true } },
+      },
+    }),
+    c.create.bind(c),
+  );
+
+  // DELETE protegido
+  app.delete(
+    '/api/timeline/:id',
+    app.withGM({
+      schema: {
+        tags: ['Timeline'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.delete.bind(c),
+  );
 }
