@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
-import type { CityDrizzleRepository } from '../../../infra/repositories/city.drizzle.repository';
-const input = z.object({ id: z.number().int().positive(), discovered: z.boolean() });
+export const setCityDiscoveredInput = z.object({
+  discovered: z.boolean(),
+});
+
 export class SetCityDiscovered {
-  constructor(private repo: CityDrizzleRepository) {}
-  async execute(i: { id: number; discovered: boolean }) {
-    const d = input.parse(i);
-    await this.repo.setDiscovered(d.id, d.discovered);
+  constructor(private repo: { setDiscovered(id: number, discovered: boolean): Promise<void> }) {}
+
+  async execute({ id, discovered }: { id: number; discovered: boolean }) {
+    return this.repo.setDiscovered(id, discovered);
   }
 }

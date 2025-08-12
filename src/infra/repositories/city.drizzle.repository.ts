@@ -38,4 +38,31 @@ export class CityDrizzleRepository {
       .set({ worldId, updatedAt: new Date() })
       .where(eq(schema.cities.id, cityId));
   }
+
+  async update(
+    id: number,
+    data: {
+      name?: string;
+      description?: string | null;
+      discovered?: boolean;
+      coordinates?: string | null;
+      imageUrl?: string | null;
+      imageAlt?: string | null;
+      worldId?: number | null;
+    },
+  ) {
+    await db
+      .update(schema.cities)
+      .set({
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.description !== undefined ? { description: data.description } : {}),
+        ...(data.discovered !== undefined ? { discovered: data.discovered } : {}),
+        ...(data.coordinates !== undefined ? { coordinates: data.coordinates } : {}),
+        ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl } : {}),
+        ...(data.imageAlt !== undefined ? { imageAlt: data.imageAlt } : {}),
+        ...(data.worldId !== undefined ? { worldId: data.worldId } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.cities.id, id));
+  }
 }

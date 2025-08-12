@@ -1,23 +1,45 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { z } from 'zod';
 
+import { createQuestInput } from '../../../core/use-cases/quest/create-quest';
+import { updateQuestInput } from '../../../core/use-cases/quest/update-quest';
 import { container } from '../../../di/container.js';
 
+type CreateBody = z.infer<typeof createQuestInput>;
+type UpdateBody = z.infer<typeof updateQuestInput>;
+type IdParams = { id: string };
+
 export class QuestController {
-  async list(req: FastifyRequest, reply: FastifyReply) {
+  async list(_req: FastifyRequest, reply: FastifyReply) {
     const uc = container.resolve('listQuests');
-    return reply.send(await uc.execute());
+    const items = await uc.execute();
+    return reply.send(items);
   }
-  async create(
-    req: FastifyRequest<{ Body: { title: string; description?: string; reward?: string } }>,
-    reply: FastifyReply,
-  ) {
+
+  async create(req: FastifyRequest<{ Body: CreateBody }>, reply: FastifyReply) {
+    const parsed = createQuestInput.safeParse(req.body);
+    if (!parsed.success) throw parsed.error;
     const uc = container.resolve('createQuest');
-    const res = await uc.execute(req.body);
+    const res = await uc.execute(parsed.data);
     return reply.code(201).send(res);
   }
-  async complete(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+
+  async complete(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
     const uc = container.resolve('completeQuest');
-    await uc.execute({ id: Number(req.params.id) });
+    await uc.execute({ id });
+    return reply.code(204).send();
+  }
+
+  async update(req: FastifyRequest<{ Params: IdParams; Body: UpdateBody }>, reply: FastifyReply) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+
+    const parsed = updateQuestInput.safeParse(req.body);
+    if (!parsed.success) throw parsed.error;
+
+    await container.resolve('updateQuest').execute(id, parsed.data);
     return reply.code(204).send();
   }
 }

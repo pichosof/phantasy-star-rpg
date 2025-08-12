@@ -9,11 +9,13 @@ import { DeleteCity } from '../core/use-cases/cities/delete-city';
 import { ListCities } from '../core/use-cases/cities/list-cities';
 import { RemoveCityFromWorld } from '../core/use-cases/cities/remove-city-from-world';
 import { SetCityDiscovered } from '../core/use-cases/cities/set-city-discovered';
+import { UpdateCity } from '../core/use-cases/cities/update-city';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
 import { DeleteLore } from '../core/use-cases/lore/delete-lore';
 import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
 import { ListLores } from '../core/use-cases/lore/list-lores';
 import { UnlinkLoreFromCity } from '../core/use-cases/lore/unlink-lore-from-city';
+import { UpdateLore } from '../core/use-cases/lore/update-lore';
 import { CreateMapMarker } from '../core/use-cases/map-marker/create-map-marker';
 import { DeleteMapMarker } from '../core/use-cases/map-marker/delete-map-marker';
 import { ListMapMarkers } from '../core/use-cases/map-marker/list-map-markers';
@@ -21,6 +23,7 @@ import { SetMapMarkerDiscovered } from '../core/use-cases/map-marker/set-map-mar
 import { CreateNpc } from '../core/use-cases/npc/create-npc';
 import { DeleteNpc } from '../core/use-cases/npc/delete-npc';
 import { ListNpcs } from '../core/use-cases/npc/list-npcs';
+import { UpdateNpc } from '../core/use-cases/npc/update-npc';
 import { UpdateNpcImage } from '../core/use-cases/npc/update-npc-image';
 import { AssignQuestToPlayer } from '../core/use-cases/player/assign-quest-to-player';
 import { CreatePlayer } from '../core/use-cases/player/create-player';
@@ -32,6 +35,7 @@ import { CreateQuest } from '../core/use-cases/quest/create-quest';
 import { LinkQuestToCity } from '../core/use-cases/quest/link-quest-to-city';
 import { ListQuests } from '../core/use-cases/quest/list-quests';
 import { UnlinkQuestFromCity } from '../core/use-cases/quest/unlink-quest-from-city';
+import { UpdateQuest } from '../core/use-cases/quest/update-quest';
 import { CreateSession } from '../core/use-cases/session/create-session';
 import { DeleteSession } from '../core/use-cases/session/delete-session';
 import { ListSessions } from '../core/use-cases/session/list-sessions';
@@ -67,6 +71,7 @@ export type Registry = {
   createQuest: CreateQuest;
   listQuests: ListQuests;
   completeQuest: CompleteQuest;
+  updateQuest: UpdateQuest;
 
   // NPC
   npcRepo: NpcDrizzleRepository;
@@ -74,6 +79,7 @@ export type Registry = {
   listNpcs: ListNpcs;
   deleteNpc: DeleteNpc;
   updateNpcImage: UpdateNpcImage;
+  updateNpc: UpdateNpc;
 
   // Sessions
   sessionRepo: SessionDrizzleRepository;
@@ -86,6 +92,7 @@ export type Registry = {
   createLore: CreateLore;
   listLores: ListLores;
   deleteLore: DeleteLore;
+  updateLore: UpdateLore;
 
   // Cities
   cityRepo: CityDrizzleRepository;
@@ -93,6 +100,7 @@ export type Registry = {
   listCities: ListCities;
   setCityDiscovered: SetCityDiscovered;
   deleteCity: DeleteCity;
+  updateCity: UpdateCity;
 
   // Bestiary
   monsterRepo: MonsterDrizzleRepository;
@@ -151,6 +159,7 @@ class Container {
     createQuest: (c) => new CreateQuest(c.resolve('questRepo')),
     listQuests: (c) => new ListQuests(c.resolve('questRepo')),
     completeQuest: (c) => new CompleteQuest(c.resolve('questRepo')),
+    updateQuest: (c) => new UpdateQuest(c.resolve('questRepo')),
 
     // NPC
     npcRepo: () => new NpcDrizzleRepository(),
@@ -158,6 +167,7 @@ class Container {
     listNpcs: (c) => new ListNpcs(c.resolve('npcRepo')),
     deleteNpc: (c) => new DeleteNpc(c.resolve('npcRepo')),
     updateNpcImage: (c) => new UpdateNpcImage(c.resolve('npcRepo')),
+    updateNpc: (c) => new UpdateNpc(c.resolve('npcRepo')),
 
     // Sessions
     sessionRepo: () => new SessionDrizzleRepository(),
@@ -170,6 +180,7 @@ class Container {
     createLore: (c) => new CreateLore(c.resolve('loreRepo')),
     listLores: (c) => new ListLores(c.resolve('loreRepo')),
     deleteLore: (c) => new DeleteLore(c.resolve('loreRepo')),
+    updateLore: (c) => new UpdateLore(c.resolve('loreRepo')),
 
     // Cities
     cityRepo: () => new CityDrizzleRepository(),
@@ -177,6 +188,7 @@ class Container {
     listCities: (c) => new ListCities(c.resolve('cityRepo')),
     setCityDiscovered: (c) => new SetCityDiscovered(c.resolve('cityRepo')),
     deleteCity: (c) => new DeleteCity(c.resolve('cityRepo')),
+    updateCity: (c) => new UpdateCity(c.resolve('cityRepo')),
 
     // Bestiary
     monsterRepo: () => new MonsterDrizzleRepository(),

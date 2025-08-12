@@ -1,11 +1,107 @@
 import type { FastifyInstance } from 'fastify';
 
-import { CityController } from '../controllers/city.controller.js';
+import { CityController } from '../controllers/city.controller';
 
 export async function cityRoutes(app: FastifyInstance) {
   const c = new CityController();
-  app.get('/api/cities', c.list.bind(c));
-  app.post('/api/cities', c.create.bind(c));
-  app.patch('/api/cities/:id/discovered', c.setDiscovered.bind(c));
-  app.delete('/api/cities/:id', c.delete.bind(c));
+
+  // GET público
+  app.get(
+    '/api/cities',
+    {
+      schema: {
+        tags: ['Cities'],
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    },
+    c.list.bind(c),
+  );
+
+  // POST protegido
+  app.post(
+    '/api/cities',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ ApiKeyAuth: [] }],
+        body: {
+          type: 'object',
+          required: ['name'],
+          properties: {
+            name: { type: 'string' },
+            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            discovered: { type: 'boolean', default: false },
+            coordinates: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            imageUrl: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            imageAlt: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            worldId: { anyOf: [{ type: 'number' }, { type: 'null' }] },
+          },
+          additionalProperties: false,
+        },
+        response: { 201: { type: 'object', additionalProperties: true } },
+      },
+    }),
+    c.create.bind(c),
+  );
+
+  // PATCH discovered protegido (já tinha)
+  app.patch(
+    '/api/cities/:id/discovered',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['discovered'],
+          properties: { discovered: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setDiscovered.bind(c),
+  );
+
+  // 👇 NOVO: PATCH update protegido
+  app.patch(
+    '/api/cities/:id',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            discovered: { type: 'boolean' },
+            coordinates: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            imageUrl: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            imageAlt: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            worldId: { anyOf: [{ type: 'number' }, { type: 'null' }] },
+          },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.update.bind(c),
+  );
+
+  // DELETE protegido
+  app.delete(
+    '/api/cities/:id',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.delete.bind(c),
+  );
 }

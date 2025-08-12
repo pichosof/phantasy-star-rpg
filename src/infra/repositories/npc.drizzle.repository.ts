@@ -45,4 +45,28 @@ export class NpcDrizzleRepository {
       })
       .where(eq(schema.npcs.id, id));
   }
+  async update(
+    id: number,
+    data: {
+      name?: string;
+      role?: string | null;
+      description?: string | null;
+      location?: string | null;
+      imageUrl?: string | null;
+      imageAlt?: string | null;
+    },
+  ) {
+    await db
+      .update(schema.npcs)
+      .set({
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.role !== undefined ? { role: data.role } : {}),
+        ...(data.description !== undefined ? { description: data.description } : {}),
+        ...(data.location !== undefined ? { location: data.location } : {}),
+        ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl } : {}),
+        ...(data.imageAlt !== undefined ? { imageAlt: data.imageAlt } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.npcs.id, id));
+  }
 }

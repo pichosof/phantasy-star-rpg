@@ -24,4 +24,24 @@ export class QuestDrizzleRepository implements IQuestRepository {
   async complete(id: number): Promise<void> {
     await db.update(schema.quests).set({ status: 'completed' }).where(eq(schema.quests.id, id));
   }
+  async update(
+    id: number,
+    data: {
+      title?: string;
+      description?: string | null;
+      reward?: string | null;
+      status?: 'active' | 'completed' | 'failed';
+    },
+  ) {
+    await db
+      .update(schema.quests)
+      .set({
+        ...(data.title !== undefined ? { title: data.title } : {}),
+        ...(data.description !== undefined ? { description: data.description } : {}),
+        ...(data.reward !== undefined ? { reward: data.reward } : {}),
+        ...(data.status !== undefined ? { status: data.status } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.quests.id, id));
+  }
 }
