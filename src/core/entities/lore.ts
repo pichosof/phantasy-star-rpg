@@ -6,6 +6,7 @@ export interface LoreProps {
   category?: LoreCategory | null; // <-- aceita null
   content?: string | null;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class Lore {
@@ -13,7 +14,6 @@ export class Lore {
 
   static create(p: Omit<LoreProps, 'id' | 'createdAt'>) {
     if (!p.title?.trim()) throw new Error('Title required');
-    // se quiser normalizar: const category = p.category ?? null;
     return new Lore(p);
   }
 

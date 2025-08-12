@@ -32,4 +32,22 @@ export class LoreDrizzleRepository {
   async delete(id: number) {
     await db.delete(schema.lores).where(eq(schema.lores.id, id));
   }
+  async update(
+    id: number,
+    data: {
+      title?: string;
+      category?: 'history' | 'culture' | 'tech' | 'biology' | 'myth' | null;
+      content?: string | null;
+    },
+  ) {
+    await db
+      .update(schema.lores)
+      .set({
+        ...(data.title !== undefined ? { title: data.title } : {}),
+        ...(data.category !== undefined ? { category: data.category } : {}),
+        ...(data.content !== undefined ? { content: data.content } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.lores.id, id));
+  }
 }

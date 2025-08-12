@@ -5,6 +5,7 @@ export interface CityProps {
   description?: string | null;
   discovered?: boolean;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 export class City {
   private constructor(readonly props: CityProps) {}

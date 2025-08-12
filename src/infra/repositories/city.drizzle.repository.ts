@@ -31,4 +31,11 @@ export class CityDrizzleRepository {
   async delete(id: number) {
     await db.delete(schema.cities).where(eq(schema.cities.id, id));
   }
+
+  async setWorld(cityId: number, worldId: number | null) {
+    await db
+      .update(schema.cities)
+      .set({ worldId, updatedAt: new Date() })
+      .where(eq(schema.cities.id, cityId));
+  }
 }

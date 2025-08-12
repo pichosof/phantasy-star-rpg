@@ -1,3 +1,5 @@
+import { eq } from 'drizzle-orm';
+
 import { Player } from '../../core/entities/player.js';
 import type { IPlayerRepository } from '../../core/repositories/player.repository.js';
 import { db, schema } from '../db/index.js';
@@ -18,5 +20,16 @@ export class PlayerDrizzleRepository implements IPlayerRepository {
   async list(): Promise<Player[]> {
     const rows = await db.select().from(schema.players).orderBy(schema.players.id);
     return rows.map((r) => Player.rehydrate(r));
+  }
+  async update(id: number, data: { name?: string; level?: number; background?: string | null }) {
+    await db
+      .update(schema.players)
+      .set({
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.level !== undefined ? { level: data.level } : {}),
+        ...(data.background !== undefined ? { background: data.background } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.players.id, id));
   }
 }

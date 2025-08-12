@@ -29,6 +29,27 @@
       "when": 1754880760393,
       "tag": "0003_parched_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1754934085934,
+      "tag": "0004_parallel_bloodaxe",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1754959156128,
+      "tag": "0005_productive_husk",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1754960357211,
+      "tag": "0006_secret_nightshade",
+      "breakpoints": true
     }
   ]
 }

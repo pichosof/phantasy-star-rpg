@@ -1,4 +1,3 @@
-// src/infra/http/schemas.ts
 import { z } from 'zod';
 
 export const PlayerModel = z.object({
