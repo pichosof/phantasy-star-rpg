@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 
 import { NpcController } from '../controllers/npc.controller.js';
-
+type IdParams = { id: string };
+type VisibilityBody = { visible: boolean };
 export async function npcRoutes(app: FastifyInstance) {
   const ctrl = new NpcController();
 
@@ -16,7 +17,24 @@ export async function npcRoutes(app: FastifyInstance) {
     },
     ctrl.list.bind(ctrl),
   );
-
+app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/npcs/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['NPCs'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    ctrl.setVisibility.bind(ctrl),
+  );
   // POST protegido
   app.post(
     '/api/npcs',

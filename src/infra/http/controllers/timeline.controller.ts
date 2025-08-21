@@ -11,6 +11,7 @@ export class TimelineController {
     const res = await container.resolve('createTimelineEvent').execute(req.body);
     return reply.code(201).send(res);
   }
+  
   async delete(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     await container.resolve('deleteTimelineEvent').execute({ id: Number(req.params.id) });
     return reply.code(204).send();

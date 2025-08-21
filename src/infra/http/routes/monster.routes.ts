@@ -2,7 +2,8 @@
 import type { FastifyInstance } from 'fastify';
 
 import { MonsterController } from '../controllers/monster.controller.js';
-
+type IdParams = { id: string };
+type VisibilityBody = { visible: boolean };
 export async function monsterRoutes(app: FastifyInstance) {
   const c = new MonsterController();
 
@@ -19,7 +20,24 @@ export async function monsterRoutes(app: FastifyInstance) {
     },
     c.list.bind(c),
   );
-
+app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/bestiary/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['Bestiary'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setVisibility.bind(c),
+  );
   // POST protegido (criar monstro)
   app.post(
     '/api/bestiary',

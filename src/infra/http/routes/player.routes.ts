@@ -1,6 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 
 import { PlayerController } from '../controllers/player.controller';
+type IdParams = { id: string };
+type VisibilityBody = { visible: boolean };
 
 export async function playerRoutes(app: FastifyInstance) {
   const ctrl = new PlayerController();
@@ -51,7 +53,24 @@ export async function playerRoutes(app: FastifyInstance) {
     }),
     ctrl.create.bind(ctrl),
   );
-
+ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/players/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['Players'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    ctrl.setVisibility.bind(ctrl),
+  );
   // PATCH imagem do player
   app.patch(
     '/api/players/:id/image',

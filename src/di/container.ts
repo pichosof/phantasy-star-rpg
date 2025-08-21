@@ -10,6 +10,7 @@ import { ListCities } from '../core/use-cases/cities/list-cities';
 import { RemoveCityFromWorld } from '../core/use-cases/cities/remove-city-from-world';
 import { SetCityDiscovered } from '../core/use-cases/cities/set-city-discovered';
 import { UpdateCity } from '../core/use-cases/cities/update-city';
+import { SetVisibility } from '../core/use-cases/common/set-visibility';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
 import { DeleteLore } from '../core/use-cases/lore/delete-lore';
 import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
@@ -60,8 +61,6 @@ import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repo
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
 import { WorldDrizzleRepository } from '../infra/repositories/world.drizzle.repository';
-
-import { SetVisibility } from '../core/use-cases/common/set-visibility';
 
 
 // ----- Tipos do container

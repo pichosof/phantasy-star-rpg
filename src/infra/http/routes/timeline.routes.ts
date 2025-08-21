@@ -1,7 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 
 import { TimelineController } from '../controllers/timeline.controller.js';
-
 export async function timelineRoutes(app: FastifyInstance) {
   const c = new TimelineController();
 

@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 
 import { WorldController } from '../controllers/world.controller';
-
+type IdParams = { id: string };
+type VisibilityBody = { visible: boolean };
 export async function worldRoutes(app: FastifyInstance) {
   const c = new WorldController();
 
@@ -17,7 +18,24 @@ export async function worldRoutes(app: FastifyInstance) {
     },
     c.list.bind(c),
   );
-
+app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/worlds/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['Worlds'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setVisibility.bind(c),
+  );
   app.post(
     '/api/worlds',
     app.withGM({

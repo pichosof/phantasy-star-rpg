@@ -20,6 +20,20 @@ export class MonsterController {
       .execute({ id: Number(req.params.id), discovered: req.body.discovered });
     return reply.code(204).send();
   }
+  async setVisibility(
+  req: FastifyRequest<{ Params: { id: string }; Body: { visible: boolean } }>,
+  reply: FastifyReply
+) {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+  const { visible } = req.body;
+  if (typeof visible !== 'boolean') return reply.code(400).send({ error: 'Invalid visible flag' });
+
+  // Trocar a key pelo domínio correto:
+  // players -> 'setPlayerVisibility', quests -> 'setQuestVisibility', etc.
+  await container.resolve('setMonsterVisibility').execute(id, visible);
+  return reply.code(204).send();
+}
   async updateImage(
     req: FastifyRequest<{
       Params: { id: string };

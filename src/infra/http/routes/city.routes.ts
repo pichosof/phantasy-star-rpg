@@ -2,6 +2,9 @@ import type { FastifyInstance } from 'fastify';
 
 import { CityController } from '../controllers/city.controller';
 
+type IdParams = { id: string };
+type VisibilityBody = { visible: boolean };
+
 export async function cityRoutes(app: FastifyInstance) {
   const c = new CityController();
 
@@ -17,6 +20,24 @@ export async function cityRoutes(app: FastifyInstance) {
     c.list.bind(c),
   );
 
+  app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/cities/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setVisibility.bind(c),
+  );
   // POST protegido
   app.post(
     '/api/cities',

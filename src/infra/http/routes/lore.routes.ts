@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 
 import { LoreController } from '../controllers/lore.controller';
-
+type IdParams = { id: string };
+type VisibilityBody = { visible: boolean };
 export async function loreRoutes(app: FastifyInstance) {
   const c = new LoreController();
 
@@ -18,7 +19,24 @@ export async function loreRoutes(app: FastifyInstance) {
     },
     c.list.bind(c),
   );
-
+app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/lores/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['Lore'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setVisibility.bind(c),
+  );
   // POST protegido (GM)
   app.post(
     '/api/lores',

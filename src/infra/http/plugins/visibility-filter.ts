@@ -1,4 +1,5 @@
-import type { FastifyInstance } from 'fastify';
+// src/infra/http/plugins/visibility-filter.ts
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
 function hasVisible(x: unknown): x is { visible?: boolean } {
@@ -6,13 +7,15 @@ function hasVisible(x: unknown): x is { visible?: boolean } {
 }
 
 export default fp(async (app: FastifyInstance) => {
-  app.addHook('preSerialization', (_req, _reply, payload, done) => {
-    // Tipagem do Fastify é ampla (unknown) aqui; tratamos só o caso de lista.
-    const req: any = _req; // leitura de isGM (decorated) sem afetar os tipos de payload
-    if (_req.method === 'GET' && !req.isGM && Array.isArray(payload)) {
-      const filtered = payload.filter((item) => !hasVisible(item) || item.visible !== false);
-      return done(null, filtered);
+  app.addHook(
+    'preSerialization',
+    async (req: FastifyRequest, _reply: FastifyReply, payload: unknown) => {
+      // Só filtra GET para não-GM e quando o payload é array
+      if (req.method === 'GET' && !req.isGM && Array.isArray(payload)) {
+        const filtered = payload.filter((item) => !hasVisible(item) || item.visible !== false);
+        return filtered; 
+      }
+      return payload;
     }
-    return done(null, payload);
-  });
+  );
 });
