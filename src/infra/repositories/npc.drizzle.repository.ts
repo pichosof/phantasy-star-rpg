@@ -32,7 +32,11 @@ export class NpcDrizzleRepository {
   async delete(id: number) {
     await db.delete(schema.npcs).where(eq(schema.npcs.id, id));
   }
-
+async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.npcs)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.npcs.id, id));
+  }
   async updateImage(id: number, img: { url: string; alt?: string; mime?: string; size?: number }) {
     await db
       .update(schema.npcs)

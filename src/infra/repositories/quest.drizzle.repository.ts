@@ -24,6 +24,11 @@ export class QuestDrizzleRepository implements IQuestRepository {
   async complete(id: number): Promise<void> {
     await db.update(schema.quests).set({ status: 'completed' }).where(eq(schema.quests.id, id));
   }
+  async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.quests)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.quests.id, id));
+  }
   async update(
     id: number,
     data: {

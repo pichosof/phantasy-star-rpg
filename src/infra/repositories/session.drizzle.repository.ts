@@ -26,7 +26,11 @@ export class SessionDrizzleRepository {
   async delete(id: number) {
     await db.delete(schema.sessions).where(eq(schema.sessions.id, id));
   }
-
+  async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.sessions)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.sessions.id, id));
+  }
   async update(
     id: number,
     data: { title?: string; date?: Date | string; summary?: string | null },

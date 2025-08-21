@@ -61,6 +61,9 @@ import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
 import { WorldDrizzleRepository } from '../infra/repositories/world.drizzle.repository';
 
+import { SetVisibility } from '../core/use-cases/common/set-visibility';
+
+
 // ----- Tipos do container
 export type Registry = {
   // Player
@@ -70,6 +73,7 @@ export type Registry = {
   updatePlayer: UpdatePlayer;
   updatePlayerImage: UpdatePlayerImage;
   updatePlayerSheet: UpdatePlayerSheet;
+  setPlayerVisibility: SetVisibility;
 
   // Quest
   questRepo: QuestDrizzleRepository;
@@ -85,6 +89,7 @@ export type Registry = {
   deleteNpc: DeleteNpc;
   updateNpcImage: UpdateNpcImage;
   updateNpc: UpdateNpc;
+  setNpcVisibility: SetVisibility;
 
   // Sessions
   sessionRepo: SessionDrizzleRepository;
@@ -99,6 +104,7 @@ export type Registry = {
   listLores: ListLores;
   deleteLore: DeleteLore;
   updateLore: UpdateLore;
+  setLoreVisibility: SetVisibility;
 
   // Cities
   cityRepo: CityDrizzleRepository;
@@ -107,6 +113,7 @@ export type Registry = {
   setCityDiscovered: SetCityDiscovered;
   deleteCity: DeleteCity;
   updateCity: UpdateCity;
+  setCityVisibility: SetVisibility;
 
   // Bestiary
   monsterRepo: MonsterDrizzleRepository;
@@ -115,6 +122,7 @@ export type Registry = {
   setMonsterDiscovered: SetMonsterDiscovered;
   updateMonsterImage: UpdateMonsterImage;
   deleteMonster: DeleteMonster;
+  setMonsterVisibility: SetVisibility;
 
   // Map Markers
   mapMarkerRepo: MapMarkerDrizzleRepository;
@@ -122,12 +130,14 @@ export type Registry = {
   listMapMarkers: ListMapMarkers;
   setMapMarkerDiscovered: SetMapMarkerDiscovered;
   deleteMapMarker: DeleteMapMarker;
+  setMapMarkerVisibility: SetVisibility;
 
   // Timeline
   timelineRepo: TimelineDrizzleRepository;
   createTimelineEvent: CreateTimelineEvent;
   listTimelineEvents: ListTimelineEvents;
   deleteTimelineEvent: DeleteTimelineEvent;
+  setTimelineVisibility: SetVisibility;
 
   // Worlds
   worldRepo: WorldDrizzleRepository;
@@ -135,6 +145,7 @@ export type Registry = {
   listWorlds: ListWorlds;
   updateWorldImage: UpdateWorldImage;
   updateWorld: UpdateWorld;
+  setWorldVisibility: SetVisibility;
 
   // Links Pivots
   linksRepo: LinksDrizzleRepository;
@@ -161,6 +172,7 @@ class Container {
     updatePlayer: (c) => new UpdatePlayer(c.resolve('playerRepo')),
     updatePlayerImage: (c) => new UpdatePlayerImage(c.resolve('playerRepo')),
     updatePlayerSheet: (c) => new UpdatePlayerSheet(c.resolve('playerRepo')),
+    setPlayerVisibility: (c) => new SetVisibility(c.resolve('playerRepo')),
 
     // Quest
     questRepo: () => new QuestDrizzleRepository(),
@@ -176,6 +188,7 @@ class Container {
     deleteNpc: (c) => new DeleteNpc(c.resolve('npcRepo')),
     updateNpcImage: (c) => new UpdateNpcImage(c.resolve('npcRepo')),
     updateNpc: (c) => new UpdateNpc(c.resolve('npcRepo')),
+    setNpcVisibility: (c) => new SetVisibility(c.resolve('npcRepo')),
 
     // Sessions
     sessionRepo: () => new SessionDrizzleRepository(),
@@ -190,6 +203,7 @@ class Container {
     listLores: (c) => new ListLores(c.resolve('loreRepo')),
     deleteLore: (c) => new DeleteLore(c.resolve('loreRepo')),
     updateLore: (c) => new UpdateLore(c.resolve('loreRepo')),
+    setLoreVisibility: (c) => new SetVisibility(c.resolve('loreRepo')),
 
     // Cities
     cityRepo: () => new CityDrizzleRepository(),
@@ -198,6 +212,7 @@ class Container {
     setCityDiscovered: (c) => new SetCityDiscovered(c.resolve('cityRepo')),
     deleteCity: (c) => new DeleteCity(c.resolve('cityRepo')),
     updateCity: (c) => new UpdateCity(c.resolve('cityRepo')),
+    setCityVisibility: (c) => new SetVisibility(c.resolve('cityRepo')),
 
     // Bestiary
     monsterRepo: () => new MonsterDrizzleRepository(),
@@ -206,6 +221,7 @@ class Container {
     setMonsterDiscovered: (c) => new SetMonsterDiscovered(c.resolve('monsterRepo')),
     updateMonsterImage: (c) => new UpdateMonsterImage(c.resolve('monsterRepo')),
     deleteMonster: (c) => new DeleteMonster(c.resolve('monsterRepo')),
+    setMonsterVisibility: (c) => new SetVisibility(c.resolve('monsterRepo')),
 
     // Map Markers
     mapMarkerRepo: () => new MapMarkerDrizzleRepository(),
@@ -213,12 +229,14 @@ class Container {
     listMapMarkers: (c) => new ListMapMarkers(c.resolve('mapMarkerRepo')),
     setMapMarkerDiscovered: (c) => new SetMapMarkerDiscovered(c.resolve('mapMarkerRepo')),
     deleteMapMarker: (c) => new DeleteMapMarker(c.resolve('mapMarkerRepo')),
+    setMapMarkerVisibility: (c) => new SetVisibility(c.resolve('mapMarkerRepo')),
 
     // Timeline
     timelineRepo: () => new TimelineDrizzleRepository(),
     createTimelineEvent: (c) => new CreateTimelineEvent(c.resolve('timelineRepo')),
     listTimelineEvents: (c) => new ListTimelineEvents(c.resolve('timelineRepo')),
     deleteTimelineEvent: (c) => new DeleteTimelineEvent(c.resolve('timelineRepo')),
+    setTimelineVisibility: (c) => new SetVisibility(c.resolve('timelineRepo')),
 
     // World
     worldRepo: () => new WorldDrizzleRepository(),
@@ -226,6 +244,7 @@ class Container {
     listWorlds: (c) => new ListWorlds(c.resolve('worldRepo')),
     updateWorldImage: (c) => new UpdateWorldImage(c.resolve('worldRepo')),
     updateWorld: (c) => new UpdateWorld(c.resolve('worldRepo')),
+    setWorldVisibility: (c) => new SetVisibility(c.resolve('worldRepo' /* CORRIGE: 'worldRepo' se tiver */)),
 
     // Links
     linksRepo: () => new LinksDrizzleRepository(),

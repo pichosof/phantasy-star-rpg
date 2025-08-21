@@ -48,7 +48,11 @@ export class MonsterDrizzleRepository {
       })
       .where(eq(schema.bestiary.id, id));
   }
-
+async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.bestiary)
+      .set({ visible })
+      .where(eq(schema.bestiary.id, id));
+  }
   async delete(id: number) {
     await db.delete(schema.bestiary).where(eq(schema.bestiary.id, id));
   }

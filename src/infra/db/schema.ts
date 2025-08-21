@@ -19,6 +19,8 @@ export const players = sqliteTable('players', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 export const questStatus = ['active', 'completed', 'failed'] as const;
@@ -36,6 +38,8 @@ export const quests = sqliteTable('quests', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 export const npcs = sqliteTable('npcs', {
@@ -54,6 +58,8 @@ export const npcs = sqliteTable('npcs', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 // Sessions (resumo de cada sessão)
@@ -68,6 +74,8 @@ export const sessions = sqliteTable('sessions', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 // Lore (enciclopédia do mundo)
@@ -85,6 +93,8 @@ export const lores = sqliteTable('lores', {
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
     .default(sql`(unixepoch('now'))`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 // Cidades
@@ -102,6 +112,8 @@ export const cities = sqliteTable('cities', {
     .notNull()
     .default(sql`(unixepoch('now'))`),
   worldId: integer('world_id').references(() => worlds.id, { onDelete: 'set null' }),
+    visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 // Bestiário (monstros/inimigos)
@@ -120,6 +132,8 @@ export const bestiary = sqliteTable('bestiary', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 // Mapa Interativo (pontos marcados)
@@ -136,6 +150,8 @@ export const mapMarkers = sqliteTable('map_markers', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 // Linha do Tempo
@@ -147,6 +163,8 @@ export const timelineEvents = sqliteTable('timeline_events', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 export const worlds = sqliteTable('worlds', {
@@ -164,6 +182,8 @@ export const worlds = sqliteTable('worlds', {
   updatedAt: integer('updated_at', { mode: 'timestamp' })
     .notNull()
     .default(sql`(unixepoch('now'))`),
+      visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+
 });
 
 export const playerQuests = sqliteTable(

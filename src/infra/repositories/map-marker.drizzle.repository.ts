@@ -40,7 +40,11 @@ export class MapMarkerDrizzleRepository {
       .set({ discovered: discovered })
       .where(eq(schema.mapMarkers.id, id));
   }
-
+async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.mapMarkers)
+      .set({ visible })
+      .where(eq(schema.mapMarkers.id, id));
+  }
   async delete(id: number) {
     await db.delete(schema.mapMarkers).where(eq(schema.mapMarkers.id, id));
   }

@@ -10,6 +10,7 @@ import { env } from '../config/env';
 import { authPlugin } from './plugins/auth';
 import { errorHandlerPlugin } from './plugins/error-handler';
 import swaggerPlugin from './plugins/swagger';
+import visibilityFilterPlugin from './plugins/visibility-filter';
 import { cityWorldRoutes } from './routes/city-world.routes';
 import { cityRoutes } from './routes/city.routes';
 import { loreCityRoutes } from './routes/lore-city.routes';
@@ -53,6 +54,7 @@ export async function buildServer() {
 
   app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
   await app.register(authPlugin);
+  await app.register(visibilityFilterPlugin); 
   if (process.env.NODE_ENV !== 'production') {
     await app.register(swaggerPlugin);
   }
@@ -78,3 +80,5 @@ export async function buildServer() {
 
   return app;
 }
+
+

@@ -18,6 +18,11 @@ export class CityDrizzleRepository {
       .returning();
     return map(r);
   }
+  async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.cities)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.cities.id, id));
+  }
 
   async list() {
     const rows = await db.select().from(schema.cities).orderBy(schema.cities.id);

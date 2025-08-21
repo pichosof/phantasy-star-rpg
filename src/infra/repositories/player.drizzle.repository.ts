@@ -32,7 +32,11 @@ export class PlayerDrizzleRepository implements IPlayerRepository {
       })
       .where(eq(schema.players.id, id));
   }
-
+async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.players)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.players.id, id));
+  }
   async updateImage(
     id: number,
     data: { url: string; alt?: string | null; mime?: string | null; size?: number | null },

@@ -50,7 +50,11 @@ export class WorldDrizzleRepository {
       })
       .where(eq(schema.worlds.id, id));
   }
-
+  async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.worlds)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.worlds.id, id));
+  }
   async update(id: number, data: { name?: string; description?: string | null }) {
     await db
       .update(schema.worlds)

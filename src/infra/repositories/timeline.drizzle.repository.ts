@@ -17,7 +17,11 @@ export class TimelineDrizzleRepository {
       .returning();
     return map(r);
   }
-
+  async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.timelineEvents)
+      .set({ visible })
+      .where(eq(schema.timelineEvents.id, id));
+  }
   async list() {
     const rows = await db.select().from(schema.timelineEvents).orderBy(schema.timelineEvents.id);
     return rows.map(map);
