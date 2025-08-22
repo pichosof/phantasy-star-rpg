@@ -14,12 +14,18 @@ export class PlayerDrizzleRepository implements IPlayerRepository {
         background: player['background'] ?? null,
       })
       .returning();
-    return Player.rehydrate(row);
+    return Player.rehydrate({
+      ...row,
+      sheetSize: row.sheetSize !== null && row.sheetSize !== undefined ? String(row.sheetSize) : row.sheetSize,
+    });
   }
-
+    
   async list(): Promise<Player[]> {
     const rows = await db.select().from(schema.players).orderBy(schema.players.id);
-    return rows.map((r) => Player.rehydrate(r));
+    return rows.map((r) => Player.rehydrate({
+      ...r,
+      sheetSize: r.sheetSize !== null && r.sheetSize !== undefined ? String(r.sheetSize) : r.sheetSize,
+    }));
   }
   async update(id: number, data: { name?: string; level?: number; background?: string | null }) {
     await db
