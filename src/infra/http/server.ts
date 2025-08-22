@@ -42,7 +42,11 @@ export async function buildServer() {
         },
   });
 
-  await app.register(cors, { origin: env.CORS_ORIGIN || '*' });
+  await app.register(cors, {
+    origin: env.CORS_ORIGIN || '*',
+    allowedHeaders: ['content-type', 'x-api-key', 'x-image-alt'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  });
   await app.register(multipart, {
     limits: { fileSize: Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024 },
   });
@@ -54,7 +58,7 @@ export async function buildServer() {
 
   app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
   await app.register(authPlugin);
-  await app.register(visibilityFilterPlugin); 
+  await app.register(visibilityFilterPlugin);
   if (process.env.NODE_ENV !== 'production') {
     await app.register(swaggerPlugin);
   }
@@ -80,5 +84,3 @@ export async function buildServer() {
 
   return app;
 }
-
-

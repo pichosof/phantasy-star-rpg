@@ -33,20 +33,21 @@ export class PlayerController {
     const result = await uc.execute(parsed.data);
     return reply.code(201).send(result);
   }
-async setVisibility(
-  req: FastifyRequest<{ Params: { id: string }; Body: { visible: boolean } }>,
-  reply: FastifyReply
-) {
-  const id = Number(req.params.id);
-  if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
-  const { visible } = req.body;
-  if (typeof visible !== 'boolean') return reply.code(400).send({ error: 'Invalid visible flag' });
+  async setVisibility(
+    req: FastifyRequest<{ Params: { id: string }; Body: { visible: boolean } }>,
+    reply: FastifyReply,
+  ) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+    const { visible } = req.body;
+    if (typeof visible !== 'boolean')
+      return reply.code(400).send({ error: 'Invalid visible flag' });
 
-  // Trocar a key pelo domínio correto:
-  // players -> 'setPlayerVisibility', quests -> 'setQuestVisibility', etc.
-  await container.resolve('setPlayerVisibility').execute(id, visible);
-  return reply.code(204).send();
-}
+    // Trocar a key pelo domínio correto:
+    // players -> 'setPlayerVisibility', quests -> 'setQuestVisibility', etc.
+    await container.resolve('setPlayerVisibility').execute(id, visible);
+    return reply.code(204).send();
+  }
   async updateImage(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) {
@@ -56,7 +57,7 @@ async setVisibility(
     const part = await req.file();
     if (!part) return reply.code(400).send({ error: 'Missing file "image"' });
 
-    const allowed = ['image/png', 'image/jpeg', 'image/webp'] as const;
+    const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] as const;
     const mime = part.mimetype || 'application/octet-stream';
     if (!allowed.includes(mime as (typeof allowed)[number])) {
       return reply.code(400).send({ error: 'Unsupported file type' });
