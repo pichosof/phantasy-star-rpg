@@ -1,8 +1,12 @@
 import type { z } from 'zod';
+import { z as zod } from 'zod';
 
 import { createCityInput } from './create-city';
 
-export const updateCityInput = createCityInput.partial();
+// antes: export const updateCityInput = createCityInput.partial();
+export const updateCityInput = createCityInput.partial().extend({
+  coordinates: zod.string().nullable().optional(),
+});
 
 export class UpdateCity {
   constructor(
