@@ -50,7 +50,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           properties: {
             title: { type: 'string' },
             category: { enum: ['history', 'culture', 'tech', 'biology', 'myth', null] },
-            content: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            content: { anyOf: [{ type: 'string' }, { type: 'null' }] }, 
           },
           additionalProperties: false,
         },

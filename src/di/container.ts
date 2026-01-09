@@ -17,6 +17,7 @@ import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
 import { ListLores } from '../core/use-cases/lore/list-lores';
 import { UnlinkLoreFromCity } from '../core/use-cases/lore/unlink-lore-from-city';
 import { UpdateLore } from '../core/use-cases/lore/update-lore';
+import { ListLoresByCityId } from '../core/use-cases/cities/list-lores-by-city-id';
 import { CreateMapMarker } from '../core/use-cases/map-marker/create-map-marker';
 import { DeleteMapMarker } from '../core/use-cases/map-marker/delete-map-marker';
 import { ListMapMarkers } from '../core/use-cases/map-marker/list-map-markers';
@@ -39,6 +40,7 @@ import { LinkQuestToCity } from '../core/use-cases/quest/link-quest-to-city';
 import { ListQuests } from '../core/use-cases/quest/list-quests';
 import { UnlinkQuestFromCity } from '../core/use-cases/quest/unlink-quest-from-city';
 import { UpdateQuest } from '../core/use-cases/quest/update-quest';
+import { ListQuestsByCityId } from '../core/use-cases/cities/list-quests-by-city-id';
 import { CreateSession } from '../core/use-cases/session/create-session';
 import { DeleteSession } from '../core/use-cases/session/delete-session';
 import { ListSessions } from '../core/use-cases/session/list-sessions';
@@ -156,6 +158,10 @@ export type Registry = {
   unlinkQuestFromCity: UnlinkQuestFromCity;
   linkLoreToCity: LinkLoreToCity;
   unlinkLoreFromCity: UnlinkLoreFromCity;
+
+  // List Pivots
+  listLoresByCityId: ListLoresByCityId;
+  listQuestsByCityId: ListQuestsByCityId;
 };
 
 class Container {
@@ -259,6 +265,10 @@ class Container {
 
     linkLoreToCity: (c) => new LinkLoreToCity(c.resolve('linksRepo')),
     unlinkLoreFromCity: (c) => new UnlinkLoreFromCity(c.resolve('linksRepo')),
+
+    //list
+    listLoresByCityId: (c) => new ListLoresByCityId(c.resolve('linksRepo')),
+    listQuestsByCityId: (c) => new ListQuestsByCityId(c.resolve('linksRepo')),
   };
 
   resolve<K extends keyof Registry>(key: K): Registry[K] {

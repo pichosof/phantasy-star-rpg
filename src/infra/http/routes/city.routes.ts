@@ -1,6 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 
 import { CityController } from '../controllers/city.controller';
+import { CityLinksController } from '../controllers/city-links.controller';
+
 
 type IdParams = { id: string };
 type VisibilityBody = { visible: boolean };
@@ -125,4 +127,19 @@ export async function cityRoutes(app: FastifyInstance) {
     }),
     c.delete.bind(c),
   );
+
+const linksController = new CityLinksController();
+
+app.get('/api/cities/:id/lores',     {
+      schema: {
+        tags: ['Cities'],
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    }, linksController.listLoresByCityId);
+app.get('/api/cities/:id/quests', {
+      schema: {
+        tags: ['Cities'],
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    }, linksController.listQuestsByCityId);
 }

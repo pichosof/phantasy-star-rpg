@@ -7,6 +7,7 @@ const map = (r: Row) =>
   Lore.rehydrate({
     id: r.id,
     title: r.title,
+    visible: r.visible,
     category: r.category ?? null,
     content: r.content ?? null,
     createdAt: r.createdAt,
@@ -19,6 +20,7 @@ export class LoreDrizzleRepository {
         title: l.props.title,
         category: l.props.category,
         content: l.props.content ?? null,
+        visible: l.props.visible ?? true,
       })
       .returning();
     return map(r);

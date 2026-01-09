@@ -3,6 +3,7 @@ import type { LoreCategory } from '../../infra/db/schema';
 export interface LoreProps {
   id?: number;
   title: string;
+  visible?: boolean| null;
   category?: LoreCategory | null; // <-- aceita null
   content?: string | null;
   createdAt?: Date;
