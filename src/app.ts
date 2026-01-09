@@ -1,9 +1,12 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
 import { env } from './infra/config/env.js';
 import { buildServer } from './infra/http/server.js';
 
-fs.mkdirSync('uploads', { recursive: true });
+// keep data/ structure stable for sqlite + static files
+fs.mkdirSync('data', { recursive: true });
+fs.mkdirSync(path.resolve('data', 'uploads'), { recursive: true });
 
 async function main() {
   const app = await buildServer();

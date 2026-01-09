@@ -19,8 +19,15 @@ declare module 'fastify' {
 
 export const authPlugin = fp(async (app: FastifyInstance) => {
   const gmKey = process.env.GM_API_KEY;
+  const isProd = process.env.NODE_ENV === 'production';
+
+  if (!gmKey && isProd) {
+    throw new Error('GM_API_KEY is required in production');
+  }
   if (!gmKey) {
-    app.log.warn('GM_API_KEY não configurada — rotas mutáveis ficarão inseguras!');
+    app.log.warn(
+      'GM_API_KEY não configurada — rotas protegidas por GM ficarão indisponíveis (401).',
+    );
   }
 
   app.decorateRequest('isGM', false);

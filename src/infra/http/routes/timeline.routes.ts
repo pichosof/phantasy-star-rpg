@@ -25,12 +25,15 @@ export async function timelineRoutes(app: FastifyInstance) {
         security: [{ ApiKeyAuth: [] }],
         body: {
           type: 'object',
-          required: ['title', 'occurredAt'],
           properties: {
             title: { type: 'string' },
-            occurredAt: { type: 'string' }, // ISO date string
+            // canonical
+            date: { type: 'string' }, // ISO date string (YYYY-MM-DD or full ISO)
+            // legacy / semantic
+            occurredAt: { type: 'string' },
             description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
           },
+          anyOf: [{ required: ['title', 'date'] }, { required: ['title', 'occurredAt'] }],
           additionalProperties: false,
         },
         response: { 201: { type: 'object', additionalProperties: true } },
