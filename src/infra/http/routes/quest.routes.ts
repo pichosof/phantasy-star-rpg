@@ -6,17 +6,16 @@ export async function questRoutes(app: FastifyInstance) {
   const ctrl = new QuestController();
 
   app.get(
-    '/api/quests',
-    {
-      schema: {
-        tags: ['Quests'],
-        response: {
-          200: { type: 'array', items: { type: 'object', additionalProperties: true } },
-        },
-      },
+  '/api/quests',
+  app.withGM({
+    schema: {
+      tags: ['Quests'],
+      security: [{ ApiKeyAuth: [] }],
+      response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
     },
-    ctrl.list.bind(ctrl),
-  );
+  }),
+  ctrl.list.bind(ctrl),
+);
 
   app.post(
     '/api/quests',

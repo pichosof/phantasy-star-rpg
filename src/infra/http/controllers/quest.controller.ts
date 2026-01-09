@@ -10,9 +10,16 @@ type UpdateBody = z.infer<typeof updateQuestInput>;
 type IdParams = { id: string };
 
 export class QuestController {
-  async list(_req: FastifyRequest, reply: FastifyReply) {
+  private isGM(req: FastifyRequest) {
+  const gmKey = (process.env.GM_API_KEY ?? '').trim();
+  const apiKey = String(req.headers['x-api-key'] ?? '').trim();
+  return Boolean(gmKey && apiKey && apiKey === gmKey);
+}
+
+
+  async list(req: FastifyRequest, reply: FastifyReply) {
     const uc = container.resolve('listQuests');
-    const items = await uc.execute();
+    const items = await uc.execute({ includeHidden: this.isGM(req) });
     return reply.send(items);
   }
 

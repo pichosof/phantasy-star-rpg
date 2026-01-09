@@ -1,34 +1,45 @@
-import { eq } from 'drizzle-orm';
+import { eq, or, isNull } from 'drizzle-orm';
 
 import { Quest } from '../../core/entities/quest.js';
-import type { IQuestRepository } from '../../core/repositories/quest.repository.js';
 import { db, schema } from '../db/index.js';
 
-export class QuestDrizzleRepository implements IQuestRepository {
+export class QuestDrizzleRepository {
   async create(quest: Quest): Promise<Quest> {
     const [row] = await db
       .insert(schema.quests)
       .values({
-        title: quest['title'],
-        status: quest['status'],
-        description: quest['description'] ?? null,
-        reward: quest['reward'] ?? null,
+        title: quest.title,
+        status: quest.status,
+        description: quest.description,
+        reward: quest.reward,
+        visible: quest.visible, // ✅ persist
       })
       .returning();
-    return Quest.rehydrate(row);
+
+    return Quest.rehydrate({
+      ...row,
+      visible: (row as any).visible ?? true,
+    });
   }
-  async list(): Promise<Quest[]> {
+
+  async list() {
     const rows = await db.select().from(schema.quests).orderBy(schema.quests.id);
-    return rows.map((r) => Quest.rehydrate(r));
+    return rows.map((r) =>
+      Quest.rehydrate({
+        ...r,
+        visible: (r as any).visible ?? true,
+      }),
+    );
   }
+
   async complete(id: number): Promise<void> {
     await db.update(schema.quests).set({ status: 'completed' }).where(eq(schema.quests.id, id));
   }
+
   async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.quests)
-      .set({ visible, updatedAt: new Date() })
-      .where(eq(schema.quests.id, id));
+    await db.update(schema.quests).set({ visible, updatedAt: new Date() }).where(eq(schema.quests.id, id));
   }
+
   async update(
     id: number,
     data: {

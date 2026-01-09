@@ -130,16 +130,42 @@ export async function cityRoutes(app: FastifyInstance) {
 
 const linksController = new CityLinksController();
 
-app.get('/api/cities/:id/lores',     {
+  app.get('/api/cities/:id/lores',     {
       schema: {
         tags: ['Cities'],
         response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
       },
     }, linksController.listLoresByCityId);
-app.get('/api/cities/:id/quests', {
+  app.get('/api/cities/:id/quests', {
       schema: {
         tags: ['Cities'],
         response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
       },
     }, linksController.listQuestsByCityId);
+    app.get(
+    '/api/gm/cities/:id/quests',
+      app.withGM({
+        schema: {
+          tags: ['Cities', 'GM'],
+          security: [{ ApiKeyAuth: [] }],
+          params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+          response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+        },
+      }),
+      linksController.listQuestsByCityId,
+    );
+
+  app.get(
+    '/api/gm/cities/:id/lores',
+    app.withGM({
+      schema: {
+        tags: ['Cities', 'GM'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    }),
+    linksController.listLoresByCityId,
+  );
 }
+

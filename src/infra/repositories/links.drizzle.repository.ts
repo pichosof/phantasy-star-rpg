@@ -21,8 +21,14 @@ export class LinksDrizzleRepository {
 
   // Quest ↔ City
   async linkQuestToCity(questId: number, cityId: number) {
-    await db.insert(s.questCities).values({ questId, cityId }).onConflictDoNothing();
-  }
+  await db
+    .insert(s.questCities)
+    .values({ questId, cityId })
+    .onConflictDoNothing({
+      target: [s.questCities.questId, s.questCities.cityId],
+    });
+}
+
   async unlinkQuestFromCity(questId: number, cityId: number) {
     await db
       .delete(s.questCities)
@@ -41,22 +47,24 @@ export class LinksDrizzleRepository {
   }
 
 async listQuestsByCityId(cityId: number, opts?: { includeHidden?: boolean }) {
-  const includeHidden = Boolean(opts?.includeHidden);
+    const includeHidden = Boolean(opts?.includeHidden);
 
-  const visiblePredicate = or(isNull(s.quests.visible), eq(s.quests.visible, true));
+    const visiblePredicate = or(isNull(s.quests.visible), eq(s.quests.visible, true));
 
-  const rows = await db
-    .select({ quest: s.quests })
-    .from(s.questCities)
-    .innerJoin(s.quests, eq(s.questCities.questId, s.quests.id))
-    .where(
-      includeHidden
-        ? eq(s.questCities.cityId, cityId)
-        : and(eq(s.questCities.cityId, cityId), visiblePredicate),
-    );
-
-  return rows.map((r) => r.quest);
-}
+    const rows = await db
+      .select({ quest: s.quests })
+      .from(s.questCities)
+      .innerJoin(s.quests, eq(s.questCities.questId, s.quests.id))
+      .where(
+        includeHidden
+          ? eq(s.questCities.cityId, cityId)
+          : and(eq(s.questCities.cityId, cityId), visiblePredicate),
+      );
+      console.log("visiblePredicate:", visiblePredicate);
+    // ✅ NÃO filtra por status aqui. Completed/failed continuam vindo.
+    const rowsMap = rows.map((r) => r.quest);
+    return rowsMap;
+  }
 
 
 async listLoresByCityId(cityId: number, opts?: { includeHidden?: boolean }) {

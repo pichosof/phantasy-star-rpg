@@ -6,6 +6,7 @@ export interface QuestProps {
   status?: QuestStatus;
   description?: string | null;
   reward?: string | null;
+  visible?: boolean; // <- boolean only
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -14,8 +15,9 @@ export class Quest {
   readonly id?: number;
   readonly title: string;
   readonly status: 'active' | 'completed' | 'failed';
-  readonly description?: string | null;
-  readonly reward?: string | null;
+  readonly description: string | null;
+  readonly reward: string | null;
+  readonly visible: boolean;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 
@@ -25,10 +27,10 @@ export class Quest {
     this.status = props.status ?? 'active';
     this.description = props.description ?? null;
     this.reward = props.reward ?? null;
+    this.visible = props.visible ?? true; // default domain = true
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }
-  
 
   static create(props: Omit<QuestProps, 'id' | 'createdAt' | 'updatedAt'>) {
     if (!props.title?.trim()) throw new Error('Title is required');
