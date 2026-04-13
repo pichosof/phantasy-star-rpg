@@ -7,6 +7,8 @@ export const createSessionInput = z.object({
   title: z.string().min(1),
   date: z.string().min(1),
   summary: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  imageAlt: z.string().nullable().optional(),
 });
 export type CreateSessionInput = z.input<typeof createSessionInput>;
 

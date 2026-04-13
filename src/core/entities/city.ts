@@ -4,6 +4,13 @@ export interface CityProps {
   region?: string | null;
   description?: string | null;
   discovered?: boolean;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  imageMime?: string | null;
+  imageSize?: number | null;
+  worldId?: number | null;
+  coordinates?: string | null;
+  visible?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

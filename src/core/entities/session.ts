@@ -3,6 +3,9 @@ export interface SessionProps {
   title: string;
   date: string; // ISO ou in-game
   summary?: string | null;
+  imageUrl?: string | null;
+  imageAlt?: string | null;
+  visible?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -28,7 +31,19 @@ export class Session {
   get summary() {
     return this.props.summary;
   }
+  get imageUrl() {
+    return this.props.imageUrl;
+  }
+  get imageAlt() {
+    return this.props.imageAlt;
+  }
+  get visible() {
+    return this.props.visible;
+  }
   get createdAt() {
     return this.props.createdAt;
+  }
+  get updatedAt() {
+    return this.props.updatedAt;
   }
 }

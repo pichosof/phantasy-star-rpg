@@ -1,8 +1,10 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { createSessionInput } from './create-session';
 
-export const updateSessionInput = createSessionInput.partial();
+export const updateSessionInput = createSessionInput.partial().extend({
+  visible: z.boolean().optional(),
+});
 
 export class UpdateSession {
   constructor(

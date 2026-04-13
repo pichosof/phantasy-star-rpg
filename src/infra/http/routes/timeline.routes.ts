@@ -27,9 +27,7 @@ export async function timelineRoutes(app: FastifyInstance) {
           type: 'object',
           properties: {
             title: { type: 'string' },
-            // canonical
-            date: { type: 'string' }, // ISO date string (YYYY-MM-DD or full ISO)
-            // legacy / semantic
+            date: { type: 'string' },
             occurredAt: { type: 'string' },
             description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
           },
@@ -40,6 +38,49 @@ export async function timelineRoutes(app: FastifyInstance) {
       },
     }),
     c.create.bind(c),
+  );
+
+  // PATCH visibilidade protegido
+  app.patch(
+    '/api/timeline/:id/visibility',
+    app.withGM({
+      schema: {
+        tags: ['Timeline'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setVisibility.bind(c),
+  );
+
+  // PATCH edição protegido
+  app.patch(
+    '/api/timeline/:id',
+    app.withGM({
+      schema: {
+        tags: ['Timeline'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            date: { type: 'string' },
+            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.update.bind(c),
   );
 
   // DELETE protegido

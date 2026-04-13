@@ -36,4 +36,14 @@ export class SessionController {
     await container.resolve('deleteSession').execute({ id: Number(req.params.id) });
     return reply.code(204).send();
   }
+
+  async setVisibility(
+    req: FastifyRequest<{ Params: { id: string }; Body: { visible: boolean } }>,
+    reply: FastifyReply,
+  ) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+    await container.resolve('setSessionVisibility').execute(id, req.body.visible);
+    return reply.code(204).send();
+  }
 }

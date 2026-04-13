@@ -7,9 +7,12 @@ import { AssignCityToWorld } from '../core/use-cases/cities/assign-city-to-world
 import { CreateCity } from '../core/use-cases/cities/create-city';
 import { DeleteCity } from '../core/use-cases/cities/delete-city';
 import { ListCities } from '../core/use-cases/cities/list-cities';
+import { ListLoresByCityId } from '../core/use-cases/cities/list-lores-by-city-id';
+import { ListQuestsByCityId } from '../core/use-cases/cities/list-quests-by-city-id';
 import { RemoveCityFromWorld } from '../core/use-cases/cities/remove-city-from-world';
 import { SetCityDiscovered } from '../core/use-cases/cities/set-city-discovered';
 import { UpdateCity } from '../core/use-cases/cities/update-city';
+import { UpdateCityImage } from '../core/use-cases/cities/update-city-image';
 import { SetVisibility } from '../core/use-cases/common/set-visibility';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
 import { DeleteLore } from '../core/use-cases/lore/delete-lore';
@@ -17,7 +20,6 @@ import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
 import { ListLores } from '../core/use-cases/lore/list-lores';
 import { UnlinkLoreFromCity } from '../core/use-cases/lore/unlink-lore-from-city';
 import { UpdateLore } from '../core/use-cases/lore/update-lore';
-import { ListLoresByCityId } from '../core/use-cases/cities/list-lores-by-city-id';
 import { CreateMapMarker } from '../core/use-cases/map-marker/create-map-marker';
 import { DeleteMapMarker } from '../core/use-cases/map-marker/delete-map-marker';
 import { ListMapMarkers } from '../core/use-cases/map-marker/list-map-markers';
@@ -40,7 +42,6 @@ import { LinkQuestToCity } from '../core/use-cases/quest/link-quest-to-city';
 import { ListQuests } from '../core/use-cases/quest/list-quests';
 import { UnlinkQuestFromCity } from '../core/use-cases/quest/unlink-quest-from-city';
 import { UpdateQuest } from '../core/use-cases/quest/update-quest';
-import { ListQuestsByCityId } from '../core/use-cases/cities/list-quests-by-city-id';
 import { CreateSession } from '../core/use-cases/session/create-session';
 import { DeleteSession } from '../core/use-cases/session/delete-session';
 import { ListSessions } from '../core/use-cases/session/list-sessions';
@@ -48,6 +49,7 @@ import { UpdateSession } from '../core/use-cases/session/update-session';
 import { CreateTimelineEvent } from '../core/use-cases/timeline/create-timeline-event';
 import { DeleteTimelineEvent } from '../core/use-cases/timeline/delete-timeline-event';
 import { ListTimelineEvents } from '../core/use-cases/timeline/list-timeline-events';
+import { UpdateTimelineEvent } from '../core/use-cases/timeline/update-timeline-event';
 import { CreateWorld } from '../core/use-cases/world/create-world';
 import { ListWorlds } from '../core/use-cases/world/list-worlds';
 import { UpdateWorld } from '../core/use-cases/world/update-world';
@@ -63,7 +65,6 @@ import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repo
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
 import { WorldDrizzleRepository } from '../infra/repositories/world.drizzle.repository';
-
 
 // ----- Tipos do container
 export type Registry = {
@@ -98,6 +99,7 @@ export type Registry = {
   listSessions: ListSessions;
   deleteSession: DeleteSession;
   updateSession: UpdateSession;
+  setSessionVisibility: SetVisibility;
 
   // Lore
   loreRepo: LoreDrizzleRepository;
@@ -114,6 +116,7 @@ export type Registry = {
   setCityDiscovered: SetCityDiscovered;
   deleteCity: DeleteCity;
   updateCity: UpdateCity;
+  updateCityImage: UpdateCityImage;
   setCityVisibility: SetVisibility;
 
   // Bestiary
@@ -138,6 +141,7 @@ export type Registry = {
   createTimelineEvent: CreateTimelineEvent;
   listTimelineEvents: ListTimelineEvents;
   deleteTimelineEvent: DeleteTimelineEvent;
+  updateTimelineEvent: UpdateTimelineEvent;
   setTimelineVisibility: SetVisibility;
 
   // Worlds
@@ -201,6 +205,7 @@ class Container {
     listSessions: (c) => new ListSessions(c.resolve('sessionRepo')),
     deleteSession: (c) => new DeleteSession(c.resolve('sessionRepo')),
     updateSession: (c) => new UpdateSession(c.resolve('sessionRepo')),
+    setSessionVisibility: (c) => new SetVisibility(c.resolve('sessionRepo')),
 
     // Lore
     loreRepo: () => new LoreDrizzleRepository(),
@@ -217,6 +222,7 @@ class Container {
     setCityDiscovered: (c) => new SetCityDiscovered(c.resolve('cityRepo')),
     deleteCity: (c) => new DeleteCity(c.resolve('cityRepo')),
     updateCity: (c) => new UpdateCity(c.resolve('cityRepo')),
+    updateCityImage: (c) => new UpdateCityImage(c.resolve('cityRepo')),
     setCityVisibility: (c) => new SetVisibility(c.resolve('cityRepo')),
 
     // Bestiary
@@ -241,6 +247,7 @@ class Container {
     createTimelineEvent: (c) => new CreateTimelineEvent(c.resolve('timelineRepo')),
     listTimelineEvents: (c) => new ListTimelineEvents(c.resolve('timelineRepo')),
     deleteTimelineEvent: (c) => new DeleteTimelineEvent(c.resolve('timelineRepo')),
+    updateTimelineEvent: (c) => new UpdateTimelineEvent(c.resolve('timelineRepo')),
     setTimelineVisibility: (c) => new SetVisibility(c.resolve('timelineRepo')),
 
     // World
@@ -249,7 +256,8 @@ class Container {
     listWorlds: (c) => new ListWorlds(c.resolve('worldRepo')),
     updateWorldImage: (c) => new UpdateWorldImage(c.resolve('worldRepo')),
     updateWorld: (c) => new UpdateWorld(c.resolve('worldRepo')),
-    setWorldVisibility: (c) => new SetVisibility(c.resolve('worldRepo' /* CORRIGE: 'worldRepo' se tiver */)),
+    setWorldVisibility: (c) =>
+      new SetVisibility(c.resolve('worldRepo' /* CORRIGE: 'worldRepo' se tiver */)),
 
     // Links
     linksRepo: () => new LinksDrizzleRepository(),

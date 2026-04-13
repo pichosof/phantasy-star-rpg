@@ -1,8 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 
-import { CityController } from '../controllers/city.controller';
 import { CityLinksController } from '../controllers/city-links.controller';
-
+import { CityController } from '../controllers/city.controller';
 
 type IdParams = { id: string };
 type VisibilityBody = { visible: boolean };
@@ -114,6 +113,20 @@ export async function cityRoutes(app: FastifyInstance) {
     c.update.bind(c),
   );
 
+  // PATCH imagem protegido
+  app.patch(
+    '/api/cities/:id/image',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.updateImage.bind(c),
+  );
+
   // DELETE protegido
   app.delete(
     '/api/cities/:id',
@@ -128,32 +141,40 @@ export async function cityRoutes(app: FastifyInstance) {
     c.delete.bind(c),
   );
 
-const linksController = new CityLinksController();
+  const linksController = new CityLinksController();
 
-  app.get('/api/cities/:id/lores',     {
+  app.get(
+    '/api/cities/:id/lores',
+    {
       schema: {
         tags: ['Cities'],
         response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
       },
-    }, linksController.listLoresByCityId);
-  app.get('/api/cities/:id/quests', {
+    },
+    linksController.listLoresByCityId,
+  );
+  app.get(
+    '/api/cities/:id/quests',
+    {
       schema: {
         tags: ['Cities'],
         response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
       },
-    }, linksController.listQuestsByCityId);
-    app.get(
+    },
+    linksController.listQuestsByCityId,
+  );
+  app.get(
     '/api/gm/cities/:id/quests',
-      app.withGM({
-        schema: {
-          tags: ['Cities', 'GM'],
-          security: [{ ApiKeyAuth: [] }],
-          params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-          response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
-        },
-      }),
-      linksController.listQuestsByCityId,
-    );
+    app.withGM({
+      schema: {
+        tags: ['Cities', 'GM'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    }),
+    linksController.listQuestsByCityId,
+  );
 
   app.get(
     '/api/gm/cities/:id/lores',
@@ -168,4 +189,3 @@ const linksController = new CityLinksController();
     linksController.listLoresByCityId,
   );
 }
-

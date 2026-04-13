@@ -19,7 +19,8 @@ export class CityDrizzleRepository {
     return map(r);
   }
   async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.cities)
+    await db
+      .update(schema.cities)
       .set({ visible, updatedAt: new Date() })
       .where(eq(schema.cities.id, id));
   }
@@ -31,6 +32,22 @@ export class CityDrizzleRepository {
 
   async setDiscovered(id: number, discovered: boolean) {
     await db.update(schema.cities).set({ discovered: discovered }).where(eq(schema.cities.id, id));
+  }
+
+  async updateImage(
+    id: number,
+    data: { url: string; alt?: string | null; mime?: string | null; size?: number | null },
+  ) {
+    await db
+      .update(schema.cities)
+      .set({
+        imageUrl: data.url,
+        imageAlt: data.alt ?? null,
+        imageMime: data.mime ?? null,
+        imageSize: data.size ?? null,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.cities.id, id));
   }
 
   async delete(id: number) {

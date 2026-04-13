@@ -32,6 +32,14 @@ export const authPlugin = fp(async (app: FastifyInstance) => {
 
   app.decorateRequest('isGM', false);
 
+  // Hook global: marca req.isGM em qualquer rota que envie a key válida
+  app.addHook('onRequest', async (req: FastifyRequest) => {
+    const provided = req.headers['x-api-key'] as string | undefined;
+    if (gmKey && provided === gmKey) {
+      req.isGM = true;
+    }
+  });
+
   // preHandler de segurança
   app.decorate('requireGM', async (req: FastifyRequest, reply: FastifyReply) => {
     const provided = req.headers['x-api-key'] as string | undefined;

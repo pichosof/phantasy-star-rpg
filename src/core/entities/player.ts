@@ -5,10 +5,11 @@ export interface PlayerProps {
   background?: string | null;
   imageUrl?: string | null;
   imageAlt?: string | null;
-  imageMime?: string | null; 
+  imageMime?: string | null;
   sheetUrl?: string | null;
   sheetMime?: string | null;
   sheetSize?: string | null;
+  visible?: boolean | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -20,10 +21,11 @@ export class Player {
   readonly background?: string | null;
   readonly imageUrl?: string | null;
   readonly imageAlt?: string | null;
-  readonly imageMime?: string | null; 
+  readonly imageMime?: string | null;
   readonly sheetUrl?: string | null;
   readonly sheetMime?: string | null;
   readonly sheetSize?: string | null;
+  readonly visible: boolean;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
 
@@ -38,6 +40,7 @@ export class Player {
     this.sheetUrl = props.sheetUrl ?? null;
     this.sheetMime = props.sheetMime ?? null;
     this.sheetSize = props.sheetSize ?? null;
+    this.visible = props.visible ?? false;
     this.createdAt = props.createdAt;
     this.updatedAt = props.updatedAt;
   }

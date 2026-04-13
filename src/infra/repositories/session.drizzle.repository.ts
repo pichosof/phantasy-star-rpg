@@ -13,6 +13,8 @@ export class SessionDrizzleRepository {
         title: s.props.title,
         date: s.props.date,
         summary: s.props.summary ?? null,
+        imageUrl: s.props.imageUrl ?? null,
+        imageAlt: s.props.imageAlt ?? null,
       })
       .returning();
     return map(r);
@@ -27,20 +29,24 @@ export class SessionDrizzleRepository {
     await db.delete(schema.sessions).where(eq(schema.sessions.id, id));
   }
   async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.sessions)
+    await db
+      .update(schema.sessions)
       .set({ visible, updatedAt: new Date() })
       .where(eq(schema.sessions.id, id));
   }
   async update(
     id: number,
-    data: { title?: string; date?: Date | string; summary?: string | null },
+    data: {
+      title?: string;
+      date?: Date | string;
+      summary?: string | null;
+      imageUrl?: string | null;
+      imageAlt?: string | null;
+      visible?: boolean;
+    },
   ) {
-    const dateValue =
-      data.date instanceof Date
-        ? data.date.toISOString()
-        : typeof data.date === 'string'
-          ? new Date(data.date).toISOString()
-          : undefined;
+    // date é coluna text — armazena a string como está (suporta datas ISO e datas in-game)
+    const dateValue = data.date instanceof Date ? data.date.toISOString() : data.date;
 
     await db
       .update(schema.sessions)
@@ -48,6 +54,9 @@ export class SessionDrizzleRepository {
         ...(data.title !== undefined ? { title: data.title } : {}),
         ...(dateValue !== undefined ? { date: dateValue } : {}),
         ...(data.summary !== undefined ? { summary: data.summary } : {}),
+        ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl } : {}),
+        ...(data.imageAlt !== undefined ? { imageAlt: data.imageAlt } : {}),
+        ...(data.visible !== undefined ? { visible: data.visible } : {}),
         updatedAt: new Date(),
       })
       .where(eq(schema.sessions.id, id));
