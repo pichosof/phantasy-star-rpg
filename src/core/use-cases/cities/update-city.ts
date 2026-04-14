@@ -6,6 +6,7 @@ import { createCityInput } from './create-city';
 // antes: export const updateCityInput = createCityInput.partial();
 export const updateCityInput = createCityInput.partial().extend({
   coordinates: zod.string().nullable().optional(),
+  worldId: zod.number().nullable().optional(),
 });
 
 export class UpdateCity {

@@ -25,6 +25,7 @@ import { questRoutes } from './routes/quest.routes';
 import { sessionRoutes } from './routes/session.routes';
 import { timelineRoutes } from './routes/timeline.routes';
 import { uploadRoutes } from './routes/upload.routes'; // novo
+import { wikiRoutes } from './routes/wiki.routes';
 import { worldRoutes } from './routes/world.routes';
 
 export async function buildServer() {
@@ -74,6 +75,7 @@ export async function buildServer() {
   await app.register(monsterRoutes);
   await app.register(mapMarkerRoutes);
   await app.register(timelineRoutes);
+  await app.register(wikiRoutes);
   await app.register(worldRoutes);
   await app.register(cityWorldRoutes);
   await app.register(playerQuestRoutes);

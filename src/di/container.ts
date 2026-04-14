@@ -50,6 +50,10 @@ import { CreateTimelineEvent } from '../core/use-cases/timeline/create-timeline-
 import { DeleteTimelineEvent } from '../core/use-cases/timeline/delete-timeline-event';
 import { ListTimelineEvents } from '../core/use-cases/timeline/list-timeline-events';
 import { UpdateTimelineEvent } from '../core/use-cases/timeline/update-timeline-event';
+import { CreateWikiPage } from '../core/use-cases/wiki/create-wiki-page';
+import { DeleteWikiPage } from '../core/use-cases/wiki/delete-wiki-page';
+import { ListWikiPages } from '../core/use-cases/wiki/list-wiki-pages';
+import { UpdateWikiPage } from '../core/use-cases/wiki/update-wiki-page';
 import { CreateWorld } from '../core/use-cases/world/create-world';
 import { ListWorlds } from '../core/use-cases/world/list-worlds';
 import { UpdateWorld } from '../core/use-cases/world/update-world';
@@ -64,6 +68,7 @@ import { PlayerDrizzleRepository } from '../infra/repositories/player.drizzle.re
 import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repository';
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
+import { WikiPageDrizzleRepository } from '../infra/repositories/wiki-page.drizzle.repository';
 import { WorldDrizzleRepository } from '../infra/repositories/world.drizzle.repository';
 
 // ----- Tipos do container
@@ -135,6 +140,14 @@ export type Registry = {
   setMapMarkerDiscovered: SetMapMarkerDiscovered;
   deleteMapMarker: DeleteMapMarker;
   setMapMarkerVisibility: SetVisibility;
+
+  // Wiki
+  wikiRepo: WikiPageDrizzleRepository;
+  createWikiPage: CreateWikiPage;
+  listWikiPages: ListWikiPages;
+  updateWikiPage: UpdateWikiPage;
+  deleteWikiPage: DeleteWikiPage;
+  setWikiPageVisibility: SetVisibility;
 
   // Timeline
   timelineRepo: TimelineDrizzleRepository;
@@ -241,6 +254,14 @@ class Container {
     setMapMarkerDiscovered: (c) => new SetMapMarkerDiscovered(c.resolve('mapMarkerRepo')),
     deleteMapMarker: (c) => new DeleteMapMarker(c.resolve('mapMarkerRepo')),
     setMapMarkerVisibility: (c) => new SetVisibility(c.resolve('mapMarkerRepo')),
+
+    // Wiki
+    wikiRepo: () => new WikiPageDrizzleRepository(),
+    createWikiPage: (c) => new CreateWikiPage(c.resolve('wikiRepo')),
+    listWikiPages: (c) => new ListWikiPages(c.resolve('wikiRepo')),
+    updateWikiPage: (c) => new UpdateWikiPage(c.resolve('wikiRepo')),
+    deleteWikiPage: (c) => new DeleteWikiPage(c.resolve('wikiRepo')),
+    setWikiPageVisibility: (c) => new SetVisibility(c.resolve('wikiRepo')),
 
     // Timeline
     timelineRepo: () => new TimelineDrizzleRepository(),

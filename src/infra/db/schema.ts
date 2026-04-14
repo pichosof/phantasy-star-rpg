@@ -215,6 +215,22 @@ export const questCities = sqliteTable(
   (t) => ({ pk: primaryKey({ columns: [t.questId, t.cityId] }) }),
 );
 
+// Wiki (compêndio consultável por jogadores, editável pelo GM)
+export const wikiPages = sqliteTable('wiki_pages', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  category: text('category'), // label livre — ex: "Técnicas", "Mundos", "Regras"
+  content: text('content'), // texto livre, newlines renderizados como pré-wrap
+  pinned: integer('pinned', { mode: 'boolean' }).notNull().default(false),
+  visible: integer('visible', { mode: 'boolean' }).notNull().default(true),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
 export const loreCities = sqliteTable(
   'lore_cities',
   {
