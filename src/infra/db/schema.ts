@@ -231,6 +231,50 @@ export const wikiPages = sqliteTable('wiki_pages', {
     .default(sql`(unixepoch('now') * 1000)`),
 });
 
+// ── GM Area ───────────────────────────────────────────────────────────────────
+
+export const gmNotes = sqliteTable('gm_notes', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  content: text('content'),
+  tags: text('tags'), // comma-separated
+  pinned: integer('pinned', { mode: 'boolean' }).notNull().default(false),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+export const gmImages = sqliteTable('gm_images', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  filename: text('filename').notNull(),
+  url: text('url').notNull(),
+  alt: text('alt'),
+  mime: text('mime').notNull(),
+  size: integer('size').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+export const characterSheetTypes = ['gurps', 'starfinder'] as const;
+export type CharacterSheetType = (typeof characterSheetTypes)[number];
+
+export const characterSheets = sqliteTable('character_sheets', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  type: text('type', { enum: characterSheetTypes }).notNull(),
+  name: text('name').notNull(),
+  data: text('data').notNull().default('{}'), // JSON blob
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
 export const loreCities = sqliteTable(
   'lore_cities',
   {

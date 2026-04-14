@@ -11,7 +11,10 @@ import { authPlugin } from './plugins/auth';
 import { errorHandlerPlugin } from './plugins/error-handler';
 import swaggerPlugin from './plugins/swagger';
 import visibilityFilterPlugin from './plugins/visibility-filter';
+import { characterSheetsRoutes } from './routes/character-sheets.routes';
 import { cityWorldRoutes } from './routes/city-world.routes';
+import { gmImagesRoutes } from './routes/gm-images.routes';
+import { gmNotesRoutes } from './routes/gm-notes.routes';
 import { cityRoutes } from './routes/city.routes';
 import { loreCityRoutes } from './routes/lore-city.routes';
 import { loreRoutes } from './routes/lore.routes';
@@ -81,6 +84,9 @@ export async function buildServer() {
   await app.register(playerQuestRoutes);
   await app.register(questCityRoutes);
   await app.register(loreCityRoutes);
+  await app.register(gmNotesRoutes);
+  await app.register(gmImagesRoutes);
+  await app.register(characterSheetsRoutes);
 
   await app.register(errorHandlerPlugin);
 

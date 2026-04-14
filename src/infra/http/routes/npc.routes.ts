@@ -101,25 +101,15 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
     ctrl.delete.bind(ctrl),
   );
 
-  // PATCH imagem protegido
+  // PATCH imagem protegido (multipart)
   app.patch(
     '/api/npcs/:id/image',
     app.withGM({
       schema: {
         tags: ['NPCs'],
         security: [{ ApiKeyAuth: [] }],
+        consumes: ['multipart/form-data'],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-        body: {
-          type: 'object',
-          required: ['url'],
-          properties: {
-            url: { type: 'string' },
-            alt: { type: 'string' },
-            mime: { type: 'string' },
-            size: { type: 'number' },
-          },
-          additionalProperties: false,
-        },
         response: { 204: { type: 'null' } },
       },
     }),

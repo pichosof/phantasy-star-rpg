@@ -78,6 +78,13 @@
       "when": 1776059319594,
       "tag": "0010_oval_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1776180398415,
+      "tag": "0011_blushing_cerebro",
+      "breakpoints": true
     }
   ]
 }

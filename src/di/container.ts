@@ -1,3 +1,18 @@
+import { CreateCharacterSheet } from '../core/use-cases/character-sheets/create-character-sheet';
+import { DeleteCharacterSheet } from '../core/use-cases/character-sheets/delete-character-sheet';
+import { GetCharacterSheet } from '../core/use-cases/character-sheets/get-character-sheet';
+import { ListCharacterSheets } from '../core/use-cases/character-sheets/list-character-sheets';
+import { UpdateCharacterSheet } from '../core/use-cases/character-sheets/update-character-sheet';
+import { DeleteGmImage } from '../core/use-cases/gm-images/delete-gm-image';
+import { ListGmImages } from '../core/use-cases/gm-images/list-gm-images';
+import { UploadGmImage } from '../core/use-cases/gm-images/upload-gm-image';
+import { CreateGmNote } from '../core/use-cases/gm-notes/create-gm-note';
+import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
+import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
+import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
+import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
+import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
+import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
 import { CreateMonster } from '../core/use-cases/bestiary/create-monster';
 import { DeleteMonster } from '../core/use-cases/bestiary/delete-monster';
 import { ListMonsters } from '../core/use-cases/bestiary/list-monsters';
@@ -167,6 +182,27 @@ export type Registry = {
   updateWorld: UpdateWorld;
   setWorldVisibility: SetVisibility;
 
+  // GM Notes
+  gmNoteRepo: GmNoteDrizzleRepository;
+  createGmNote: CreateGmNote;
+  listGmNotes: ListGmNotes;
+  updateGmNote: UpdateGmNote;
+  deleteGmNote: DeleteGmNote;
+
+  // GM Images
+  gmImageRepo: GmImageDrizzleRepository;
+  uploadGmImage: UploadGmImage;
+  listGmImages: ListGmImages;
+  deleteGmImage: DeleteGmImage;
+
+  // Character Sheets
+  sheetRepo: CharacterSheetDrizzleRepository;
+  createCharacterSheet: CreateCharacterSheet;
+  listCharacterSheets: ListCharacterSheets;
+  getCharacterSheet: GetCharacterSheet;
+  updateCharacterSheet: UpdateCharacterSheet;
+  deleteCharacterSheet: DeleteCharacterSheet;
+
   // Links Pivots
   linksRepo: LinksDrizzleRepository;
   assignCityToWorld: AssignCityToWorld;
@@ -282,6 +318,27 @@ class Container {
     updateWorld: (c) => new UpdateWorld(c.resolve('worldRepo')),
     setWorldVisibility: (c) =>
       new SetVisibility(c.resolve('worldRepo' /* CORRIGE: 'worldRepo' se tiver */)),
+
+    // GM Notes
+    gmNoteRepo: () => new GmNoteDrizzleRepository(),
+    createGmNote: (c) => new CreateGmNote(c.resolve('gmNoteRepo')),
+    listGmNotes: (c) => new ListGmNotes(c.resolve('gmNoteRepo')),
+    updateGmNote: (c) => new UpdateGmNote(c.resolve('gmNoteRepo')),
+    deleteGmNote: (c) => new DeleteGmNote(c.resolve('gmNoteRepo')),
+
+    // GM Images
+    gmImageRepo: () => new GmImageDrizzleRepository(),
+    uploadGmImage: (c) => new UploadGmImage(c.resolve('gmImageRepo')),
+    listGmImages: (c) => new ListGmImages(c.resolve('gmImageRepo')),
+    deleteGmImage: (c) => new DeleteGmImage(c.resolve('gmImageRepo')),
+
+    // Character Sheets
+    sheetRepo: () => new CharacterSheetDrizzleRepository(),
+    createCharacterSheet: (c) => new CreateCharacterSheet(c.resolve('sheetRepo')),
+    listCharacterSheets: (c) => new ListCharacterSheets(c.resolve('sheetRepo')),
+    getCharacterSheet: (c) => new GetCharacterSheet(c.resolve('sheetRepo')),
+    updateCharacterSheet: (c) => new UpdateCharacterSheet(c.resolve('sheetRepo')),
+    deleteCharacterSheet: (c) => new DeleteCharacterSheet(c.resolve('sheetRepo')),
 
     // Links
     linksRepo: () => new LinksDrizzleRepository(),
