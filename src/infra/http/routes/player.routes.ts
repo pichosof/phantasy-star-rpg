@@ -53,7 +53,7 @@ export async function playerRoutes(app: FastifyInstance) {
     }),
     ctrl.create.bind(ctrl),
   );
- app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+  app.patch<{ Params: IdParams; Body: VisibilityBody }>(
     '/api/players/:id/visibility',
     app.withGM({
       schema: {

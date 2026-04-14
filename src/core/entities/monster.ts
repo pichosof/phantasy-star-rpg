@@ -15,6 +15,9 @@ export interface MonsterProps {
 }
 export class Monster {
   private constructor(readonly props: MonsterProps) {}
+  toJSON() {
+    return this.props;
+  }
   static create(p: Omit<MonsterProps, 'id' | 'createdAt'>) {
     if (!p.name?.trim()) throw new Error('Name required');
     return new Monster({ discovered: false, ...p });

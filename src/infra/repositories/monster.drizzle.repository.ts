@@ -48,11 +48,31 @@ export class MonsterDrizzleRepository {
       })
       .where(eq(schema.bestiary.id, id));
   }
-async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.bestiary)
-      .set({ visible })
+  async setVisibility(id: number, visible: boolean) {
+    await db.update(schema.bestiary).set({ visible }).where(eq(schema.bestiary.id, id));
+  }
+  async update(
+    id: number,
+    data: {
+      name?: string;
+      type?: string | null;
+      habitat?: string | null;
+      weaknesses?: string | null;
+      description?: string | null;
+    },
+  ) {
+    await db
+      .update(schema.bestiary)
+      .set({
+        ...(data.name !== undefined ? { name: data.name } : {}),
+        ...(data.type !== undefined ? { type: data.type } : {}),
+        ...(data.habitat !== undefined ? { habitat: data.habitat } : {}),
+        ...(data.weaknesses !== undefined ? { weaknesses: data.weaknesses } : {}),
+        ...(data.description !== undefined ? { description: data.description } : {}),
+      })
       .where(eq(schema.bestiary.id, id));
   }
+
   async delete(id: number) {
     await db.delete(schema.bestiary).where(eq(schema.bestiary.id, id));
   }

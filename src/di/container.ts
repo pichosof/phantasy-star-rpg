@@ -2,6 +2,7 @@ import { CreateMonster } from '../core/use-cases/bestiary/create-monster';
 import { DeleteMonster } from '../core/use-cases/bestiary/delete-monster';
 import { ListMonsters } from '../core/use-cases/bestiary/list-monsters';
 import { SetMonsterDiscovered } from '../core/use-cases/bestiary/set-monster-discovered';
+import { UpdateMonster } from '../core/use-cases/bestiary/update-monster';
 import { UpdateMonsterImage } from '../core/use-cases/bestiary/update-monster-image';
 import { AssignCityToWorld } from '../core/use-cases/cities/assign-city-to-world';
 import { CreateCity } from '../core/use-cases/cities/create-city';
@@ -129,6 +130,7 @@ export type Registry = {
   createMonster: CreateMonster;
   listMonsters: ListMonsters;
   setMonsterDiscovered: SetMonsterDiscovered;
+  updateMonster: UpdateMonster;
   updateMonsterImage: UpdateMonsterImage;
   deleteMonster: DeleteMonster;
   setMonsterVisibility: SetVisibility;
@@ -243,6 +245,7 @@ class Container {
     createMonster: (c) => new CreateMonster(c.resolve('monsterRepo')),
     listMonsters: (c) => new ListMonsters(c.resolve('monsterRepo')),
     setMonsterDiscovered: (c) => new SetMonsterDiscovered(c.resolve('monsterRepo')),
+    updateMonster: (c) => new UpdateMonster(c.resolve('monsterRepo')),
     updateMonsterImage: (c) => new UpdateMonsterImage(c.resolve('monsterRepo')),
     deleteMonster: (c) => new DeleteMonster(c.resolve('monsterRepo')),
     setMonsterVisibility: (c) => new SetVisibility(c.resolve('monsterRepo')),

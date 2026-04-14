@@ -2,8 +2,10 @@
 import type { FastifyInstance } from 'fastify';
 
 import { MonsterController } from '../controllers/monster.controller.js';
+
 type IdParams = { id: string };
 type VisibilityBody = { visible: boolean };
+
 export async function monsterRoutes(app: FastifyInstance) {
   const c = new MonsterController();
 
@@ -20,24 +22,7 @@ export async function monsterRoutes(app: FastifyInstance) {
     },
     c.list.bind(c),
   );
-app.patch<{ Params: IdParams; Body: VisibilityBody }>(
-    '/api/bestiary/:id/visibility',
-    app.withGM({
-      schema: {
-        tags: ['Bestiary'],
-        security: [{ ApiKeyAuth: [] }],
-        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-        body: {
-          type: 'object',
-          required: ['visible'],
-          properties: { visible: { type: 'boolean' } },
-          additionalProperties: false,
-        },
-        response: { 204: { type: 'null' } },
-      },
-    }),
-    c.setVisibility.bind(c),
-  );
+
   // POST protegido (criar monstro)
   app.post(
     '/api/bestiary',
@@ -50,11 +35,10 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           required: ['name'],
           properties: {
             name: { type: 'string' },
-            species: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            type: { anyOf: [{ type: 'string' }, { type: 'null' }] },
             habitat: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-            discovered: { type: 'boolean', default: false },
-            imageUrl: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-            imageAlt: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            weaknesses: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
           },
           additionalProperties: false,
         },
@@ -62,6 +46,31 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
       },
     }),
     c.create.bind(c),
+  );
+
+  // PATCH protegido (atualizar campos do monstro)
+  app.patch<{ Params: IdParams; Body: Record<string, unknown> }>(
+    '/api/bestiary/:id',
+    app.withGM({
+      schema: {
+        tags: ['Bestiary'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        body: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            type: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            habitat: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            weaknesses: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          },
+          additionalProperties: false,
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.update.bind(c),
   );
 
   // PATCH protegido (marcar como descoberto)
@@ -84,9 +93,9 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
     c.setDiscovered.bind(c),
   );
 
-  // PATCH protegido (atualizar imagem por URL)
-  app.patch(
-    '/api/bestiary/:id/image',
+  // PATCH protegido (visibilidade)
+  app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+    '/api/bestiary/:id/visibility',
     app.withGM({
       schema: {
         tags: ['Bestiary'],
@@ -94,15 +103,25 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
         body: {
           type: 'object',
-          required: ['url'],
-          properties: {
-            url: { type: 'string' },
-            alt: { type: 'string' },
-            mime: { type: 'string' },
-            size: { type: 'number' },
-          },
+          required: ['visible'],
+          properties: { visible: { type: 'boolean' } },
           additionalProperties: false,
         },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.setVisibility.bind(c),
+  );
+
+  // PATCH protegido (upload de imagem — multipart)
+  app.patch(
+    '/api/bestiary/:id/image',
+    app.withGM({
+      schema: {
+        tags: ['Bestiary'],
+        security: [{ ApiKeyAuth: [] }],
+        consumes: ['multipart/form-data'],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
         response: { 204: { type: 'null' } },
       },
     }),
