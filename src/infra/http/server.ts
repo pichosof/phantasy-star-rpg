@@ -98,7 +98,7 @@ export async function buildServer() {
     origin: env.CORS_ORIGIN || (isProd ? false : '*'),
     allowedHeaders: [
       'content-type',
-      'x-api-key',
+      'authorization',
       'x-client-id',
       'x-image-alt',
       'x-library-key',

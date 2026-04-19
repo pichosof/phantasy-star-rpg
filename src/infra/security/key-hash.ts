@@ -19,16 +19,22 @@
  *   r = 8      (block size)
  *   p = 1      (parallelism factor)
  *   keylen = 64 bytes
+ *
+ * Why maxmem = 128 MB:
+ *   Node.js default maxmem is 32 MB. scrypt with N=65536, r=8 needs
+ *   128 × N × r = 64 MB, which exceeds the default and throws
+ *   ERR_CRYPTO_INVALID_SCRYPT_PARAMS at runtime. 128 MB gives 2× headroom.
  */
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
 const PARAMS = { N: 65536, r: 8, p: 1 } as const;
+const SCRYPT_MAXMEM = 128 * 1024 * 1024; // 128 MB
 const KEY_LEN = 64;
 const PREFIX = '$scrypt$';
 
 export function hashKey(plaintext: string): string {
   const salt = randomBytes(32);
-  const hash = scryptSync(plaintext, salt, KEY_LEN, PARAMS);
+  const hash = scryptSync(plaintext, salt, KEY_LEN, { ...PARAMS, maxmem: SCRYPT_MAXMEM });
   return `${PREFIX}N=${PARAMS.N},r=${PARAMS.r},p=${PARAMS.p}$${salt.toString('base64')}$${hash.toString('base64')}`;
 }
 
@@ -49,9 +55,12 @@ export function verifyKey(plaintext: string, stored: string): boolean {
   const salt = Buffer.from(saltB64, 'base64');
   const expectedHash = Buffer.from(hashB64, 'base64');
 
+  // maxmem must also be set on verify — same params, same memory requirement.
+  const maxmem = Math.max(SCRYPT_MAXMEM, 128 * N * r * 2);
+
   let actualHash: Buffer;
   try {
-    actualHash = scryptSync(plaintext, salt, expectedHash.length, { N, r, p }) as Buffer;
+    actualHash = scryptSync(plaintext, salt, expectedHash.length, { N, r, p, maxmem }) as Buffer;
   } catch {
     return false;
   }
