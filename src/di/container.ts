@@ -10,6 +10,7 @@ import { CreateGmNote } from '../core/use-cases/gm-notes/create-gm-note';
 import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
 import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
 import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
+import { LibraryDocumentRepository } from '../infra/repositories/library-document.drizzle.repository';
 import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
 import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
 import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
@@ -195,6 +196,9 @@ export type Registry = {
   listGmImages: ListGmImages;
   deleteGmImage: DeleteGmImage;
 
+  // Library
+  libraryDocumentRepo: LibraryDocumentRepository;
+
   // Character Sheets
   sheetRepo: CharacterSheetDrizzleRepository;
   createCharacterSheet: CreateCharacterSheet;
@@ -331,6 +335,9 @@ class Container {
     uploadGmImage: (c) => new UploadGmImage(c.resolve('gmImageRepo')),
     listGmImages: (c) => new ListGmImages(c.resolve('gmImageRepo')),
     deleteGmImage: (c) => new DeleteGmImage(c.resolve('gmImageRepo')),
+
+    // Library
+    libraryDocumentRepo: () => new LibraryDocumentRepository(),
 
     // Character Sheets
     sheetRepo: () => new CharacterSheetDrizzleRepository(),

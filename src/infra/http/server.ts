@@ -11,6 +11,7 @@ import { authPlugin } from './plugins/auth';
 import { errorHandlerPlugin } from './plugins/error-handler';
 import swaggerPlugin from './plugins/swagger';
 import visibilityFilterPlugin from './plugins/visibility-filter';
+import { libraryRoutes } from './routes/library.routes';
 import { characterSheetsRoutes } from './routes/character-sheets.routes';
 import { cityWorldRoutes } from './routes/city-world.routes';
 import { gmImagesRoutes } from './routes/gm-images.routes';
@@ -48,7 +49,7 @@ export async function buildServer() {
 
   await app.register(cors, {
     origin: env.CORS_ORIGIN || '*',
-    allowedHeaders: ['content-type', 'x-api-key', 'x-image-alt'],
+    allowedHeaders: ['content-type', 'x-api-key', 'x-image-alt', 'x-library-key', 'x-doc-title', 'x-doc-description', 'x-doc-category'],
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   });
   await app.register(multipart, {
@@ -86,6 +87,7 @@ export async function buildServer() {
   await app.register(loreCityRoutes);
   await app.register(gmNotesRoutes);
   await app.register(gmImagesRoutes);
+  await app.register(libraryRoutes);
   await app.register(characterSheetsRoutes);
 
   await app.register(errorHandlerPlugin);

@@ -275,6 +275,36 @@ export const characterSheets = sqliteTable('character_sheets', {
     .default(sql`(unixepoch('now') * 1000)`),
 });
 
+// ── Library ───────────────────────────────────────────────────────────────────
+
+export const libraryDocuments = sqliteTable('library_documents', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title').notNull(),
+  description: text('description'),
+  category: text('category'), // rulebook, supplement, reference, other
+  filename: text('filename').notNull(),
+  originalName: text('original_name').notNull(),
+  url: text('url').notNull(),
+  mime: text('mime').notNull(),
+  size: integer('size').notNull(),
+  visible: integer('visible', { mode: 'boolean' }).notNull().default(true),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+// Single-row settings table (always id = 1)
+export const librarySettings = sqliteTable('library_settings', {
+  id: integer('id').primaryKey(),
+  playerKey: text('player_key'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
 export const loreCities = sqliteTable(
   'lore_cities',
   {
