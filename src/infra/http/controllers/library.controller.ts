@@ -5,13 +5,16 @@ import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import { container } from '../../../di/container.js';
+
 import { LibraryDocument } from '../../../core/entities/library-document.js';
+import { container } from '../../../di/container.js';
+import { hashKey, validateKeyStrength } from '../../security/key-hash.js';
 
 type IdParams = { id: string };
 
 const DOC_DIR = path.resolve('data', 'uploads', 'library');
 
+/** Allowed MIME types and their canonical extensions. */
 const ALLOWED_MIME: Record<string, string> = {
   'application/pdf': '.pdf',
   'text/plain': '.txt',
@@ -27,8 +30,17 @@ const ALLOWED_MIME: Record<string, string> = {
   'text/markdown': '.md',
 };
 
+/** Strip characters outside printable ASCII 0x20–0x7E for header values. */
+function sanitiseHeader(value: string | undefined, maxLen = 500): string {
+  if (!value) return '';
+  return value
+    .replace(/[^\x20-\x7E]/g, '')
+    .trim()
+    .slice(0, maxLen);
+}
+
 export class LibraryController {
-  async list(req: FastifyRequest, reply: FastifyReply) {
+  async list(_req: FastifyRequest, reply: FastifyReply) {
     const repo = container.resolve('libraryDocumentRepo');
     const docs = await repo.list();
     return reply.send(docs.map((d) => d.toJSON()));
@@ -49,7 +61,10 @@ export class LibraryController {
 
     const filename = `${Date.now()}-${randomUUID()}${ext}`;
     const filePath = path.join(DOC_DIR, filename);
-    const originalName = part.filename || filename;
+
+    // Sanitise original filename — strip path traversal chars
+    const originalName =
+      sanitiseHeader(part.filename || filename, 255).replace(/[/\\]/g, '_') || filename;
 
     let written = 0;
     const ws = fs.createWriteStream(filePath, { flags: 'wx' });
@@ -67,14 +82,25 @@ export class LibraryController {
       throw e;
     }
 
-    const title = (req.headers['x-doc-title'] as string) || originalName.replace(/\.[^.]+$/, '');
-    const description = (req.headers['x-doc-description'] as string) || null;
-    const category = (req.headers['x-doc-category'] as string) || null;
+    const title =
+      sanitiseHeader(req.headers['x-doc-title'] as string, 200) ||
+      originalName.replace(/\.[^.]+$/, '');
+    const description = sanitiseHeader(req.headers['x-doc-description'] as string, 2000) || null;
+    const category = sanitiseHeader(req.headers['x-doc-category'] as string, 100) || null;
     const url = `/files/library/${filename}`;
 
     const repo = container.resolve('libraryDocumentRepo');
     const doc = await repo.create(
-      LibraryDocument.create({ title, description, category, filename, originalName, url, mime, size: written }),
+      LibraryDocument.create({
+        title,
+        description,
+        category,
+        filename,
+        originalName,
+        url,
+        mime,
+        size: written,
+      }),
     );
     return reply.code(201).send(doc.toJSON());
   }
@@ -82,7 +108,14 @@ export class LibraryController {
   async update(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
-    const body = req.body as { title?: string; description?: string | null; category?: string | null; visible?: boolean };
+
+    const body = req.body as {
+      title?: string;
+      description?: string | null;
+      category?: string | null;
+      visible?: boolean;
+    };
+
     const repo = container.resolve('libraryDocumentRepo');
     await repo.update(id, body);
     return reply.code(204).send();
@@ -96,7 +129,6 @@ export class LibraryController {
     const doc = await repo.findById(id);
     if (!doc) return reply.code(404).send({ error: 'Not found' });
 
-    // Remove file from disk
     const filePath = path.join(DOC_DIR, doc.props.filename);
     await fsp.rm(filePath, { force: true });
 
@@ -104,16 +136,35 @@ export class LibraryController {
     return reply.code(204).send();
   }
 
+  /**
+   * Returns { hasPlayerKey: boolean } — never the hash itself.
+   * The key is stored as a scrypt hash; it cannot be reversed or shown to the GM.
+   */
   async getSettings(_req: FastifyRequest, reply: FastifyReply) {
     const repo = container.resolve('libraryDocumentRepo');
-    const playerKey = await repo.getPlayerKey();
-    return reply.send({ playerKey });
+    const stored = await repo.getPlayerKey();
+    return reply.send({ hasPlayerKey: Boolean(stored?.startsWith('$scrypt$')) });
   }
 
+  /**
+   * Accepts the plaintext key, validates strength, hashes with scrypt, stores the hash.
+   * Passing null clears the key (locks the library for all players).
+   */
   async setSettings(req: FastifyRequest, reply: FastifyReply) {
-    const body = req.body as { playerKey: string | null };
+    const { playerKey } = req.body as { playerKey: string | null };
     const repo = container.resolve('libraryDocumentRepo');
-    await repo.setPlayerKey(body.playerKey?.trim() || null);
+
+    if (playerKey === null) {
+      await repo.setPlayerKey(null);
+      return reply.code(204).send();
+    }
+
+    const plain = playerKey.trim();
+    const error = validateKeyStrength(plain);
+    if (error) return reply.code(400).send({ error });
+
+    const hashed = hashKey(plain);
+    await repo.setPlayerKey(hashed);
     return reply.code(204).send();
   }
 }

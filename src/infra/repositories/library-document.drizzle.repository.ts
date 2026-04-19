@@ -1,4 +1,5 @@
 import { desc, eq } from 'drizzle-orm';
+
 import { LibraryDocument } from '../../core/entities/library-document.js';
 import { db, schema } from '../db/index.js';
 
@@ -57,7 +58,12 @@ export class LibraryDocumentRepository {
 
   async update(
     id: number,
-    data: { title?: string; description?: string | null; category?: string | null; visible?: boolean },
+    data: {
+      title?: string;
+      description?: string | null;
+      category?: string | null;
+      visible?: boolean;
+    },
   ): Promise<void> {
     await db
       .update(schema.libraryDocuments)
@@ -66,7 +72,7 @@ export class LibraryDocumentRepository {
         ...(data.description !== undefined ? { description: data.description } : {}),
         ...(data.category !== undefined ? { category: data.category } : {}),
         ...(data.visible !== undefined ? { visible: data.visible } : {}),
-        updatedAt: Date.now(),
+        updatedAt: new Date(),
       })
       .where(eq(schema.libraryDocuments.id, id));
   }
@@ -77,17 +83,20 @@ export class LibraryDocumentRepository {
 
   // Settings helpers
   async getPlayerKey(): Promise<string | null> {
-    const [row] = await db.select().from(schema.librarySettings).where(eq(schema.librarySettings.id, 1));
+    const [row] = await db
+      .select()
+      .from(schema.librarySettings)
+      .where(eq(schema.librarySettings.id, 1));
     return row?.playerKey ?? null;
   }
 
   async setPlayerKey(key: string | null): Promise<void> {
     await db
       .insert(schema.librarySettings)
-      .values({ id: 1, playerKey: key, updatedAt: Date.now() })
+      .values({ id: 1, playerKey: key, updatedAt: new Date() })
       .onConflictDoUpdate({
         target: schema.librarySettings.id,
-        set: { playerKey: key, updatedAt: Date.now() },
+        set: { playerKey: key, updatedAt: new Date() },
       });
   }
 }
