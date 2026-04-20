@@ -85,6 +85,20 @@ export async function playerRoutes(app: FastifyInstance) {
     ctrl.updateImage.bind(ctrl),
   );
 
+  // DELETE player (GM only)
+  app.delete<{ Params: IdParams }>(
+    '/api/players/:id',
+    app.withGM({
+      schema: {
+        tags: ['Players'],
+        security: [{ ApiKeyAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    ctrl.delete.bind(ctrl),
+  );
+
   // PATCH ficha (PDF) do player
   app.patch(
     '/api/players/:id/sheet',

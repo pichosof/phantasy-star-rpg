@@ -146,4 +146,28 @@ export class PlayerController {
 
     return reply.code(204).send();
   }
+
+  async delete(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+
+    const repo = container.resolve('playerRepo');
+    const [player] = await repo.findById(id);
+
+    if (player) {
+      // Delete physical files
+      if (player.imageUrl) {
+        const imgPath = path.join(IMG_DIR, path.basename(player.imageUrl));
+        await fsp.rm(imgPath, { force: true });
+      }
+      if (player.sheetUrl) {
+        const sheetPath = path.join(PDF_DIR, path.basename(player.sheetUrl));
+        await fsp.rm(sheetPath, { force: true });
+      }
+    }
+
+    // Delete from DB (cascade removes player_notes, player_quests)
+    await repo.delete(id);
+    return reply.code(204).send();
+  }
 }

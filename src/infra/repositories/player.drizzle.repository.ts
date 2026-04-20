@@ -16,16 +16,22 @@ export class PlayerDrizzleRepository implements IPlayerRepository {
       .returning();
     return Player.rehydrate({
       ...row,
-      sheetSize: row.sheetSize !== null && row.sheetSize !== undefined ? String(row.sheetSize) : row.sheetSize,
+      sheetSize:
+        row.sheetSize !== null && row.sheetSize !== undefined
+          ? String(row.sheetSize)
+          : row.sheetSize,
     });
   }
-    
+
   async list(): Promise<Player[]> {
     const rows = await db.select().from(schema.players).orderBy(schema.players.id);
-    return rows.map((r) => Player.rehydrate({
-      ...r,
-      sheetSize: r.sheetSize !== null && r.sheetSize !== undefined ? String(r.sheetSize) : r.sheetSize,
-    }));
+    return rows.map((r) =>
+      Player.rehydrate({
+        ...r,
+        sheetSize:
+          r.sheetSize !== null && r.sheetSize !== undefined ? String(r.sheetSize) : r.sheetSize,
+      }),
+    );
   }
   async update(id: number, data: { name?: string; level?: number; background?: string | null }) {
     await db
@@ -38,8 +44,9 @@ export class PlayerDrizzleRepository implements IPlayerRepository {
       })
       .where(eq(schema.players.id, id));
   }
-async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.players)
+  async setVisibility(id: number, visible: boolean) {
+    await db
+      .update(schema.players)
       .set({ visible, updatedAt: new Date() })
       .where(eq(schema.players.id, id));
   }
@@ -57,6 +64,14 @@ async setVisibility(id: number, visible: boolean) {
         updatedAt: new Date(),
       })
       .where(eq(schema.players.id, id));
+  }
+
+  async findById(id: number) {
+    return db.select().from(schema.players).where(eq(schema.players.id, id));
+  }
+
+  async delete(id: number) {
+    await db.delete(schema.players).where(eq(schema.players.id, id));
   }
 
   async updateSheet(id: number, data: { url: string; mime?: string | null; size?: number | null }) {

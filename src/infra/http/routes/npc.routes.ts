@@ -17,7 +17,7 @@ export async function npcRoutes(app: FastifyInstance) {
     },
     ctrl.list.bind(ctrl),
   );
-app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+  app.patch<{ Params: IdParams; Body: VisibilityBody }>(
     '/api/npcs/:id/visibility',
     app.withGM({
       schema: {
@@ -99,6 +99,21 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
       },
     }),
     ctrl.delete.bind(ctrl),
+  );
+
+  // PATCH sheet (PDF) protegido
+  app.patch(
+    '/api/npcs/:id/sheet',
+    app.withGM({
+      schema: {
+        tags: ['NPCs'],
+        security: [{ ApiKeyAuth: [] }],
+        consumes: ['multipart/form-data'],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    ctrl.updateSheet.bind(ctrl),
   );
 
   // PATCH imagem protegido (multipart)

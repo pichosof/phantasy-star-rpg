@@ -25,6 +25,7 @@ import { loreRoutes } from './routes/lore.routes';
 import { mapMarkerRoutes } from './routes/map-marker.routes';
 import { monsterRoutes } from './routes/monster.routes';
 import { npcRoutes } from './routes/npc.routes';
+import { playerNotesRoutes } from './routes/player-notes.routes';
 import { playerQuestRoutes } from './routes/player-quest.routes';
 import { playerRoutes } from './routes/player.routes';
 import { questCityRoutes } from './routes/quest-city.routes';
@@ -162,6 +163,7 @@ export async function buildServer() {
 
   // ── Application routes ───────────────────────────────────────────────────────
   await app.register(playerRoutes);
+  await app.register(playerNotesRoutes);
   await app.register(questRoutes);
   await app.register(uploadRoutes);
   await app.register(npcRoutes);

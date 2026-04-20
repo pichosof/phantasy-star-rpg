@@ -48,6 +48,9 @@ export const npcs = sqliteTable('npcs', {
   imageAlt: text('image_alt'), // alt text
   imageMime: text('image_mime'), // opcional
   imageSize: integer('image_size'), // bytes (opcional)
+  sheetUrl: text('sheet_url'),
+  sheetMime: text('sheet_mime'),
+  sheetSize: integer('sheet_size'),
   description: text('description'),
   location: text('location'), // cidade/local atual
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
@@ -119,7 +122,9 @@ export const cities = sqliteTable('cities', {
 // Imagens das cidades (múltiplas por cidade)
 export const cityImages = sqliteTable('city_images', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  cityId: integer('city_id').notNull().references(() => cities.id, { onDelete: 'cascade' }),
+  cityId: integer('city_id')
+    .notNull()
+    .references(() => cities.id, { onDelete: 'cascade' }),
   url: text('url').notNull(),
   alt: text('alt'),
   mime: text('mime').notNull(),
@@ -314,6 +319,22 @@ export const libraryDocuments = sqliteTable('library_documents', {
 export const librarySettings = sqliteTable('library_settings', {
   id: integer('id').primaryKey(),
   playerKey: text('player_key'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+export const playerNotes = sqliteTable('player_notes', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  playerId: integer('player_id')
+    .notNull()
+    .references(() => players.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  content: text('content'),
+  date: text('date').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),

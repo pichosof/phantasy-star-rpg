@@ -15,6 +15,7 @@ type IdParams = { id: string };
 type UpdateBody = z.infer<typeof updateNpcInput>;
 
 const IMG_DIR = path.resolve('data', 'uploads', 'npcs', 'images');
+const PDF_DIR = path.resolve('data', 'uploads', 'npcs', 'sheets');
 
 export class NpcController {
   async list(_req: FastifyRequest, reply: FastifyReply) {
@@ -89,6 +90,47 @@ export class NpcController {
       size: written,
     });
 
+    return reply.code(204).send();
+  }
+
+  async updateSheet(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+
+    const part = await req.file();
+    if (!part) return reply.code(400).send({ error: 'Missing file' });
+
+    const mime = part.mimetype || 'application/octet-stream';
+    if (mime !== 'application/pdf') return reply.code(400).send({ error: 'Only PDF allowed' });
+
+    const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
+    await fsp.mkdir(PDF_DIR, { recursive: true });
+
+    const name = `${id}-${Date.now()}-${randomUUID()}.pdf`;
+    const filePath = path.join(PDF_DIR, name);
+
+    let written = 0;
+    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
+    part.file.on('data', (chunk: Buffer) => {
+      written += chunk.length;
+      if (written > maxBytes) part.file.destroy(new Error('File too large'));
+    });
+
+    try {
+      await pipeline(part.file, ws);
+    } catch (e) {
+      await fsp.rm(filePath, { force: true });
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes('too large')) return reply.code(413).send({ error: 'Payload too large' });
+      throw e;
+    }
+
+    const { db, schema } = await import('../../db/index.js');
+    const { eq } = await import('drizzle-orm');
+    await db
+      .update(schema.npcs)
+      .set({ sheetUrl: `/files/npcs/sheets/${name}`, sheetMime: mime, sheetSize: written })
+      .where(eq(schema.npcs.id, id));
     return reply.code(204).send();
   }
 
