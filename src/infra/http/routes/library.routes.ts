@@ -7,6 +7,11 @@ import { LibraryController } from '../controllers/library.controller.js';
 
 type IdParams = { id: string };
 
+// Max upload size in bytes — gives 20 MB headroom above the configured limit for
+// multipart envelope overhead. Fastify checks bodyLimit before @fastify/multipart
+// can stream the body, so this must be at least as large as the file limit.
+const UPLOAD_BODY_LIMIT = (Number(process.env.MAX_UPLOAD_MB || 30) + 20) * 1024 * 1024;
+
 /**
  * Library access guard.
  *
@@ -24,7 +29,6 @@ async function requireLibraryAccess(req: FastifyRequest, reply: FastifyReply) {
 
   const ip = req.ip;
 
-  // Check brute-force lockout before doing any DB work
   const remaining = libraryBruteForce.lockoutRemaining(ip);
   if (remaining > 0) {
     await reply
@@ -36,21 +40,16 @@ async function requireLibraryAccess(req: FastifyRequest, reply: FastifyReply) {
 
   const provided = req.headers['x-library-key'] as string | undefined;
 
-  // Get stored hash — do this before checking `provided` so timing is constant
   const repo = container.resolve('libraryDocumentRepo');
   const storedHash = await repo.getPlayerKey();
 
-  // Always run verifyKey (even on missing/null values) to prevent timing oracle.
-  // verifyKey returns false for empty/null inputs without doing crypto work,
-  // but we normalise the response time by always going through the same code path.
-  const keyToVerify = provided ?? '';
+  const keyToVerify  = provided ?? '';
   const hashToVerify = storedHash ?? '';
 
   const valid = hashToVerify.startsWith('$scrypt$') ? verifyKey(keyToVerify, hashToVerify) : false;
 
   if (!valid) {
     libraryBruteForce.recordFailure(ip);
-    // Uniform error — no distinction between "no key" / "wrong key" / "library locked"
     await reply.code(401).send({ error: 'Unauthorized' });
     return;
   }
@@ -61,21 +60,36 @@ async function requireLibraryAccess(req: FastifyRequest, reply: FastifyReply) {
 export async function libraryRoutes(app: FastifyInstance) {
   const c = new LibraryController();
 
-  // GET — player or GM access (rate-limited at network level by global plugin)
+  // GET list — player or GM
   app.get(
     '/api/library/documents',
-    {
-      preHandler: [requireLibraryAccess],
-      schema: { tags: ['Library'] },
-    },
+    { preHandler: [requireLibraryAccess], schema: { tags: ['Library'] } },
     c.list.bind(c),
   );
 
-  // POST (upload) — GM only, multipart
+  // POST upload — GM only.
+  // bodyLimit is set per-route: Fastify enforces it before @fastify/multipart can
+  // stream the body, so the route limit must be larger than the max file size.
   app.post(
     '/api/library/documents',
-    app.withGM({ schema: { tags: ['Library'], security: [{ ApiKeyAuth: [] }] } }),
+    app.withGM({
+      bodyLimit: UPLOAD_BODY_LIMIT,
+      schema: { tags: ['Library'], security: [{ BearerAuth: [] }] },
+    }),
     c.upload.bind(c),
+  );
+
+  // GET download — player or GM; streams file with original filename + Range support
+  app.get<{ Params: IdParams }>(
+    '/api/library/documents/:id/download',
+    {
+      preHandler: [requireLibraryAccess],
+      schema: {
+        tags: ['Library'],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+      },
+    },
+    c.download.bind(c),
   );
 
   // PATCH — GM only
@@ -84,15 +98,15 @@ export async function libraryRoutes(app: FastifyInstance) {
     app.withGM({
       schema: {
         tags: ['Library'],
-        security: [{ ApiKeyAuth: [] }],
+        security: [{ BearerAuth: [] }],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
         body: {
           type: 'object',
           properties: {
-            title: { type: 'string', maxLength: 200 },
+            title:       { type: 'string', maxLength: 200 },
             description: { anyOf: [{ type: 'string', maxLength: 2000 }, { type: 'null' }] },
-            category: { anyOf: [{ type: 'string', maxLength: 100 }, { type: 'null' }] },
-            visible: { type: 'boolean' },
+            category:    { anyOf: [{ type: 'string', maxLength: 100 }, { type: 'null' }] },
+            visible:     { type: 'boolean' },
           },
           additionalProperties: false,
         },
@@ -108,7 +122,7 @@ export async function libraryRoutes(app: FastifyInstance) {
     app.withGM({
       schema: {
         tags: ['Library'],
-        security: [{ ApiKeyAuth: [] }],
+        security: [{ BearerAuth: [] }],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
         response: { 204: { type: 'null' } },
       },
@@ -116,26 +130,24 @@ export async function libraryRoutes(app: FastifyInstance) {
     c.delete.bind(c),
   );
 
-  // GET settings — GM only; returns { hasPlayerKey: boolean } — never returns the hash
+  // GET settings — GM only
   app.get(
     '/api/library/settings',
-    app.withGM({ schema: { tags: ['Library'], security: [{ ApiKeyAuth: [] }] } }),
+    app.withGM({ schema: { tags: ['Library'], security: [{ BearerAuth: [] }] } }),
     c.getSettings.bind(c),
   );
 
-  // PATCH settings — GM only; accepts plaintext key, hashes it before storage
+  // PATCH settings — GM only
   app.patch(
     '/api/library/settings',
     app.withGM({
       schema: {
         tags: ['Library'],
-        security: [{ ApiKeyAuth: [] }],
+        security: [{ BearerAuth: [] }],
         body: {
           type: 'object',
           properties: {
-            playerKey: {
-              anyOf: [{ type: 'string', minLength: 12, maxLength: 256 }, { type: 'null' }],
-            },
+            playerKey: { anyOf: [{ type: 'string', minLength: 12, maxLength: 256 }, { type: 'null' }] },
           },
           additionalProperties: false,
         },
