@@ -1,8 +1,12 @@
 import { randomUUID } from 'node:crypto';
+import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
@@ -31,6 +35,23 @@ const ALLOWED_MIME: Record<string, string> = {
   'application/mobi': '.mobi',
   'text/markdown': '.md',
 };
+
+/**
+ * Converts a MOBI file to EPUB using Calibre's ebook-convert CLI.
+ * Returns the new EPUB path on success, null if Calibre is not installed or conversion fails.
+ * The original MOBI file is deleted on success.
+ */
+async function mobiToEpub(mobiPath: string): Promise<string | null> {
+  const epubPath = mobiPath.replace(/\.mobi$/i, '.epub');
+  try {
+    await execFileAsync('ebook-convert', [mobiPath, epubPath]);
+    await fsp.rm(mobiPath, { force: true });
+    return epubPath;
+  } catch {
+    await fsp.rm(epubPath, { force: true }); // clean up partial output if any
+    return null;
+  }
+}
 
 /** Strip characters outside printable ASCII 0x20–0x7E for header values. */
 function sanitiseHeader(value: string | undefined, maxLen = 500): string {
@@ -71,7 +92,20 @@ export class LibraryController {
     const part = await req.file();
     if (!part) return reply.code(400).send({ error: 'Missing file' });
 
-    const mime = part.mimetype || 'application/octet-stream';
+    let mime = part.mimetype || 'application/octet-stream';
+
+    // Browsers often report generic types for uncommon formats (e.g. MOBI → octet-stream).
+    // Fall back to extension-based detection so the allow-list still applies.
+    if (!ALLOWED_MIME[mime]) {
+      const originalExt = path.extname(part.filename ?? '').toLowerCase();
+      const EXT_TO_MIME: Record<string, string> = {
+        '.mobi': 'application/x-mobipocket-ebook',
+        '.epub': 'application/epub+zip',
+        '.md':   'text/markdown',
+      };
+      if (EXT_TO_MIME[originalExt]) mime = EXT_TO_MIME[originalExt];
+    }
+
     const ext = ALLOWED_MIME[mime];
     if (!ext) {
       return reply.code(400).send({ error: `Unsupported file type: ${mime}` });
@@ -102,16 +136,30 @@ export class LibraryController {
       throw e;
     }
 
+    // Convert MOBI → EPUB automatically so the viewer can render it.
+    let storedFilename = filename;
+    let storedMime     = mime;
+    if (mime === 'application/x-mobipocket-ebook' || mime === 'application/mobi') {
+      const epubPath = await mobiToEpub(filePath);
+      if (epubPath) {
+        storedFilename = path.basename(epubPath);
+        storedMime     = 'application/epub+zip';
+        const epubStat = await fsp.stat(epubPath).catch(() => null);
+        if (epubStat) written = epubStat.size;
+      }
+      // If conversion failed (Calibre not installed) we keep the MOBI as-is.
+    }
+
     const title =
       sanitiseHeader(req.headers['x-doc-title'] as string, 200) ||
       originalName.replace(/\.[^.]+$/, '');
     const description = sanitiseHeader(req.headers['x-doc-description'] as string, 2000) || null;
     const category    = sanitiseHeader(req.headers['x-doc-category'] as string, 100) || null;
-    const url = `/files/library/${filename}`;
+    const url = `/files/library/${storedFilename}`;
 
     const repo = container.resolve('libraryDocumentRepo');
     const doc = await repo.create(
-      LibraryDocument.create({ title, description, category, filename, originalName, url, mime, size: written }),
+      LibraryDocument.create({ title, description, category, filename: storedFilename, originalName, url, mime: storedMime, size: written }),
     );
     return reply.code(201).send(doc.toJSON());
   }

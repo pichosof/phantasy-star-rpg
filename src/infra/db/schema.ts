@@ -116,6 +116,20 @@ export const cities = sqliteTable('cities', {
   imageSize: integer('image_size'),
 });
 
+// Imagens das cidades (múltiplas por cidade)
+export const cityImages = sqliteTable('city_images', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  cityId: integer('city_id').notNull().references(() => cities.id, { onDelete: 'cascade' }),
+  url: text('url').notNull(),
+  alt: text('alt'),
+  mime: text('mime').notNull(),
+  size: integer('size').notNull(),
+  position: integer('position').notNull().default(0),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
 // Bestiário (monstros/inimigos)
 export const bestiary = sqliteTable('bestiary', {
   id: integer('id').primaryKey({ autoIncrement: true }),

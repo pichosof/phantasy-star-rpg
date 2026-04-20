@@ -1,3 +1,14 @@
+export interface CityImage {
+  id: number;
+  cityId: number;
+  url: string;
+  alt: string | null;
+  mime: string;
+  size: number;
+  position: number;
+  createdAt: Date;
+}
+
 export interface CityProps {
   id?: number;
   name: string;
@@ -8,6 +19,7 @@ export interface CityProps {
   imageAlt?: string | null;
   imageMime?: string | null;
   imageSize?: number | null;
+  images?: CityImage[];
   worldId?: number | null;
   coordinates?: string | null;
   visible?: boolean;

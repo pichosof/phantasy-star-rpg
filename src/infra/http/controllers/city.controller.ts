@@ -117,6 +117,64 @@ export class CityController {
     return reply.code(204).send();
   }
 
+  async addImage(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+
+    const part = await req.file();
+    if (!part) return reply.code(400).send({ error: 'Missing file' });
+
+    const allowed = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] as const;
+    const mime = part.mimetype || 'application/octet-stream';
+    if (!allowed.includes(mime as (typeof allowed)[number]))
+      return reply.code(400).send({ error: 'Unsupported file type' });
+
+    const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
+    await fsp.mkdir(IMG_DIR, { recursive: true });
+
+    const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
+    const name = `${id}-${Date.now()}-${randomUUID()}.${ext}`;
+    const filePath = path.join(IMG_DIR, name);
+
+    let written = 0;
+    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
+    part.file.on('data', (chunk: Buffer) => {
+      written += chunk.length;
+      if (written > maxBytes) part.file.destroy(new Error('File too large'));
+    });
+
+    try {
+      await pipeline(part.file, ws);
+    } catch (e) {
+      await fsp.rm(filePath, { force: true });
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes('too large')) return reply.code(413).send({ error: 'Payload too large' });
+      throw e;
+    }
+
+    const publicUrl = `/files/cities/images/${name}`;
+    const alt = (req.headers['x-image-alt'] as string) || null;
+    const repo = container.resolve('cityRepo');
+    const image = await repo.addImage({ cityId: id, url: publicUrl, alt, mime, size: written });
+    return reply.code(201).send(image);
+  }
+
+  async deleteImage(req: FastifyRequest<{ Params: { id: string; imageId: string } }>, reply: FastifyReply) {
+    const cityId = Number(req.params.id);
+    const imageId = Number(req.params.imageId);
+    if (!Number.isFinite(cityId) || !Number.isFinite(imageId))
+      return reply.code(400).send({ error: 'Invalid id' });
+
+    const repo = container.resolve('cityRepo');
+    const image = await repo.getImage(imageId);
+    if (!image || image.cityId !== cityId) return reply.code(404).send({ error: 'Not found' });
+
+    const filePath = path.join(IMG_DIR, path.basename(image.url));
+    await fsp.rm(filePath, { force: true });
+    await repo.deleteImage(imageId);
+    return reply.code(204).send();
+  }
+
   async delete(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });

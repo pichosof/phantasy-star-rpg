@@ -127,6 +127,38 @@ export async function cityRoutes(app: FastifyInstance) {
     c.updateImage.bind(c),
   );
 
+  // POST imagem (adicionar uma das N imagens)
+  app.post(
+    '/api/cities/:id/images',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ BearerAuth: [] }],
+        params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+        response: { 201: { type: 'object', additionalProperties: true } },
+      },
+    }),
+    c.addImage.bind(c),
+  );
+
+  // DELETE imagem individual
+  app.delete(
+    '/api/cities/:id/images/:imageId',
+    app.withGM({
+      schema: {
+        tags: ['Cities'],
+        security: [{ BearerAuth: [] }],
+        params: {
+          type: 'object',
+          required: ['id', 'imageId'],
+          properties: { id: { type: 'string' }, imageId: { type: 'string' } },
+        },
+        response: { 204: { type: 'null' } },
+      },
+    }),
+    c.deleteImage.bind(c),
+  );
+
   // DELETE protegido
   app.delete(
     '/api/cities/:id',

@@ -1,9 +1,20 @@
-import { eq } from 'drizzle-orm';
+import { eq, asc } from 'drizzle-orm';
 
 import { City } from '../../core/entities/city.js';
 import { db, schema } from '../db/index.js';
 type Row = typeof schema.cities.$inferSelect;
 const map = (r: Row) => City.rehydrate(r);
+
+export interface CityImageRow {
+  id: number;
+  cityId: number;
+  url: string;
+  alt: string | null;
+  mime: string;
+  size: number;
+  position: number;
+  createdAt: Date;
+}
 
 export class CityDrizzleRepository {
   async create(c: City) {
@@ -27,7 +38,40 @@ export class CityDrizzleRepository {
 
   async list() {
     const rows = await db.select().from(schema.cities).orderBy(schema.cities.id);
-    return rows.map(map);
+    const images = await db.select().from(schema.cityImages).orderBy(asc(schema.cityImages.position), asc(schema.cityImages.createdAt));
+    return rows.map((r) => {
+      const city = map(r);
+      city.props.images = images.filter((img) => img.cityId === r.id);
+      return city;
+    });
+  }
+
+  async listImages(cityId: number): Promise<CityImageRow[]> {
+    return db
+      .select()
+      .from(schema.cityImages)
+      .where(eq(schema.cityImages.cityId, cityId))
+      .orderBy(asc(schema.cityImages.position), asc(schema.cityImages.createdAt));
+  }
+
+  async addImage(data: { cityId: number; url: string; alt?: string | null; mime: string; size: number }): Promise<CityImageRow> {
+    const [row] = await db.insert(schema.cityImages).values({
+      cityId: data.cityId,
+      url: data.url,
+      alt: data.alt ?? null,
+      mime: data.mime,
+      size: data.size,
+    }).returning();
+    return row as CityImageRow;
+  }
+
+  async deleteImage(imageId: number): Promise<void> {
+    await db.delete(schema.cityImages).where(eq(schema.cityImages.id, imageId));
+  }
+
+  async getImage(imageId: number): Promise<CityImageRow | null> {
+    const [row] = await db.select().from(schema.cityImages).where(eq(schema.cityImages.id, imageId));
+    return (row as CityImageRow) ?? null;
   }
 
   async setDiscovered(id: number, discovered: boolean) {
