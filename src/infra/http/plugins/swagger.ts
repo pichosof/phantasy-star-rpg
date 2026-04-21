@@ -10,6 +10,7 @@ export default fp(async (app) => {
       components: {
         securitySchemes: {
           ApiKeyAuth: { type: 'apiKey', in: 'header', name: 'x-api-key' },
+          BearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
         },
       },
     },

@@ -17,6 +17,7 @@ import visibilityFilterPlugin from './plugins/visibility-filter';
 import { characterSheetsRoutes } from './routes/character-sheets.routes';
 import { cityWorldRoutes } from './routes/city-world.routes';
 import { cityRoutes } from './routes/city.routes';
+import { dungeonRoutes } from './routes/dungeon.routes';
 import { gmImagesRoutes } from './routes/gm-images.routes';
 import { gmNotesRoutes } from './routes/gm-notes.routes';
 import { libraryRoutes } from './routes/library.routes';
@@ -31,6 +32,7 @@ import { playerRoutes } from './routes/player.routes';
 import { questCityRoutes } from './routes/quest-city.routes';
 import { questRoutes } from './routes/quest.routes';
 import { sessionRoutes } from './routes/session.routes';
+import { tagsRoutes } from './routes/tags.routes';
 import { timelineRoutes } from './routes/timeline.routes';
 import { uploadRoutes } from './routes/upload.routes';
 import { wikiRoutes } from './routes/wiki.routes';
@@ -183,6 +185,8 @@ export async function buildServer() {
   await app.register(gmImagesRoutes);
   await app.register(characterSheetsRoutes);
   await app.register(libraryRoutes);
+  await app.register(dungeonRoutes);
+  await app.register(tagsRoutes);
 
   await app.register(errorHandlerPlugin);
 

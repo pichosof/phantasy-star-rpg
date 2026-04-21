@@ -6,16 +6,16 @@ export async function questRoutes(app: FastifyInstance) {
   const ctrl = new QuestController();
 
   app.get(
-  '/api/quests',
-  app.withGM({
-    schema: {
-      tags: ['Quests'],
-      security: [{ ApiKeyAuth: [] }],
-      response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
-    },
-  }),
-  ctrl.list.bind(ctrl),
-);
+    '/api/quests',
+    app.withGM({
+      schema: {
+        tags: ['Quests'],
+        security: [{ ApiKeyAuth: [] }],
+        response: { 200: { type: 'array', items: { type: 'object', additionalProperties: true } } },
+      },
+    }),
+    ctrl.list.bind(ctrl),
+  );
 
   app.post(
     '/api/quests',
@@ -28,8 +28,8 @@ export async function questRoutes(app: FastifyInstance) {
           required: ['title'],
           properties: {
             title: { type: 'string' },
-            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-            reward: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            description: { type: 'string', nullable: true },
+            reward: { type: 'string', nullable: true },
           },
           additionalProperties: false,
         },
@@ -46,7 +46,7 @@ export async function questRoutes(app: FastifyInstance) {
         tags: ['Quests'],
         security: [{ ApiKeyAuth: [] }],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     ctrl.complete.bind(ctrl),
@@ -63,13 +63,13 @@ export async function questRoutes(app: FastifyInstance) {
           type: 'object',
           properties: {
             title: { type: 'string' },
-            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
-            reward: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            description: { type: 'string', nullable: true },
+            reward: { type: 'string', nullable: true },
             status: { enum: ['active', 'completed', 'failed'] },
           },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     ctrl.update.bind(ctrl),

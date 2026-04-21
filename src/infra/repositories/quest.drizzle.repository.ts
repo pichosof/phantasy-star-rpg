@@ -1,4 +1,4 @@
-import { eq, or, isNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 import { Quest } from '../../core/entities/quest.js';
 import { db, schema } from '../db/index.js';
@@ -18,7 +18,7 @@ export class QuestDrizzleRepository {
 
     return Quest.rehydrate({
       ...row,
-      visible: (row as any).visible ?? true,
+      visible: (row as { visible?: boolean | null }).visible ?? true,
     });
   }
 
@@ -27,7 +27,7 @@ export class QuestDrizzleRepository {
     return rows.map((r) =>
       Quest.rehydrate({
         ...r,
-        visible: (r as any).visible ?? true,
+        visible: (r as { visible?: boolean | null }).visible ?? true,
       }),
     );
   }
@@ -37,7 +37,10 @@ export class QuestDrizzleRepository {
   }
 
   async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.quests).set({ visible, updatedAt: new Date() }).where(eq(schema.quests.id, id));
+    await db
+      .update(schema.quests)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.quests.id, id));
   }
 
   async update(

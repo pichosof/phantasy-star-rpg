@@ -1,4 +1,5 @@
-import { desc, eq, like } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
+
 import { GmNote } from '../../core/entities/gm-note.js';
 import { db, schema } from '../db/index.js';
 
@@ -38,11 +39,17 @@ export class GmNoteDrizzleRepository {
     if (!tag) return all;
     const t = tag.toLowerCase();
     return all.filter((n) =>
-      (n.props.tags ?? '').split(',').map((s) => s.trim().toLowerCase()).includes(t),
+      (n.props.tags ?? '')
+        .split(',')
+        .map((s) => s.trim().toLowerCase())
+        .includes(t),
     );
   }
 
-  async update(id: number, data: Partial<{ title: string; content: string | null; tags: string | null; pinned: boolean }>): Promise<void> {
+  async update(
+    id: number,
+    data: Partial<{ title: string; content: string | null; tags: string | null; pinned: boolean }>,
+  ): Promise<void> {
     await db
       .update(schema.gmNotes)
       .set({ ...data, updatedAt: new Date() })

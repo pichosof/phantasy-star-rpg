@@ -1,9 +1,15 @@
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+
 import type { GmImage } from '../../entities/gm-image.js';
 
 export class DeleteGmImage {
-  constructor(private repo: { findById(id: number): Promise<GmImage | null>; delete(id: number): Promise<void> }) {}
+  constructor(
+    private repo: {
+      findById(id: number): Promise<GmImage | null>;
+      delete(id: number): Promise<void>;
+    },
+  ) {}
 
   async execute(id: number) {
     const img = await this.repo.findById(id);

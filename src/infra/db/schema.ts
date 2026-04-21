@@ -340,6 +340,86 @@ export const playerNotes = sqliteTable('player_notes', {
     .default(sql`(unixepoch('now') * 1000)`),
 });
 
+// Dungeons
+export const dungeonTypes = [
+  'cave',
+  'tower',
+  'ruin',
+  'lair',
+  'temple',
+  'facility',
+  'other',
+] as const;
+export type DungeonType = (typeof dungeonTypes)[number];
+
+export const dungeons = sqliteTable('dungeons', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  type: text('type', { enum: dungeonTypes }),
+  description: text('description'),
+  region: text('region'),
+  coordinates: text('coordinates'), // "u,v" normalized [0..1]
+  discovered: integer('discovered', { mode: 'boolean' }).notNull().default(false),
+  visible: integer('visible', { mode: 'boolean' }).notNull().default(false),
+  cityId: integer('city_id').references(() => cities.id, { onDelete: 'set null' }),
+  worldId: integer('world_id').references(() => worlds.id, { onDelete: 'set null' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+export const dungeonImages = sqliteTable('dungeon_images', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  dungeonId: integer('dungeon_id')
+    .notNull()
+    .references(() => dungeons.id, { onDelete: 'cascade' }),
+  url: text('url').notNull(),
+  alt: text('alt'),
+  mime: text('mime').notNull(),
+  size: integer('size').notNull(),
+  position: integer('position').notNull().default(0),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+// Tags
+export const tags = sqliteTable('tags', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().unique(),
+  color: text('color').notNull().default('#1677ff'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+export const entityTagTypes = [
+  'beast',
+  'npc',
+  'city',
+  'dungeon',
+  'world',
+  'player',
+  'lore',
+  'quest',
+] as const;
+export type EntityTagType = (typeof entityTagTypes)[number];
+
+export const entityTags = sqliteTable(
+  'entity_tags',
+  {
+    tagId: integer('tag_id')
+      .notNull()
+      .references(() => tags.id, { onDelete: 'cascade' }),
+    entityType: text('entity_type', { enum: entityTagTypes }).notNull(),
+    entityId: integer('entity_id').notNull(),
+  },
+  (t) => ({ pk: primaryKey({ columns: [t.tagId, t.entityType, t.entityId] }) }),
+);
+
 export const loreCities = sqliteTable(
   'lore_cities',
   {

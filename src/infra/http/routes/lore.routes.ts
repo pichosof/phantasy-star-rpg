@@ -19,7 +19,7 @@ export async function loreRoutes(app: FastifyInstance) {
     },
     c.list.bind(c),
   );
-app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+  app.patch<{ Params: IdParams; Body: VisibilityBody }>(
     '/api/lores/:id/visibility',
     app.withGM({
       schema: {
@@ -32,7 +32,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           properties: { visible: { type: 'boolean' } },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.setVisibility.bind(c),
@@ -50,7 +50,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           properties: {
             title: { type: 'string' },
             category: { enum: ['history', 'culture', 'tech', 'biology', 'myth', null] },
-            content: { anyOf: [{ type: 'string' }, { type: 'null' }] }, 
+            content: { type: 'string', nullable: true },
           },
           additionalProperties: false,
         },
@@ -73,11 +73,11 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           properties: {
             title: { type: 'string' },
             category: { enum: ['history', 'culture', 'tech', 'biology', 'myth', null] },
-            content: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            content: { type: 'string', nullable: true },
           },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.update.bind(c),
@@ -91,7 +91,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
         tags: ['Lore'],
         security: [{ ApiKeyAuth: [] }],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.delete.bind(c),

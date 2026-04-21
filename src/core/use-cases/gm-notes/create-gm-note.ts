@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { GmNote } from '../../entities/gm-note.js';
 
 export const createGmNoteInput = z.object({

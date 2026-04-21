@@ -1,4 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
+
 import { createGmNoteInput } from '../../../core/use-cases/gm-notes/create-gm-note.js';
 import { updateGmNoteInput } from '../../../core/use-cases/gm-notes/update-gm-note.js';
 import { container } from '../../../di/container.js';

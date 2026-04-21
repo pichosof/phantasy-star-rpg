@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { Quest } from '../../entities/quest';
 
 export const createQuestInput = z.object({

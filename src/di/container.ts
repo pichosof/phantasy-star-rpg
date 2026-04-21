@@ -1,25 +1,14 @@
-import { CreateCharacterSheet } from '../core/use-cases/character-sheets/create-character-sheet';
-import { DeleteCharacterSheet } from '../core/use-cases/character-sheets/delete-character-sheet';
-import { GetCharacterSheet } from '../core/use-cases/character-sheets/get-character-sheet';
-import { ListCharacterSheets } from '../core/use-cases/character-sheets/list-character-sheets';
-import { UpdateCharacterSheet } from '../core/use-cases/character-sheets/update-character-sheet';
-import { DeleteGmImage } from '../core/use-cases/gm-images/delete-gm-image';
-import { ListGmImages } from '../core/use-cases/gm-images/list-gm-images';
-import { UploadGmImage } from '../core/use-cases/gm-images/upload-gm-image';
-import { CreateGmNote } from '../core/use-cases/gm-notes/create-gm-note';
-import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
-import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
-import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
-import { LibraryDocumentRepository } from '../infra/repositories/library-document.drizzle.repository';
-import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
-import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
-import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
 import { CreateMonster } from '../core/use-cases/bestiary/create-monster';
 import { DeleteMonster } from '../core/use-cases/bestiary/delete-monster';
 import { ListMonsters } from '../core/use-cases/bestiary/list-monsters';
 import { SetMonsterDiscovered } from '../core/use-cases/bestiary/set-monster-discovered';
 import { UpdateMonster } from '../core/use-cases/bestiary/update-monster';
 import { UpdateMonsterImage } from '../core/use-cases/bestiary/update-monster-image';
+import { CreateCharacterSheet } from '../core/use-cases/character-sheets/create-character-sheet';
+import { DeleteCharacterSheet } from '../core/use-cases/character-sheets/delete-character-sheet';
+import { GetCharacterSheet } from '../core/use-cases/character-sheets/get-character-sheet';
+import { ListCharacterSheets } from '../core/use-cases/character-sheets/list-character-sheets';
+import { UpdateCharacterSheet } from '../core/use-cases/character-sheets/update-character-sheet';
 import { AssignCityToWorld } from '../core/use-cases/cities/assign-city-to-world';
 import { CreateCity } from '../core/use-cases/cities/create-city';
 import { DeleteCity } from '../core/use-cases/cities/delete-city';
@@ -31,6 +20,13 @@ import { SetCityDiscovered } from '../core/use-cases/cities/set-city-discovered'
 import { UpdateCity } from '../core/use-cases/cities/update-city';
 import { UpdateCityImage } from '../core/use-cases/cities/update-city-image';
 import { SetVisibility } from '../core/use-cases/common/set-visibility';
+import { DeleteGmImage } from '../core/use-cases/gm-images/delete-gm-image';
+import { ListGmImages } from '../core/use-cases/gm-images/list-gm-images';
+import { UploadGmImage } from '../core/use-cases/gm-images/upload-gm-image';
+import { CreateGmNote } from '../core/use-cases/gm-notes/create-gm-note';
+import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
+import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
+import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
 import { DeleteLore } from '../core/use-cases/lore/delete-lore';
 import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
@@ -75,7 +71,12 @@ import { CreateWorld } from '../core/use-cases/world/create-world';
 import { ListWorlds } from '../core/use-cases/world/list-worlds';
 import { UpdateWorld } from '../core/use-cases/world/update-world';
 import { UpdateWorldImage } from '../core/use-cases/world/update-world-image';
+import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
 import { CityDrizzleRepository } from '../infra/repositories/city.drizzle.repository';
+import { DungeonDrizzleRepository } from '../infra/repositories/dungeon.drizzle.repository';
+import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
+import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
+import { LibraryDocumentRepository } from '../infra/repositories/library-document.drizzle.repository';
 import { LinksDrizzleRepository } from '../infra/repositories/links.drizzle.repository';
 import { LoreDrizzleRepository } from '../infra/repositories/lore.drizzle.repository';
 import { MapMarkerDrizzleRepository } from '../infra/repositories/map-marker.drizzle.repository';
@@ -84,6 +85,7 @@ import { NpcDrizzleRepository } from '../infra/repositories/npc.drizzle.reposito
 import { PlayerDrizzleRepository } from '../infra/repositories/player.drizzle.repository';
 import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repository';
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
+import { TagsDrizzleRepository } from '../infra/repositories/tags.drizzle.repository';
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
 import { WikiPageDrizzleRepository } from '../infra/repositories/wiki-page.drizzle.repository';
 import { WorldDrizzleRepository } from '../infra/repositories/world.drizzle.repository';
@@ -206,6 +208,12 @@ export type Registry = {
   getCharacterSheet: GetCharacterSheet;
   updateCharacterSheet: UpdateCharacterSheet;
   deleteCharacterSheet: DeleteCharacterSheet;
+
+  // Dungeons
+  dungeonRepo: DungeonDrizzleRepository;
+
+  // Tags
+  tagsRepo: TagsDrizzleRepository;
 
   // Links Pivots
   linksRepo: LinksDrizzleRepository;
@@ -346,6 +354,12 @@ class Container {
     getCharacterSheet: (c) => new GetCharacterSheet(c.resolve('sheetRepo')),
     updateCharacterSheet: (c) => new UpdateCharacterSheet(c.resolve('sheetRepo')),
     deleteCharacterSheet: (c) => new DeleteCharacterSheet(c.resolve('sheetRepo')),
+
+    // Dungeons
+    dungeonRepo: () => new DungeonDrizzleRepository(),
+
+    // Tags
+    tagsRepo: () => new TagsDrizzleRepository(),
 
     // Links
     linksRepo: () => new LinksDrizzleRepository(),

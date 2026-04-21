@@ -15,10 +15,10 @@ export async function cityWorldRoutes(app: FastifyInstance) {
         body: {
           type: 'object',
           required: ['worldId'],
-          properties: { worldId: { anyOf: [{ type: 'number' }, { type: 'null' }] } },
+          properties: { worldId: { type: 'number', nullable: true } },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.setWorld.bind(c),

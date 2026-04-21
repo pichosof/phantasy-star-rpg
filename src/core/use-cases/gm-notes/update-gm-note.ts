@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import type { z } from 'zod';
+
 import { createGmNoteInput } from './create-gm-note.js';
 
 export const updateGmNoteInput = createGmNoteInput.partial();

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
+
 import { container } from '../../../di/container.js';
 
 type IdParams = { id: string };
@@ -30,7 +31,14 @@ export class GmImagesController {
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
     await fsp.mkdir(IMG_DIR, { recursive: true });
 
-    const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : mime === 'image/gif' ? 'gif' : 'jpg';
+    const ext =
+      mime === 'image/png'
+        ? 'png'
+        : mime === 'image/webp'
+          ? 'webp'
+          : mime === 'image/gif'
+            ? 'gif'
+            : 'jpg';
     const filename = `${Date.now()}-${randomUUID()}.${ext}`;
     const filePath = path.join(IMG_DIR, filename);
 
@@ -52,7 +60,9 @@ export class GmImagesController {
 
     const url = `/files/gm/images/${filename}`;
     const alt = (req.headers['x-image-alt'] as string) || null;
-    const img = await container.resolve('uploadGmImage').execute({ filename, url, alt, mime, size: written });
+    const img = await container
+      .resolve('uploadGmImage')
+      .execute({ filename, url, alt, mime, size: written });
     return reply.code(201).send(img);
   }
 

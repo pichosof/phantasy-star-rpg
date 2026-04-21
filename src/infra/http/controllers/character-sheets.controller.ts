@@ -1,4 +1,5 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
+
 import { createSheetInput } from '../../../core/use-cases/character-sheets/create-character-sheet.js';
 import { updateSheetInput } from '../../../core/use-cases/character-sheets/update-character-sheet.js';
 import { container } from '../../../di/container.js';

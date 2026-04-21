@@ -43,7 +43,7 @@ async function requireLibraryAccess(req: FastifyRequest, reply: FastifyReply) {
   const repo = container.resolve('libraryDocumentRepo');
   const storedHash = await repo.getPlayerKey();
 
-  const keyToVerify  = provided ?? '';
+  const keyToVerify = provided ?? '';
   const hashToVerify = storedHash ?? '';
 
   const valid = hashToVerify.startsWith('$scrypt$') ? verifyKey(keyToVerify, hashToVerify) : false;
@@ -103,14 +103,14 @@ export async function libraryRoutes(app: FastifyInstance) {
         body: {
           type: 'object',
           properties: {
-            title:       { type: 'string', maxLength: 200 },
-            description: { anyOf: [{ type: 'string', maxLength: 2000 }, { type: 'null' }] },
-            category:    { anyOf: [{ type: 'string', maxLength: 100 }, { type: 'null' }] },
-            visible:     { type: 'boolean' },
+            title: { type: 'string', maxLength: 200 },
+            description: { type: 'string', maxLength: 2000, nullable: true },
+            category: { type: 'string', maxLength: 100, nullable: true },
+            visible: { type: 'boolean' },
           },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.update.bind(c),
@@ -124,7 +124,7 @@ export async function libraryRoutes(app: FastifyInstance) {
         tags: ['Library'],
         security: [{ BearerAuth: [] }],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.delete.bind(c),
@@ -147,11 +147,11 @@ export async function libraryRoutes(app: FastifyInstance) {
         body: {
           type: 'object',
           properties: {
-            playerKey: { anyOf: [{ type: 'string', minLength: 12, maxLength: 256 }, { type: 'null' }] },
+            playerKey: { type: 'string', minLength: 12, maxLength: 256, nullable: true },
           },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.setSettings.bind(c),

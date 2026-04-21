@@ -18,7 +18,7 @@ export async function worldRoutes(app: FastifyInstance) {
     },
     c.list.bind(c),
   );
-app.patch<{ Params: IdParams; Body: VisibilityBody }>(
+  app.patch<{ Params: IdParams; Body: VisibilityBody }>(
     '/api/worlds/:id/visibility',
     app.withGM({
       schema: {
@@ -31,7 +31,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           properties: { visible: { type: 'boolean' } },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.setVisibility.bind(c),
@@ -47,7 +47,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           required: ['name'],
           properties: {
             name: { type: 'string' },
-            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            description: { type: 'string', nullable: true },
           },
           additionalProperties: false,
         },
@@ -65,7 +65,7 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
         security: [{ ApiKeyAuth: [] }],
         consumes: ['multipart/form-data'],
         params: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.updateImage.bind(c),
@@ -82,11 +82,11 @@ app.patch<{ Params: IdParams; Body: VisibilityBody }>(
           type: 'object',
           properties: {
             name: { type: 'string' },
-            description: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+            description: { type: 'string', nullable: true },
           },
           additionalProperties: false,
         },
-        response: { 204: { type: 'null' } },
+        response: { 204: { description: 'No Content' } },
       },
     }),
     c.update.bind(c),

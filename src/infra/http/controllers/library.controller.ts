@@ -1,5 +1,5 @@
-import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
@@ -71,12 +71,15 @@ function contentDispositionFilename(name: string): string {
 }
 
 /** Parse a Range header — returns null when absent or unparseable. */
-function parseRange(header: string | undefined, totalSize: number): { start: number; end: number } | null {
+function parseRange(
+  header: string | undefined,
+  totalSize: number,
+): { start: number; end: number } | null {
   if (!header) return null;
   const match = /bytes=(\d*)-(\d*)/.exec(header);
   if (!match) return null;
   const start = match[1] ? parseInt(match[1], 10) : totalSize - parseInt(match[2] ?? '0', 10);
-  const end   = match[2] ? parseInt(match[2], 10) : totalSize - 1;
+  const end = match[2] ? parseInt(match[2], 10) : totalSize - 1;
   if (isNaN(start) || isNaN(end) || start > end || end >= totalSize) return null;
   return { start, end };
 }
@@ -101,7 +104,7 @@ export class LibraryController {
       const EXT_TO_MIME: Record<string, string> = {
         '.mobi': 'application/x-mobipocket-ebook',
         '.epub': 'application/epub+zip',
-        '.md':   'text/markdown',
+        '.md': 'text/markdown',
       };
       if (EXT_TO_MIME[originalExt]) mime = EXT_TO_MIME[originalExt];
     }
@@ -132,18 +135,21 @@ export class LibraryController {
     } catch (e) {
       await fsp.rm(filePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('too large')) return reply.code(413).send({ error: `File exceeds the ${process.env.MAX_UPLOAD_MB || 30} MB limit.` });
+      if (msg.includes('too large'))
+        return reply
+          .code(413)
+          .send({ error: `File exceeds the ${process.env.MAX_UPLOAD_MB || 30} MB limit.` });
       throw e;
     }
 
     // Convert MOBI → EPUB automatically so the viewer can render it.
     let storedFilename = filename;
-    let storedMime     = mime;
+    let storedMime = mime;
     if (mime === 'application/x-mobipocket-ebook' || mime === 'application/mobi') {
       const epubPath = await mobiToEpub(filePath);
       if (epubPath) {
         storedFilename = path.basename(epubPath);
-        storedMime     = 'application/epub+zip';
+        storedMime = 'application/epub+zip';
         const epubStat = await fsp.stat(epubPath).catch(() => null);
         if (epubStat) written = epubStat.size;
       }
@@ -154,12 +160,21 @@ export class LibraryController {
       sanitiseHeader(req.headers['x-doc-title'] as string, 200) ||
       originalName.replace(/\.[^.]+$/, '');
     const description = sanitiseHeader(req.headers['x-doc-description'] as string, 2000) || null;
-    const category    = sanitiseHeader(req.headers['x-doc-category'] as string, 100) || null;
+    const category = sanitiseHeader(req.headers['x-doc-category'] as string, 100) || null;
     const url = `/files/library/${storedFilename}`;
 
     const repo = container.resolve('libraryDocumentRepo');
     const doc = await repo.create(
-      LibraryDocument.create({ title, description, category, filename: storedFilename, originalName, url, mime: storedMime, size: written }),
+      LibraryDocument.create({
+        title,
+        description,
+        category,
+        filename: storedFilename,
+        originalName,
+        url,
+        mime: storedMime,
+        size: written,
+      }),
     );
     return reply.code(201).send(doc.toJSON());
   }
