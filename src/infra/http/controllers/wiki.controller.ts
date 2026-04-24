@@ -1,18 +1,14 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
-import { pipeline } from 'node:stream/promises';
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { createWikiPageInput } from '../../../core/use-cases/wiki/create-wiki-page.js';
 import { updateWikiPageInput } from '../../../core/use-cases/wiki/update-wiki-page.js';
 import { container } from '../../../di/container.js';
+import { fileStorage } from '../../storage/index.js';
 
 type IdParams = { id: string };
 
-const IMG_DIR = path.resolve('data', 'uploads', 'wiki', 'images');
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] as const;
 
 export class WikiController {
@@ -64,8 +60,6 @@ export class WikiController {
     }
 
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
-    await fsp.mkdir(IMG_DIR, { recursive: true });
-
     const ext =
       mime === 'image/png'
         ? 'png'
@@ -75,24 +69,18 @@ export class WikiController {
             ? 'gif'
             : 'jpg';
     const name = `${Date.now()}-${randomUUID()}.${ext}`;
-    const filePath = path.join(IMG_DIR, name);
-
-    let written = 0;
-    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
-    part.file.on('data', (chunk: Buffer) => {
-      written += chunk.length;
-      if (written > maxBytes) part.file.destroy(new Error('File too large'));
-    });
 
     try {
-      await pipeline(part.file, ws);
+      const saved = await fileStorage.saveStream(part.file, {
+        key: `wiki/images/${name}`,
+        mime,
+        maxBytes,
+      });
+      return reply.code(200).send({ url: saved.url });
     } catch (e) {
-      await fsp.rm(filePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('too large')) return reply.code(413).send({ error: 'Payload too large' });
       throw e;
     }
-
-    return reply.code(200).send({ url: `/files/wiki/images/${name}` });
   }
 }

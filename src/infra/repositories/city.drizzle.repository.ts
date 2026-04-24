@@ -38,7 +38,10 @@ export class CityDrizzleRepository {
 
   async list() {
     const rows = await db.select().from(schema.cities).orderBy(schema.cities.id);
-    const images = await db.select().from(schema.cityImages).orderBy(asc(schema.cityImages.position), asc(schema.cityImages.createdAt));
+    const images = await db
+      .select()
+      .from(schema.cityImages)
+      .orderBy(asc(schema.cityImages.position), asc(schema.cityImages.createdAt));
     return rows.map((r) => {
       const city = map(r);
       city.props.images = images.filter((img) => img.cityId === r.id);
@@ -54,14 +57,30 @@ export class CityDrizzleRepository {
       .orderBy(asc(schema.cityImages.position), asc(schema.cityImages.createdAt));
   }
 
-  async addImage(data: { cityId: number; url: string; alt?: string | null; mime: string; size: number }): Promise<CityImageRow> {
-    const [row] = await db.insert(schema.cityImages).values({
-      cityId: data.cityId,
-      url: data.url,
-      alt: data.alt ?? null,
-      mime: data.mime,
-      size: data.size,
-    }).returning();
+  async findById(id: number): Promise<(Row & { images: CityImageRow[] }) | null> {
+    const [row] = await db.select().from(schema.cities).where(eq(schema.cities.id, id));
+    if (!row) return null;
+    const images = await this.listImages(id);
+    return { ...row, images };
+  }
+
+  async addImage(data: {
+    cityId: number;
+    url: string;
+    alt?: string | null;
+    mime: string;
+    size: number;
+  }): Promise<CityImageRow> {
+    const [row] = await db
+      .insert(schema.cityImages)
+      .values({
+        cityId: data.cityId,
+        url: data.url,
+        alt: data.alt ?? null,
+        mime: data.mime,
+        size: data.size,
+      })
+      .returning();
     return row as CityImageRow;
   }
 
@@ -70,7 +89,10 @@ export class CityDrizzleRepository {
   }
 
   async getImage(imageId: number): Promise<CityImageRow | null> {
-    const [row] = await db.select().from(schema.cityImages).where(eq(schema.cityImages.id, imageId));
+    const [row] = await db
+      .select()
+      .from(schema.cityImages)
+      .where(eq(schema.cityImages.id, imageId));
     return (row as CityImageRow) ?? null;
   }
 

@@ -52,10 +52,16 @@ export class NpcDrizzleRepository {
   }
 
   async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.npcs).set({ visible, updatedAt: new Date() }).where(eq(schema.npcs.id, id));
+    await db
+      .update(schema.npcs)
+      .set({ visible, updatedAt: new Date() })
+      .where(eq(schema.npcs.id, id));
   }
 
-  async updateImage(id: number, img: { url: string; alt?: string | null; mime?: string; size?: number }) {
+  async updateImage(
+    id: number,
+    img: { url: string; alt?: string | null; mime?: string; size?: number },
+  ) {
     await db
       .update(schema.npcs)
       .set({
@@ -66,6 +72,11 @@ export class NpcDrizzleRepository {
         updatedAt: new Date(),
       })
       .where(eq(schema.npcs.id, id));
+  }
+
+  async findById(id: number) {
+    const [row] = await db.select().from(schema.npcs).where(eq(schema.npcs.id, id));
+    return row ?? null;
   }
 
   async delete(id: number) {

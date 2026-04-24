@@ -1,19 +1,13 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
-import { pipeline } from 'node:stream/promises';
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { z } from 'zod';
 
 import { createPlayerInput } from '../../../core/use-cases/player/create-player';
 import { container } from '../../../di/container';
+import { deleteStoredFileByUrl, fileStorage } from '../../storage/index.js';
 
 type IdParams = { id: string };
-
-const IMG_DIR = path.resolve('data', 'uploads', 'players', 'images');
-const PDF_DIR = path.resolve('data', 'uploads', 'players', 'sheets');
 
 type CreatePlayerBody = z.infer<typeof createPlayerInput>;
 
@@ -64,37 +58,32 @@ export class PlayerController {
     }
 
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
-
-    await fsp.mkdir(IMG_DIR, { recursive: true });
     const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
-    const name = `${id}-${Date.now()}-${randomUUID()}.${ext}`;
-    const filePath = path.join(IMG_DIR, name);
-
-    let written = 0;
-    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
-    part.file.on('data', (chunk: Buffer) => {
-      written += chunk.length;
-      if (written > maxBytes) part.file.destroy(new Error('File too large'));
-    });
+    const repo = container.resolve('playerRepo');
+    const [player] = await repo.findById(id);
 
     try {
-      await pipeline(part.file, ws);
+      const saved = await fileStorage.saveStream(part.file, {
+        key: `players/images/${id}-${Date.now()}-${randomUUID()}.${ext}`,
+        mime,
+        maxBytes,
+      });
+
+      await container.resolve('updatePlayerImage').execute(id, {
+        url: saved.url,
+        alt: (req.headers['x-image-alt'] as string) || null,
+        mime,
+        size: saved.size,
+      });
+
+      await deleteStoredFileByUrl(player?.imageUrl);
     } catch (e) {
-      await fsp.rm(filePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('too large')) {
         return reply.code(413).send({ error: 'Payload too large' });
       }
       throw e;
     }
-
-    const publicUrl = `/files/players/images/${name}`;
-    await container.resolve('updatePlayerImage').execute(id, {
-      url: publicUrl,
-      alt: (req.headers['x-image-alt'] as string) || null,
-      mime,
-      size: written,
-    });
 
     return reply.code(204).send();
   }
@@ -114,35 +103,30 @@ export class PlayerController {
     }
 
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
-
-    await fsp.mkdir(PDF_DIR, { recursive: true });
-    const name = `${id}-${Date.now()}-${randomUUID()}.pdf`;
-    const filePath = path.join(PDF_DIR, name);
-
-    let written = 0;
-    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
-    part.file.on('data', (chunk: Buffer) => {
-      written += chunk.length;
-      if (written > maxBytes) part.file.destroy(new Error('File too large'));
-    });
+    const repo = container.resolve('playerRepo');
+    const [player] = await repo.findById(id);
 
     try {
-      await pipeline(part.file, ws);
+      const saved = await fileStorage.saveStream(part.file, {
+        key: `players/sheets/${id}-${Date.now()}-${randomUUID()}.pdf`,
+        mime,
+        maxBytes,
+      });
+
+      await container.resolve('updatePlayerSheet').execute(id, {
+        url: saved.url,
+        mime,
+        size: saved.size,
+      });
+
+      await deleteStoredFileByUrl(player?.sheetUrl);
     } catch (e) {
-      await fsp.rm(filePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('too large')) {
         return reply.code(413).send({ error: 'Payload too large' });
       }
       throw e;
     }
-
-    const publicUrl = `/files/players/sheets/${name}`;
-    await container.resolve('updatePlayerSheet').execute(id, {
-      url: publicUrl,
-      mime,
-      size: written,
-    });
 
     return reply.code(204).send();
   }
@@ -155,15 +139,8 @@ export class PlayerController {
     const [player] = await repo.findById(id);
 
     if (player) {
-      // Delete physical files
-      if (player.imageUrl) {
-        const imgPath = path.join(IMG_DIR, path.basename(player.imageUrl));
-        await fsp.rm(imgPath, { force: true });
-      }
-      if (player.sheetUrl) {
-        const sheetPath = path.join(PDF_DIR, path.basename(player.sheetUrl));
-        await fsp.rm(sheetPath, { force: true });
-      }
+      await deleteStoredFileByUrl(player.imageUrl);
+      await deleteStoredFileByUrl(player.sheetUrl);
     }
 
     // Delete from DB (cascade removes player_notes, player_quests)

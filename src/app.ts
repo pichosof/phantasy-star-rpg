@@ -6,7 +6,8 @@ import { buildServer } from './infra/http/server.js';
 
 // keep data/ structure stable for sqlite + static files
 fs.mkdirSync('data', { recursive: true });
-fs.mkdirSync(path.resolve('data', 'uploads'), { recursive: true });
+fs.mkdirSync(path.resolve(env.UPLOADS_LOCAL_DIR), { recursive: true });
+fs.mkdirSync(path.resolve('data', 'tmp'), { recursive: true });
 
 async function main() {
   const app = await buildServer();

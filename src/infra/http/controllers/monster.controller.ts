@@ -1,18 +1,13 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
-import { pipeline } from 'node:stream/promises';
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import type { CreateMonsterInput } from '../../../core/use-cases/bestiary/create-monster.js';
 import type { UpdateMonsterInput } from '../../../core/use-cases/bestiary/update-monster.js';
 import { container } from '../../../di/container.js';
+import { deleteStoredFileByUrl, fileStorage } from '../../storage/index.js';
 
 type IdParams = { id: string };
-
-const IMG_DIR = path.resolve('data', 'uploads', 'bestiary', 'images');
 
 export class MonsterController {
   async list(req: FastifyRequest, reply: FastifyReply) {
@@ -68,42 +63,44 @@ export class MonsterController {
     }
 
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
-
-    await fsp.mkdir(IMG_DIR, { recursive: true });
     const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
-    const name = `${id}-${Date.now()}-${randomUUID()}.${ext}`;
-    const filePath = path.join(IMG_DIR, name);
-
-    let written = 0;
-    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
-    part.file.on('data', (chunk: Buffer) => {
-      written += chunk.length;
-      if (written > maxBytes) part.file.destroy(new Error('File too large'));
-    });
+    const repo = container.resolve('monsterRepo');
+    const current = await repo.findById(id);
 
     try {
-      await pipeline(part.file, ws);
+      const saved = await fileStorage.saveStream(part.file, {
+        key: `bestiary/images/${id}-${Date.now()}-${randomUUID()}.${ext}`,
+        mime,
+        maxBytes,
+      });
+
+      await container.resolve('updateMonsterImage').execute({
+        id,
+        url: saved.url,
+        alt: (req.headers['x-image-alt'] as string) || null,
+        mime,
+        size: saved.size,
+      });
+
+      await deleteStoredFileByUrl(current?.imageUrl);
     } catch (e) {
-      await fsp.rm(filePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('too large')) return reply.code(413).send({ error: 'Payload too large' });
       throw e;
     }
 
-    const publicUrl = `/files/bestiary/images/${name}`;
-    await container.resolve('updateMonsterImage').execute({
-      id,
-      url: publicUrl,
-      alt: (req.headers['x-image-alt'] as string) || null,
-      mime,
-      size: written,
-    });
-
     return reply.code(204).send();
   }
 
   async delete(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
-    await container.resolve('deleteMonster').execute({ id: Number(req.params.id) });
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return reply.code(400).send({ error: 'Invalid id' });
+
+    const repo = container.resolve('monsterRepo');
+    const current = await repo.findById(id);
+    await deleteStoredFileByUrl(current?.imageUrl);
+
+    await container.resolve('deleteMonster').execute({ id });
     return reply.code(204).send();
   }
 }

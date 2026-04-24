@@ -1,16 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs';
-import fsp from 'node:fs/promises';
-import path from 'node:path';
-import { pipeline } from 'node:stream/promises';
 
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import { container } from '../../../di/container.js';
+import { fileStorage } from '../../storage/index.js';
 
 type IdParams = { id: string };
 
-const IMG_DIR = path.resolve('data', 'uploads', 'gm', 'images');
 const ALLOWED_MIME = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] as const;
 
 export class GmImagesController {
@@ -29,8 +25,6 @@ export class GmImagesController {
     }
 
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
-    await fsp.mkdir(IMG_DIR, { recursive: true });
-
     const ext =
       mime === 'image/png'
         ? 'png'
@@ -40,30 +34,24 @@ export class GmImagesController {
             ? 'gif'
             : 'jpg';
     const filename = `${Date.now()}-${randomUUID()}.${ext}`;
-    const filePath = path.join(IMG_DIR, filename);
-
-    let written = 0;
-    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
-    part.file.on('data', (chunk: Buffer) => {
-      written += chunk.length;
-      if (written > maxBytes) part.file.destroy(new Error('File too large'));
-    });
 
     try {
-      await pipeline(part.file, ws);
+      const saved = await fileStorage.saveStream(part.file, {
+        key: `gm/images/${filename}`,
+        mime,
+        maxBytes,
+      });
+
+      const alt = (req.headers['x-image-alt'] as string) || null;
+      const img = await container
+        .resolve('uploadGmImage')
+        .execute({ filename, url: saved.url, alt, mime, size: saved.size });
+      return reply.code(201).send(img);
     } catch (e) {
-      await fsp.rm(filePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('too large')) return reply.code(413).send({ error: 'Payload too large' });
       throw e;
     }
-
-    const url = `/files/gm/images/${filename}`;
-    const alt = (req.headers['x-image-alt'] as string) || null;
-    const img = await container
-      .resolve('uploadGmImage')
-      .execute({ filename, url, alt, mime, size: written });
-    return reply.code(201).send(img);
   }
 
   async delete(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {

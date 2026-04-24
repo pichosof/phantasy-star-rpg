@@ -35,6 +35,11 @@ export class WorldDrizzleRepository {
     return rows.map(map);
   }
 
+  async findById(id: number) {
+    const [row] = await db.select().from(schema.worlds).where(eq(schema.worlds.id, id));
+    return row ?? null;
+  }
+
   async updateImage(
     id: number,
     data: { url: string; alt?: string | null; mime?: string | null; size?: number | null },
@@ -51,7 +56,8 @@ export class WorldDrizzleRepository {
       .where(eq(schema.worlds.id, id));
   }
   async setVisibility(id: number, visible: boolean) {
-    await db.update(schema.worlds)
+    await db
+      .update(schema.worlds)
       .set({ visible, updatedAt: new Date() })
       .where(eq(schema.worlds.id, id));
   }

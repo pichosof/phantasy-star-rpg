@@ -48,6 +48,12 @@ export class MonsterDrizzleRepository {
       })
       .where(eq(schema.bestiary.id, id));
   }
+
+  async findById(id: number) {
+    const [row] = await db.select().from(schema.bestiary).where(eq(schema.bestiary.id, id));
+    return row ?? null;
+  }
+
   async setVisibility(id: number, visible: boolean) {
     await db.update(schema.bestiary).set({ visible }).where(eq(schema.bestiary.id, id));
   }

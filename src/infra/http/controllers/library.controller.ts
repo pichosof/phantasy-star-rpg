@@ -13,10 +13,12 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import { LibraryDocument } from '../../../core/entities/library-document.js';
 import { container } from '../../../di/container.js';
 import { hashKey, validateKeyStrength } from '../../security/key-hash.js';
+import { extractStorageKeyFromUrl, parseRangeHeader } from '../../storage/file-storage.utils.js';
+import { deleteStoredFileByUrl, fileStorage } from '../../storage/index.js';
 
 type IdParams = { id: string };
 
-const DOC_DIR = path.resolve('data', 'uploads', 'library');
+const TEMP_DIR = path.resolve('data', 'tmp', 'library');
 
 /** Allowed MIME types and their canonical extensions. */
 const ALLOWED_MIME: Record<string, string> = {
@@ -70,20 +72,6 @@ function contentDispositionFilename(name: string): string {
   return `attachment; filename="${ascii}"; filename*=UTF-8''${utf8}`;
 }
 
-/** Parse a Range header — returns null when absent or unparseable. */
-function parseRange(
-  header: string | undefined,
-  totalSize: number,
-): { start: number; end: number } | null {
-  if (!header) return null;
-  const match = /bytes=(\d*)-(\d*)/.exec(header);
-  if (!match) return null;
-  const start = match[1] ? parseInt(match[1], 10) : totalSize - parseInt(match[2] ?? '0', 10);
-  const end = match[2] ? parseInt(match[2], 10) : totalSize - 1;
-  if (isNaN(start) || isNaN(end) || start > end || end >= totalSize) return null;
-  return { start, end };
-}
-
 export class LibraryController {
   async list(_req: FastifyRequest, reply: FastifyReply) {
     const repo = container.resolve('libraryDocumentRepo');
@@ -115,16 +103,16 @@ export class LibraryController {
     }
 
     const maxBytes = (Number(process.env.MAX_UPLOAD_MB || 30) * 1024 * 1024) | 0;
-    await fsp.mkdir(DOC_DIR, { recursive: true });
+    await fsp.mkdir(TEMP_DIR, { recursive: true });
 
     const filename = `${Date.now()}-${randomUUID()}${ext}`;
-    const filePath = path.join(DOC_DIR, filename);
+    const tempFilePath = path.join(TEMP_DIR, filename);
 
     const originalName =
       sanitiseHeader(part.filename || filename, 255).replace(/[/\\]/g, '_') || filename;
 
     let written = 0;
-    const ws = fs.createWriteStream(filePath, { flags: 'wx' });
+    const ws = fs.createWriteStream(tempFilePath, { flags: 'wx' });
     part.file.on('data', (chunk: Buffer) => {
       written += chunk.length;
       if (written > maxBytes) part.file.destroy(new Error('File too large'));
@@ -133,7 +121,7 @@ export class LibraryController {
     try {
       await pipeline(part.file, ws);
     } catch (e) {
-      await fsp.rm(filePath, { force: true });
+      await fsp.rm(tempFilePath, { force: true });
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('too large'))
         return reply
@@ -143,11 +131,13 @@ export class LibraryController {
     }
 
     // Convert MOBI → EPUB automatically so the viewer can render it.
+    let finalLocalPath = tempFilePath;
     let storedFilename = filename;
     let storedMime = mime;
     if (mime === 'application/x-mobipocket-ebook' || mime === 'application/mobi') {
-      const epubPath = await mobiToEpub(filePath);
+      const epubPath = await mobiToEpub(tempFilePath);
       if (epubPath) {
+        finalLocalPath = epubPath;
         storedFilename = path.basename(epubPath);
         storedMime = 'application/epub+zip';
         const epubStat = await fsp.stat(epubPath).catch(() => null);
@@ -161,7 +151,21 @@ export class LibraryController {
       originalName.replace(/\.[^.]+$/, '');
     const description = sanitiseHeader(req.headers['x-doc-description'] as string, 2000) || null;
     const category = sanitiseHeader(req.headers['x-doc-category'] as string, 100) || null;
-    const url = `/files/library/${storedFilename}`;
+    let savedUrl = '';
+
+    try {
+      const saved = await fileStorage.saveStream(fs.createReadStream(finalLocalPath), {
+        key: `library/${storedFilename}`,
+        mime: storedMime,
+      });
+      savedUrl = saved.url;
+      written = saved.size;
+    } finally {
+      await fsp.rm(tempFilePath, { force: true });
+      if (finalLocalPath !== tempFilePath) {
+        await fsp.rm(finalLocalPath, { force: true });
+      }
+    }
 
     const repo = container.resolve('libraryDocumentRepo');
     const doc = await repo.create(
@@ -171,7 +175,7 @@ export class LibraryController {
         category,
         filename: storedFilename,
         originalName,
-        url,
+        url: savedUrl,
         mime: storedMime,
         size: written,
       }),
@@ -194,17 +198,15 @@ export class LibraryController {
     const doc = await repo.findById(id);
     if (!doc) return reply.code(404).send({ error: 'Not found' });
 
-    const filePath = path.join(DOC_DIR, doc.props.filename);
+    const key = extractStorageKeyFromUrl(doc.props.url);
+    if (!key) return reply.code(404).send({ error: 'File not found in storage' });
 
-    let stat: Awaited<ReturnType<typeof fsp.stat>>;
-    try {
-      stat = await fsp.stat(filePath);
-    } catch {
-      return reply.code(404).send({ error: 'File not found on disk' });
-    }
+    const initial = await fileStorage.openReadStream(key);
+    if (!initial) return reply.code(404).send({ error: 'File not found in storage' });
 
-    const totalSize = stat.size;
-    const range = parseRange(req.headers.range, totalSize);
+    const range = parseRangeHeader(req.headers.range, initial.totalSize);
+    const file = range ? await fileStorage.openReadStream(key, range) : initial;
+    if (!file) return reply.code(404).send({ error: 'File not found in storage' });
 
     reply
       .header('Accept-Ranges', 'bytes')
@@ -215,16 +217,15 @@ export class LibraryController {
 
     if (range) {
       const { start, end } = range;
-      const chunkSize = end - start + 1;
       reply
         .code(206)
-        .header('Content-Range', `bytes ${start}-${end}/${totalSize}`)
-        .header('Content-Length', String(chunkSize));
-      return reply.send(fs.createReadStream(filePath, { start, end }));
+        .header('Content-Range', `bytes ${start}-${end}/${file.totalSize}`)
+        .header('Content-Length', String(file.contentLength));
+      return reply.send(file.stream);
     }
 
-    reply.header('Content-Length', String(totalSize));
-    return reply.send(fs.createReadStream(filePath));
+    reply.header('Content-Length', String(file.contentLength));
+    return reply.send(file.stream);
   }
 
   async update(req: FastifyRequest<{ Params: IdParams }>, reply: FastifyReply) {
@@ -251,9 +252,7 @@ export class LibraryController {
     const doc = await repo.findById(id);
     if (!doc) return reply.code(404).send({ error: 'Not found' });
 
-    const filePath = path.join(DOC_DIR, doc.props.filename);
-    await fsp.rm(filePath, { force: true });
-
+    await deleteStoredFileByUrl(doc.props.url);
     await repo.delete(id);
     return reply.code(204).send();
   }

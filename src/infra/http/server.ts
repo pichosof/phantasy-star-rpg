@@ -1,13 +1,12 @@
-import path from 'node:path';
-
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
-import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 
 import { env } from '../config/env';
+import { decodeStorageKey, parseRangeHeader } from '../storage/file-storage.utils.js';
+import { fileStorage } from '../storage/index.js';
 
 import { authPlugin } from './plugins/auth';
 import { clientAuthPlugin } from './plugins/client-auth';
@@ -142,10 +141,32 @@ export async function buildServer() {
   });
 
   // ── Static files ─────────────────────────────────────────────────────────────
-  await app.register(fastifyStatic, {
-    root: path.resolve('data', 'uploads'),
-    prefix: '/files/',
-    decorateReply: false,
+  app.get<{ Params: { '*': string } }>('/files/*', async (req, reply) => {
+    const key = decodeStorageKey(req.params['*'] ?? '');
+    if (!key) return reply.code(404).send({ error: 'Not found' });
+
+    let file = await fileStorage.openReadStream(key);
+    if (!file) return reply.code(404).send({ error: 'Not found' });
+
+    const range = parseRangeHeader(req.headers.range, file.totalSize);
+    if (range) {
+      file = await fileStorage.openReadStream(key, range);
+      if (!file) return reply.code(404).send({ error: 'Not found' });
+    }
+
+    reply.header('Accept-Ranges', 'bytes');
+    if (file.mime) reply.header('Content-Type', file.mime);
+
+    if (file.range) {
+      reply
+        .code(206)
+        .header('Content-Length', String(file.contentLength))
+        .header('Content-Range', `bytes ${file.range.start}-${file.range.end}/${file.totalSize}`);
+    } else {
+      reply.header('Content-Length', String(file.contentLength));
+    }
+
+    return reply.send(file.stream);
   });
 
   // ── Health check (no rate limit applied — exempt via low cost) ───────────────
