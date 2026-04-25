@@ -1,0 +1,93 @@
+location: eastus
+name: "__CONTAINER_APP_NAME__"
+type: Microsoft.App/containerApps
+properties:
+  managedEnvironmentId: "__MANAGED_ENVIRONMENT_ID__"
+  configuration:
+    activeRevisionsMode: Single
+    ingress:
+      external: true
+      allowInsecure: false
+      targetPort: 3010
+      transport: auto
+    registries:
+      - server: "__REGISTRY_SERVER__"
+        username: "__REGISTRY_USERNAME__"
+        passwordSecretRef: acr-password
+    secrets:
+      - name: acr-password
+        value: "__REGISTRY_PASSWORD__"
+      - name: azure-storage-connection-string
+        value: "__AZURE_STORAGE_CONNECTION_STRING__"
+      - name: gm-api-key
+        value: "__GM_API_KEY__"
+      - name: client-secret
+        value: "__CLIENT_SECRET__"
+      - name: jwt-secret
+        value: "__JWT_SECRET__"
+  template:
+    containers:
+      - name: "__CONTAINER_APP_NAME__"
+        image: "__IMAGE_NAME__"
+        env:
+          - name: PORT
+            value: "3010"
+          - name: NODE_ENV
+            value: production
+          - name: DATABASE_URL
+            value: /app/data/app.db
+          - name: CORS_ORIGIN
+            value: "__CORS_ORIGIN__"
+          - name: FILE_STORAGE_DRIVER
+            value: azure-blob
+          - name: UPLOADS_LOCAL_DIR
+            value: /app/data/uploads
+          - name: AZURE_STORAGE_CONTAINER
+            value: uploads
+          - name: AZURE_STORAGE_ACCESS_TIER
+            value: Cool
+          - name: AZURE_STORAGE_CONNECTION_STRING
+            secretRef: azure-storage-connection-string
+          - name: GM_API_KEY
+            secretRef: gm-api-key
+          - name: MAX_UPLOAD_MB
+            value: "__MAX_UPLOAD_MB__"
+          - name: CLIENT_SECRET
+            secretRef: client-secret
+          - name: JWT_SECRET
+            secretRef: jwt-secret
+          - name: JWT_EXPIRES_IN
+            value: 8h
+        resources:
+          cpu: 0.25
+          memory: 0.5Gi
+        probes:
+          - type: Startup
+            httpGet:
+              path: /api/health
+              port: 3010
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            failureThreshold: 12
+          - type: Liveness
+            httpGet:
+              path: /api/health
+              port: 3010
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 3
+        volumeMounts:
+          - volumeName: app-data
+            mountPath: /app/data
+    scale:
+      minReplicas: 0
+      maxReplicas: 1
+      rules:
+        - name: http
+          http:
+            metadata:
+              concurrentRequests: "10"
+    volumes:
+      - name: app-data
+        storageType: AzureFile
+        storageName: appdata

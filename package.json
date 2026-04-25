@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/app.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node scripts/fix-dist-imports.mjs",
     "start": "node dist/app.js",
     "storage:migrate:azure-blob": "tsx scripts/migrate-uploads-to-azure-blob.ts",
     "drizzle:generate": "drizzle-kit generate",
