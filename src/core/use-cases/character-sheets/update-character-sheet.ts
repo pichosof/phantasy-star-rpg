@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const updateSheetInput = z.object({
   name: z.string().min(1).optional(),
-  data: z.record(z.unknown()).optional(),
+  data: z.record(z.string(), z.unknown()).optional(),
 });
 export type UpdateSheetInput = z.infer<typeof updateSheetInput>;
 

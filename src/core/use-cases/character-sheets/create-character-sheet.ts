@@ -5,7 +5,7 @@ import { CharacterSheet } from '../../entities/character-sheet.js';
 export const createSheetInput = z.object({
   type: z.enum(['gurps', 'starfinder']),
   name: z.string().min(1),
-  data: z.record(z.unknown()).optional().default({}),
+  data: z.record(z.string(), z.unknown()).optional().default({}),
 });
 export type CreateSheetInput = z.infer<typeof createSheetInput>;
 

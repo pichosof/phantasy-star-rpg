@@ -12,8 +12,12 @@ function hasValidation(err: unknown): err is FastifyError & { validation: AjvIss
   );
 }
 
+function isFastifyError(err: unknown): err is FastifyError {
+  return err instanceof Error;
+}
+
 export async function errorHandlerPlugin(app: FastifyInstance) {
-  app.setErrorHandler((err, _req, reply) => {
+  app.setErrorHandler((err: unknown, _req, reply) => {
     // Zod
     if (err instanceof ZodError) {
       const issues = err.issues.map((i) => ({
@@ -35,12 +39,17 @@ export async function errorHandlerPlugin(app: FastifyInstance) {
       return reply.status(400).send({ error: 'SchemaValidationError', issues });
     }
 
-    const status = err.statusCode && err.statusCode >= 400 ? err.statusCode : 500;
-    app.log.error({ err }, 'Unhandled error');
-    return reply.status(status).send({
-      error: err.name || 'Error',
-      message: envSafeMessage(err, process.env.NODE_ENV),
-    });
+    if (isFastifyError(err)) {
+      const status = err.statusCode && err.statusCode >= 400 ? err.statusCode : 500;
+      app.log.error({ err }, 'Unhandled error');
+      return reply.status(status).send({
+        error: err.name || 'Error',
+        message: envSafeMessage(err, process.env.NODE_ENV),
+      });
+    }
+
+    app.log.error({ err }, 'Unhandled non-Error throw');
+    return reply.status(500).send({ error: 'Error', message: 'Internal server error' });
   });
 }
 
