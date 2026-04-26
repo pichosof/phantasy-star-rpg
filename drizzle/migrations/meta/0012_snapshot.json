@@ -275,12 +275,8 @@
           "name": "cities_world_id_worlds_id_fk",
           "tableFrom": "cities",
           "tableTo": "worlds",
-          "columnsFrom": [
-            "world_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["world_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -564,12 +560,8 @@
           "name": "lore_cities_lore_id_lores_id_fk",
           "tableFrom": "lore_cities",
           "tableTo": "lores",
-          "columnsFrom": [
-            "lore_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["lore_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -577,22 +569,15 @@
           "name": "lore_cities_city_id_cities_id_fk",
           "tableFrom": "lore_cities",
           "tableTo": "cities",
-          "columnsFrom": [
-            "city_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["city_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "lore_cities_lore_id_city_id_pk": {
-          "columns": [
-            "lore_id",
-            "city_id"
-          ],
+          "columns": ["lore_id", "city_id"],
           "name": "lore_cities_lore_id_city_id_pk"
         }
       },
@@ -874,12 +859,8 @@
           "name": "player_quests_player_id_players_id_fk",
           "tableFrom": "player_quests",
           "tableTo": "players",
-          "columnsFrom": [
-            "player_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["player_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -887,22 +868,15 @@
           "name": "player_quests_quest_id_quests_id_fk",
           "tableFrom": "player_quests",
           "tableTo": "quests",
-          "columnsFrom": [
-            "quest_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["quest_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "player_quests_player_id_quest_id_pk": {
-          "columns": [
-            "player_id",
-            "quest_id"
-          ],
+          "columns": ["player_id", "quest_id"],
           "name": "player_quests_player_id_quest_id_pk"
         }
       },
@@ -1045,12 +1019,8 @@
           "name": "quest_cities_quest_id_quests_id_fk",
           "tableFrom": "quest_cities",
           "tableTo": "quests",
-          "columnsFrom": [
-            "quest_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["quest_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1058,22 +1028,15 @@
           "name": "quest_cities_city_id_cities_id_fk",
           "tableFrom": "quest_cities",
           "tableTo": "cities",
-          "columnsFrom": [
-            "city_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["city_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
         "quest_cities_quest_id_city_id_pk": {
-          "columns": [
-            "quest_id",
-            "city_id"
-          ],
+          "columns": ["quest_id", "city_id"],
           "name": "quest_cities_quest_id_city_id_pk"
         }
       },

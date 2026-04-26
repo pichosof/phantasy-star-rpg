@@ -16,7 +16,9 @@ export interface LibraryDocumentProps {
 export class LibraryDocument {
   private constructor(readonly props: LibraryDocumentProps) {}
 
-  toJSON() { return this.props; }
+  toJSON() {
+    return this.props;
+  }
 
   static create(props: Omit<LibraryDocumentProps, 'id' | 'createdAt' | 'updatedAt'>) {
     if (!props.title?.trim()) throw new Error('Title is required');

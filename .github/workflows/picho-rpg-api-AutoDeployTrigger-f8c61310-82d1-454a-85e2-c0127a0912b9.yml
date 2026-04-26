@@ -4,19 +4,18 @@ name: Trigger auto deployment for picho-rpg-api
 on:
   # Automatically trigger it when detected changes in repo
   push:
-    branches: 
-      [ main ]
+    branches: [main]
     paths:
-    - '**'
-    - '.github/workflows/picho-rpg-api-AutoDeployTrigger-f8c61310-82d1-454a-85e2-c0127a0912b9.yml'
+      - '**'
+      - '.github/workflows/picho-rpg-api-AutoDeployTrigger-f8c61310-82d1-454a-85e2-c0127a0912b9.yml'
 
-  # Allow manual trigger 
-  workflow_dispatch:      
+  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions: 
+    permissions:
       id-token: write #This is required for requesting the OIDC JWT Token
       contents: read #Required when GH token is used to authenticate with private repo
 
@@ -45,5 +44,3 @@ jobs:
           imageToBuild: pichorpg2404acr.azurecr.io/picho-rpg-api:${{ github.sha }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
-
-

@@ -13,9 +13,9 @@ export default fp(async (app: FastifyInstance) => {
       // Só filtra GET para não-GM e quando o payload é array
       if (req.method === 'GET' && !req.isGM && Array.isArray(payload)) {
         const filtered = payload.filter((item) => !hasVisible(item) || item.visible !== false);
-        return filtered; 
+        return filtered;
       }
       return payload;
-    }
+    },
   );
 });

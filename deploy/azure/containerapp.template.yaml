@@ -1,8 +1,8 @@
 location: eastus
-name: "__CONTAINER_APP_NAME__"
+name: '__CONTAINER_APP_NAME__'
 type: Microsoft.App/containerApps
 properties:
-  managedEnvironmentId: "__MANAGED_ENVIRONMENT_ID__"
+  managedEnvironmentId: '__MANAGED_ENVIRONMENT_ID__'
   configuration:
     activeRevisionsMode: Single
     ingress:
@@ -11,33 +11,33 @@ properties:
       targetPort: 3010
       transport: auto
     registries:
-      - server: "__REGISTRY_SERVER__"
-        username: "__REGISTRY_USERNAME__"
+      - server: '__REGISTRY_SERVER__'
+        username: '__REGISTRY_USERNAME__'
         passwordSecretRef: acr-password
     secrets:
       - name: acr-password
-        value: "__REGISTRY_PASSWORD__"
+        value: '__REGISTRY_PASSWORD__'
       - name: azure-storage-connection-string
-        value: "__AZURE_STORAGE_CONNECTION_STRING__"
+        value: '__AZURE_STORAGE_CONNECTION_STRING__'
       - name: gm-api-key
-        value: "__GM_API_KEY__"
+        value: '__GM_API_KEY__'
       - name: client-secret
-        value: "__CLIENT_SECRET__"
+        value: '__CLIENT_SECRET__'
       - name: jwt-secret
-        value: "__JWT_SECRET__"
+        value: '__JWT_SECRET__'
   template:
     containers:
-      - name: "__CONTAINER_APP_NAME__"
-        image: "__IMAGE_NAME__"
+      - name: '__CONTAINER_APP_NAME__'
+        image: '__IMAGE_NAME__'
         env:
           - name: PORT
-            value: "3010"
+            value: '3010'
           - name: NODE_ENV
             value: production
           - name: DATABASE_URL
             value: /app/data/app.db
           - name: CORS_ORIGIN
-            value: "__CORS_ORIGIN__"
+            value: '__CORS_ORIGIN__'
           - name: FILE_STORAGE_DRIVER
             value: azure-blob
           - name: UPLOADS_LOCAL_DIR
@@ -51,7 +51,7 @@ properties:
           - name: GM_API_KEY
             secretRef: gm-api-key
           - name: MAX_UPLOAD_MB
-            value: "__MAX_UPLOAD_MB__"
+            value: '__MAX_UPLOAD_MB__'
           - name: CLIENT_SECRET
             secretRef: client-secret
           - name: JWT_SECRET
@@ -86,7 +86,7 @@ properties:
         - name: http
           http:
             metadata:
-              concurrentRequests: "10"
+              concurrentRequests: '10'
     volumes:
       - name: app-data
         storageType: AzureFile

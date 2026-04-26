@@ -11,11 +11,10 @@ type IdParams = { id: string };
 
 export class QuestController {
   private isGM(req: FastifyRequest) {
-  const gmKey = (process.env.GM_API_KEY ?? '').trim();
-  const apiKey = String(req.headers['x-api-key'] ?? '').trim();
-  return Boolean(gmKey && apiKey && apiKey === gmKey);
-}
-
+    const gmKey = (process.env.GM_API_KEY ?? '').trim();
+    const apiKey = String(req.headers['x-api-key'] ?? '').trim();
+    return Boolean(gmKey && apiKey && apiKey === gmKey);
+  }
 
   async list(req: FastifyRequest, reply: FastifyReply) {
     const uc = container.resolve('listQuests');

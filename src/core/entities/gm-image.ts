@@ -11,7 +11,9 @@ export interface GmImageProps {
 export class GmImage {
   private constructor(readonly props: GmImageProps) {}
 
-  toJSON() { return this.props; }
+  toJSON() {
+    return this.props;
+  }
 
   static create(props: Omit<GmImageProps, 'id' | 'createdAt'>) {
     if (!props.url) throw new Error('URL is required');

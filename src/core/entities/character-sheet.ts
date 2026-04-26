@@ -12,7 +12,9 @@ export interface CharacterSheetProps {
 export class CharacterSheet {
   private constructor(readonly props: CharacterSheetProps) {}
 
-  toJSON() { return this.props; }
+  toJSON() {
+    return this.props;
+  }
 
   static create(props: Omit<CharacterSheetProps, 'id' | 'createdAt' | 'updatedAt'>) {
     if (!props.name?.trim()) throw new Error('Name is required');

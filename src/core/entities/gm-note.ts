@@ -11,7 +11,9 @@ export interface GmNoteProps {
 export class GmNote {
   private constructor(readonly props: GmNoteProps) {}
 
-  toJSON() { return this.props; }
+  toJSON() {
+    return this.props;
+  }
 
   static create(props: Omit<GmNoteProps, 'id' | 'createdAt' | 'updatedAt'>) {
     if (!props.title?.trim()) throw new Error('Title is required');

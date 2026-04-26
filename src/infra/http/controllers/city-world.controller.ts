@@ -25,5 +25,4 @@ export class CityWorldController {
 
     return reply.code(204).send();
   }
-
 }
