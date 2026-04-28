@@ -36,6 +36,8 @@ const ALLOWED_MIME: Record<string, string> = {
   'application/x-mobipocket-ebook': '.mobi',
   'application/mobi': '.mobi',
   'text/markdown': '.md',
+  'text/csv': '.csv',
+  'application/csv': '.csv',
 };
 
 /**
@@ -93,6 +95,7 @@ export class LibraryController {
         '.mobi': 'application/x-mobipocket-ebook',
         '.epub': 'application/epub+zip',
         '.md': 'text/markdown',
+        '.csv': 'text/csv',
       };
       if (EXT_TO_MIME[originalExt]) mime = EXT_TO_MIME[originalExt];
     }

@@ -1,6 +1,13 @@
 {
-  "name": "rpg-backend",
+  "name": "picho-rpg-backend",
   "version": "0.1.0",
+  "description": "Picho-RPG backend — Fastify + Drizzle + SQLite API for the Picho-RPG tabletop companion.",
+  "homepage": "https://picho.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/picho-org/picho-rpg-backend.git"
+  },
+  "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {
