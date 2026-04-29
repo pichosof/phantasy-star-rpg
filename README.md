@@ -337,6 +337,45 @@ For Azure Container Apps:
 - Persistent disk goes via Azure Files volume mounted at `/app/data`.
 - Set `FILE_STORAGE_DRIVER=azure-blob` to push uploads to Blob instead of the volume.
 
+### Production CD
+
+[`deploy-production.yml`](.github/workflows/deploy-production.yml) deploys every push to `main` to Azure Container Apps:
+
+- Azure login uses GitHub OIDC with an Azure identity federated to this repository's `main` branch.
+- The workflow builds and pushes an image tagged with `${GITHUB_SHA}` to Azure Container Registry.
+- The workflow updates the configured Azure Container App.
+- Secrets remain in Azure Container Apps and are referenced as `secretref:*`; secret values are never stored in the repository.
+
+Required GitHub Actions secrets:
+
+| Secret name                            | Purpose                                                   |
+| -------------------------------------- | --------------------------------------------------------- |
+| `AZURE_CLIENT_ID`                      | OIDC-enabled Azure identity client ID.                    |
+| `AZURE_TENANT_ID`                      | Azure tenant ID.                                          |
+| `AZURE_SUBSCRIPTION_ID`                | Azure subscription ID.                                    |
+| `AZURE_RESOURCE_GROUP`                 | Resource group that owns the API resources.               |
+| `ACR_NAME`                             | Azure Container Registry name.                            |
+| `ACR_LOGIN_SERVER`                     | Azure Container Registry login server.                    |
+| `ACR_IMAGE_NAME`                       | Container image repository name.                          |
+| `AZURE_CONTAINER_APP_NAME`             | Azure Container Apps API resource name.                   |
+| `API_HEALTH_URL`                       | Production health-check URL.                              |
+| `API_PORT`                             | API container port.                                       |
+| `NODE_ENV`                             | Runtime environment name.                                 |
+| `DATABASE_URL`                         | Database path/URL used by the container.                  |
+| `CORS_ORIGIN`                          | Allowed production frontend origin.                       |
+| `FILE_STORAGE_DRIVER`                  | Upload storage driver.                                    |
+| `UPLOADS_LOCAL_DIR`                    | Local upload mount path used by the container.            |
+| `AZURE_STORAGE_CONTAINER`              | Blob container name.                                      |
+| `AZURE_STORAGE_ACCESS_TIER`            | Blob access tier.                                         |
+| `MAX_UPLOAD_MB`                        | Upload cap in MB.                                         |
+| `JWT_EXPIRES_IN`                       | GM JWT expiration window.                                 |
+| `AZURE_STORAGE_CONNECTION_SECRET_NAME` | Container App secret name for the storage connection.     |
+| `CLIENT_SECRET_NAME`                   | Container App secret name for the frontend client secret. |
+| `GM_API_KEY_SECRET_NAME`               | Container App secret name for the GM key.                 |
+| `JWT_SECRET_NAME`                      | Container App secret name for JWT signing.                |
+
+The workflow performs a health check after every deployment.
+
 ---
 
 ## Contributing

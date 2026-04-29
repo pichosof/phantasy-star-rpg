@@ -1,0 +1,141 @@
+name: Deploy API to Azure Container Apps
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.dockerignore'
+      - '.github/workflows/deploy-production.yml'
+      - 'Dockerfile'
+      - 'deploy/azure/**'
+      - 'drizzle/**'
+      - 'drizzle.config.ts'
+      - 'package-lock.json'
+      - 'package.json'
+      - 'scripts/**'
+      - 'src/**'
+      - 'tsconfig.json'
+  workflow_dispatch:
+
+concurrency:
+  group: production-api
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate API
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Build image and deploy API
+    needs: validate
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure Azure Container Apps CLI
+        run: az extension add --name containerapp --upgrade --output none
+
+      - name: Build and push container image
+        id: image
+        shell: bash
+        env:
+          ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          IMAGE_NAME: ${{ secrets.ACR_IMAGE_NAME }}
+        run: |
+          image="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}"
+          echo "image=${image}" >> "${GITHUB_OUTPUT}"
+
+          az acr login --name "${ACR_NAME}" --output none
+          docker build --tag "${image}" .
+          docker push "${image}"
+
+      - name: Deploy container revision
+        shell: bash
+        env:
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+          APP_PORT: ${{ secrets.API_PORT }}
+          AZURE_STORAGE_ACCESS_TIER: ${{ secrets.AZURE_STORAGE_ACCESS_TIER }}
+          AZURE_STORAGE_CONNECTION_SECRET_NAME: ${{ secrets.AZURE_STORAGE_CONNECTION_SECRET_NAME }}
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
+          CLIENT_SECRET_NAME: ${{ secrets.CLIENT_SECRET_NAME }}
+          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FILE_STORAGE_DRIVER: ${{ secrets.FILE_STORAGE_DRIVER }}
+          GM_API_KEY_SECRET_NAME: ${{ secrets.GM_API_KEY_SECRET_NAME }}
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+          JWT_SECRET_NAME: ${{ secrets.JWT_SECRET_NAME }}
+          MAX_UPLOAD_MB: ${{ secrets.MAX_UPLOAD_MB }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          UPLOADS_LOCAL_DIR: ${{ secrets.UPLOADS_LOCAL_DIR }}
+        run: |
+          az containerapp update \
+            --name "${CONTAINER_APP_NAME}" \
+            --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --image "${{ steps.image.outputs.image }}" \
+            --set-env-vars \
+              PORT="${APP_PORT}" \
+              NODE_ENV="${NODE_ENV}" \
+              DATABASE_URL="${DATABASE_URL}" \
+              CORS_ORIGIN="${CORS_ORIGIN}" \
+              FILE_STORAGE_DRIVER="${FILE_STORAGE_DRIVER}" \
+              UPLOADS_LOCAL_DIR="${UPLOADS_LOCAL_DIR}" \
+              AZURE_STORAGE_CONTAINER="${AZURE_STORAGE_CONTAINER}" \
+              AZURE_STORAGE_ACCESS_TIER="${AZURE_STORAGE_ACCESS_TIER}" \
+              AZURE_STORAGE_CONNECTION_STRING="secretref:${AZURE_STORAGE_CONNECTION_SECRET_NAME}" \
+              GM_API_KEY="secretref:${GM_API_KEY_SECRET_NAME}" \
+              MAX_UPLOAD_MB="${MAX_UPLOAD_MB}" \
+              CLIENT_SECRET="secretref:${CLIENT_SECRET_NAME}" \
+              JWT_SECRET="secretref:${JWT_SECRET_NAME}" \
+              JWT_EXPIRES_IN="${JWT_EXPIRES_IN}" \
+            --output none
+
+      - name: Health check
+        shell: bash
+        env:
+          API_HEALTH_URL: ${{ secrets.API_HEALTH_URL }}
+        run: |
+          for attempt in {1..18}; do
+            if curl --fail --silent --output /dev/null "${API_HEALTH_URL}"; then
+              exit 0
+            fi
+            echo "API not ready yet (${attempt}/18). Retrying in 10s..."
+            sleep 10
+          done
+
+          echo "API health check failed after deployment."
+          exit 1
