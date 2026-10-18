@@ -7,4 +7,5 @@ import * as schema from './schema.js';
 
 const sqlite = new Database(env.DATABASE_URL, { fileMustExist: false });
 export const db = drizzle(sqlite, { schema });
-export { schema };
+/** Raw better-sqlite3 handle — only for ops tasks like online backups. */
+export { sqlite, schema };

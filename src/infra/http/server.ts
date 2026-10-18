@@ -16,6 +16,7 @@ import visibilityFilterPlugin from './plugins/visibility-filter';
 import { characterSheetsRoutes } from './routes/character-sheets.routes';
 import { cityWorldRoutes } from './routes/city-world.routes';
 import { cityRoutes } from './routes/city.routes';
+import { databaseRoutes } from './routes/database.routes';
 import { dungeonRoutes } from './routes/dungeon.routes';
 import { gmImagesRoutes } from './routes/gm-images.routes';
 import { gmNotesRoutes } from './routes/gm-notes.routes';
@@ -97,7 +98,11 @@ export async function buildServer() {
 
   // ── CORS ────────────────────────────────────────────────────────────────────
   await app.register(cors, {
-    origin: env.CORS_ORIGIN || (isProd ? false : '*'),
+    origin: env.CORS_ORIGINS.includes('*')
+      ? '*'
+      : env.CORS_ORIGINS.length
+        ? env.CORS_ORIGINS
+        : !isProd,
     allowedHeaders: [
       'content-type',
       'authorization',
@@ -208,6 +213,7 @@ export async function buildServer() {
   await app.register(libraryRoutes);
   await app.register(dungeonRoutes);
   await app.register(tagsRoutes);
+  await app.register(databaseRoutes);
 
   await app.register(errorHandlerPlugin);
 

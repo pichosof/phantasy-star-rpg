@@ -27,6 +27,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
+import { env } from '../../config/env.js';
 import { safeCompare } from '../../security/safe-compare.js';
 
 const EXEMPT_PATHS = new Set(['/api/health']);
@@ -34,7 +35,9 @@ const EXEMPT_PREFIX = '/files/';
 
 export const clientAuthPlugin = fp(async (app: FastifyInstance) => {
   const clientSecret = process.env.CLIENT_SECRET;
-  const corsOrigin = process.env.CORS_ORIGIN ?? '*';
+  const allowedOrigins = env.CORS_ORIGINS;
+  const isAllowedOrigin = (o: string) =>
+    allowedOrigins.some((allowed) => safeCompare(o.replace(/\/$/, ''), allowed));
   const isProd = process.env.NODE_ENV === 'production';
 
   if (!clientSecret) {
@@ -81,7 +84,7 @@ export const clientAuthPlugin = fp(async (app: FastifyInstance) => {
     // Browsers always send Origin on cross-origin requests and on same-origin
     // POST/PUT/PATCH/DELETE requests. Missing Origin on a state-changing route
     // is suspicious (typical of curl/Postman without explicit header spoofing).
-    if (isProd && corsOrigin !== '*') {
+    if (isProd && !allowedOrigins.includes('*')) {
       const origin = req.headers['origin'] as string | undefined;
       const referer = req.headers['referer'] as string | undefined;
 
@@ -90,7 +93,7 @@ export const clientAuthPlugin = fp(async (app: FastifyInstance) => {
 
       if (!isSafeMethod && origin) {
         // origin is present — validate it
-        if (!safeCompare(origin.replace(/\/$/, ''), corsOrigin.replace(/\/$/, ''))) {
+        if (!isAllowedOrigin(origin)) {
           app.log.warn({ ip: req.ip, origin, path }, '[client-auth] rejected: Origin mismatch');
           await reply.code(403).send({ error: 'Forbidden' });
           return;
@@ -101,7 +104,7 @@ export const clientAuthPlugin = fp(async (app: FastifyInstance) => {
         // Some browsers omit Origin on same-origin redirects but include Referer
         try {
           const refOrigin = new URL(referer).origin;
-          if (!safeCompare(refOrigin, corsOrigin.replace(/\/$/, ''))) {
+          if (!isAllowedOrigin(refOrigin)) {
             app.log.warn({ ip: req.ip, referer, path }, '[client-auth] rejected: Referer mismatch');
             await reply.code(403).send({ error: 'Forbidden' });
             return;

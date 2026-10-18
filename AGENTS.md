@@ -177,6 +177,15 @@ Read at boot from `.env` via `src/infra/config/env.ts`. Treated as required unle
 | `CLIENT_SECRET`                   | —                | Shared with the frontend (`VITE_CLIENT_SECRET`).                   |
 | `JWT_SECRET`                      | —                | Signs the GM JWTs.                                                 |
 | `JWT_EXPIRES_IN`                  | `8h`             | JWT TTL.                                                           |
+| `BACKUP_ENABLED`                  | prod only        | Periodic SQLite backups (boot, every interval, and on SIGTERM).    |
+| `BACKUP_INTERVAL_HOURS`           | `6`              | Interval between backups while the process is up.                  |
+| `BACKUP_RETENTION`                | `30`             | Number of backups kept; older ones are pruned.                     |
+| `AZURE_BACKUP_CONTAINER`          | `db-backups`     | **Private** Blob container (never served by `/files/*`).           |
+| `BACKUP_LOCAL_DIR`                | `./data/backups` | Backup target when the storage driver is `local`.                  |
+
+`CORS_ORIGIN` is a comma-separated allow-list (e.g. `https://rpg.picho.org`); it also drives the Origin/Referer check in `client-auth` for state-changing requests in production.
+
+GM endpoints for the database: `GET /api/gm/database/download` (streams a fresh snapshot) and `POST /api/gm/database/backup` (backs up now; skipped if unchanged). Implementation: [src/infra/backup/](src/infra/backup/).
 
 ---
 
