@@ -341,6 +341,10 @@ Two implementations:
 
 The adapter is chosen at server boot in `src/infra/storage/index.ts`.
 
+**Thumbnails** (`src/infra/storage/image-thumbnails.ts`, `sharp`): `GET /files/<key>?w=320|640|1280` returns a resized WebP, generated on first request and cached in the same storage under `_thumbs/w<width>/<key>.webp`. Works for all existing uploads; animated GIFs become their first frame. Other widths fall back to the original. Deleting an upload via `deleteStoredFileByUrl` also purges its thumbnails. The frontend uses thumbnails in cards/drawers and the original only in the lightbox.
+
+**Image focus** (`image_focus` table, `src/infra/http/routes/image-focus.routes.ts`): per-image focal point (0–100 %) keyed by storage key, set by the GM (`PUT /api/gm/image-focus`) and read with `GET /api/image-focus?keys=…` (only answers for keys the caller already has). The table is created at boot with `CREATE TABLE IF NOT EXISTS` in `src/infra/db/index.ts`, because production does not run migrations.
+
 To migrate existing local uploads to Blob:
 
 ```bash

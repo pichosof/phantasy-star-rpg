@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { sqliteTable, integer, text, primaryKey } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, primaryKey, real } from 'drizzle-orm/sqlite-core';
 
 export const players = sqliteTable('players', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -432,3 +432,18 @@ export const loreCities = sqliteTable(
   },
   (t) => ({ pk: primaryKey({ columns: [t.loreId, t.cityId] }) }),
 );
+
+/**
+ * Focal point of an uploaded image (percentages, 0–100), keyed by its storage key, so
+ * every entity with images shares one table. Covers use it as CSS object-position.
+ * Created at boot with CREATE TABLE IF NOT EXISTS (see db/index.ts), since production
+ * does not run migrations.
+ */
+export const imageFocus = sqliteTable('image_focus', {
+  key: text('key').primaryKey(),
+  x: real('x').notNull(),
+  y: real('y').notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});

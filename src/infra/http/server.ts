@@ -6,7 +6,8 @@ import Fastify from 'fastify';
 
 import { env } from '../config/env';
 import { decodeStorageKey, parseRangeHeader } from '../storage/file-storage.utils.js';
-import { fileStorage } from '../storage/index.js';
+import { parseThumbWidth } from '../storage/image-thumbnails.js';
+import { fileStorage, imageThumbnails } from '../storage/index.js';
 
 import { authPlugin } from './plugins/auth';
 import { clientAuthPlugin } from './plugins/client-auth';
@@ -20,6 +21,7 @@ import { databaseRoutes } from './routes/database.routes';
 import { dungeonRoutes } from './routes/dungeon.routes';
 import { gmImagesRoutes } from './routes/gm-images.routes';
 import { gmNotesRoutes } from './routes/gm-notes.routes';
+import { imageFocusRoutes } from './routes/image-focus.routes';
 import { libraryRoutes } from './routes/library.routes';
 import { loreCityRoutes } from './routes/lore-city.routes';
 import { loreRoutes } from './routes/lore.routes';
@@ -148,33 +150,54 @@ export async function buildServer() {
   });
 
   // ── Static files ─────────────────────────────────────────────────────────────
-  app.get<{ Params: { '*': string } }>('/files/*', async (req, reply) => {
-    const key = decodeStorageKey(req.params['*'] ?? '');
-    if (!key) return reply.code(404).send({ error: 'Not found' });
+  app.get<{ Params: { '*': string }; Querystring: { w?: string } }>(
+    '/files/*',
+    async (req, reply) => {
+      const key = decodeStorageKey(req.params['*'] ?? '');
+      if (!key) return reply.code(404).send({ error: 'Not found' });
 
-    let file = await fileStorage.openReadStream(key);
-    if (!file) return reply.code(404).send({ error: 'Not found' });
+      // Keys are unique per upload (uuid) and never overwritten, so files can be cached for good.
+      reply.header('Cache-Control', 'public, max-age=31536000, immutable');
 
-    const range = parseRangeHeader(req.headers.range, file.totalSize);
-    if (range) {
-      file = await fileStorage.openReadStream(key, range);
+      // ?w=320|640|1280 → resized WebP for cards/drawers; the original stays at the plain URL.
+      const width = parseThumbWidth(req.query.w);
+      if (width) {
+        const thumb = await imageThumbnails.get(key, width).catch((err: Error) => {
+          req.log.warn({ err, key, width }, 'thumbnail failed, serving original');
+          return null;
+        });
+        if (thumb) {
+          return reply
+            .header('Content-Type', 'image/webp')
+            .header('Content-Length', String(thumb.length))
+            .send(thumb);
+        }
+      }
+
+      let file = await fileStorage.openReadStream(key);
       if (!file) return reply.code(404).send({ error: 'Not found' });
-    }
 
-    reply.header('Accept-Ranges', 'bytes');
-    if (file.mime) reply.header('Content-Type', file.mime);
+      const range = parseRangeHeader(req.headers.range, file.totalSize);
+      if (range) {
+        file = await fileStorage.openReadStream(key, range);
+        if (!file) return reply.code(404).send({ error: 'Not found' });
+      }
 
-    if (file.range) {
-      reply
-        .code(206)
-        .header('Content-Length', String(file.contentLength))
-        .header('Content-Range', `bytes ${file.range.start}-${file.range.end}/${file.totalSize}`);
-    } else {
-      reply.header('Content-Length', String(file.contentLength));
-    }
+      reply.header('Accept-Ranges', 'bytes');
+      if (file.mime) reply.header('Content-Type', file.mime);
 
-    return reply.send(file.stream);
-  });
+      if (file.range) {
+        reply
+          .code(206)
+          .header('Content-Length', String(file.contentLength))
+          .header('Content-Range', `bytes ${file.range.start}-${file.range.end}/${file.totalSize}`);
+      } else {
+        reply.header('Content-Length', String(file.contentLength));
+      }
+
+      return reply.send(file.stream);
+    },
+  );
 
   // ── Health check (no rate limit applied — exempt via low cost) ───────────────
   app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
@@ -215,6 +238,7 @@ export async function buildServer() {
   await app.register(libraryRoutes);
   await app.register(dungeonRoutes);
   await app.register(tagsRoutes);
+  await app.register(imageFocusRoutes);
   await app.register(databaseRoutes);
 
   await app.register(errorHandlerPlugin);

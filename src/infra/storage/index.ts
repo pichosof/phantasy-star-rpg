@@ -2,6 +2,7 @@ import { env } from '../config/env.js';
 
 import { AzureBlobFileStorage } from './azure-blob.file-storage.js';
 import { extractStorageKeyFromUrl } from './file-storage.utils.js';
+import { ImageThumbnails } from './image-thumbnails.js';
 import { LocalFileStorage } from './local-file.storage.js';
 
 function createFileStorage() {
@@ -18,10 +19,12 @@ function createFileStorage() {
 }
 
 export const fileStorage = createFileStorage();
+export const imageThumbnails = new ImageThumbnails(fileStorage);
 
 export async function deleteStoredFileByUrl(url: string | null | undefined): Promise<void> {
   if (!url) return;
   const key = extractStorageKeyFromUrl(url);
   if (!key) return;
   await fileStorage.deleteByKey(key);
+  await imageThumbnails.purge(key);
 }
