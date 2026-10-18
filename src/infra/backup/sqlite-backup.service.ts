@@ -39,11 +39,26 @@ export class SqliteBackupService {
     private readonly log: Logger = console,
   ) {}
 
-  /** Writes a consistent copy of the live DB to a temp file. Caller must delete it. */
-  async createSnapshot(): Promise<string> {
-    const file = path.join(os.tmpdir(), `picho-rpg-snapshot-${randomUUID()}.db`);
-    await sqlite.backup(file);
-    return file;
+  /**
+   * Writes a consistent copy of the live DB to a temp file. Caller must delete it.
+   * The DB lives on Azure Files (SMB), where locks can fail transiently — notably while
+   * an old revision still holds the file during a rollout — so lock errors are retried.
+   */
+  async createSnapshot(attempts = 5, delayMs = 5_000): Promise<string> {
+    for (let i = 1; ; i++) {
+      const file = path.join(os.tmpdir(), `picho-rpg-snapshot-${randomUUID()}.db`);
+      try {
+        await sqlite.backup(file);
+        return file;
+      } catch (e) {
+        await fsp.rm(file, { force: true });
+        const code = (e as { code?: string }).code ?? '';
+        const retriable = /BUSY|LOCKED|PROTOCOL/.test(code) || /lock/i.test((e as Error).message);
+        if (!retriable || i >= attempts) throw e;
+        this.log.info(`[backup] snapshot attempt ${i} hit "${(e as Error).message}", retrying`);
+        await new Promise((r) => setTimeout(r, delayMs * i));
+      }
+    }
   }
 
   /** Snapshot → upload (skipped when identical to the latest backup) → prune. */
@@ -94,12 +109,17 @@ export class SqliteBackupService {
         this.log.error(`[backup] ${reason} failed: ${e.message}`),
       );
 
-    void this.target
-      .list()
-      .then(([latest]) => {
-        if (!latest || Date.now() - latest.createdAt.getTime() > intervalMs) return safeRun('boot');
-      })
-      .catch((e: Error) => this.log.error(`[backup] boot check failed: ${e.message}`));
+    // Delay the boot check so the previous revision has released the DB file.
+    const bootTimer = setTimeout(() => {
+      void this.target
+        .list()
+        .then(([latest]) => {
+          if (!latest || Date.now() - latest.createdAt.getTime() > intervalMs)
+            return safeRun('boot');
+        })
+        .catch((e: Error) => this.log.error(`[backup] boot check failed: ${e.message}`));
+    }, 90_000);
+    bootTimer.unref();
 
     this.timer = setInterval(() => void safeRun('scheduled'), intervalMs);
     this.timer.unref();
