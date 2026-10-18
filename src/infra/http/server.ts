@@ -134,7 +134,9 @@ export async function buildServer() {
     // Stricter limit for any route whose path contains "library" or "api-key" auth attempts.
     // Auth-level brute-force is handled by BruteForceGuard; this layer throttles volume.
     keyGenerator: (req) => req.ip,
+    // The builder's return value is thrown; without statusCode Fastify answers 500.
     errorResponseBuilder: (_req, context) => ({
+      statusCode: 429,
       error: 'Too Many Requests',
       retryAfterMs: context.after,
     }),

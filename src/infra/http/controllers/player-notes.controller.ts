@@ -9,6 +9,13 @@ export class PlayerNotesController {
   async list(req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const playerId = Number(req.params.id);
     if (!Number.isFinite(playerId)) return reply.code(400).send({ error: 'Invalid id' });
+    if (!req.isGM) {
+      const [player] = await db
+        .select()
+        .from(schema.players)
+        .where(eq(schema.players.id, playerId));
+      if (!player || player.visible === false) return reply.code(404).send({ error: 'Not found' });
+    }
     const notes = await db
       .select()
       .from(schema.playerNotes)
