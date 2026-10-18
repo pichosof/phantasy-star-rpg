@@ -8,6 +8,7 @@ export const createLoreInput = z.object({
   title: z.string().min(1),
   category: z.enum(loreCategories).nullable().optional(),
   content: z.string().nullable().optional(),
+  visible: z.boolean().optional(),
 });
 export type CreateLoreInput = z.input<typeof createLoreInput>;
 

@@ -11,6 +11,27 @@ function isValidEntityType(t: string): t is EntityTagType {
   return (s.entityTagTypes as readonly string[]).includes(t);
 }
 
+const TABLE_BY_TYPE = {
+  beast: s.bestiary,
+  npc: s.npcs,
+  city: s.cities,
+  dungeon: s.dungeons,
+  world: s.worlds,
+  player: s.players,
+  lore: s.lores,
+  quest: s.quests,
+} as const;
+
+/** Missing or visible=false entities are treated alike so players can't probe ids. */
+async function isHiddenEntity(type: EntityTagType, id: number): Promise<boolean> {
+  const table = TABLE_BY_TYPE[type as keyof typeof TABLE_BY_TYPE];
+  if (!table) return false;
+  const { db } = await import('../../db/index.js');
+  const { eq } = await import('drizzle-orm');
+  const [row] = (await db.select().from(table).where(eq(table.id, id))) as { visible?: boolean }[];
+  return !row || row.visible === false;
+}
+
 export class TagsController {
   async list(_req: FastifyRequest, reply: FastifyReply) {
     const repo = container.resolve('tagsRepo');
@@ -90,6 +111,9 @@ export class TagsController {
     const entityId = Number(req.params.entityId);
     if (!isValidEntityType(type)) return reply.code(400).send({ error: 'Invalid entity type' });
     if (!Number.isFinite(entityId)) return reply.code(400).send({ error: 'Invalid entityId' });
+    if (!req.isGM && (await isHiddenEntity(type, entityId))) {
+      return reply.code(404).send({ error: 'Not found' });
+    }
     const repo = container.resolve('tagsRepo');
     const tags = await repo.getEntityTags(type, entityId);
     return reply.send(tags);

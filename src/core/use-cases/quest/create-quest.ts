@@ -6,6 +6,7 @@ export const createQuestInput = z.object({
   title: z.string().min(1),
   description: z.string().nullable().optional(),
   reward: z.string().nullable().optional(),
+  visible: z.boolean().optional(),
 });
 export type CreateQuestInput = z.input<typeof createQuestInput>;
 

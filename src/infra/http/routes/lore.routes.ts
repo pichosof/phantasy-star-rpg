@@ -51,6 +51,7 @@ export async function loreRoutes(app: FastifyInstance) {
             title: { type: 'string' },
             category: { enum: ['history', 'culture', 'tech', 'biology', 'myth', null] },
             content: { type: 'string', nullable: true },
+            visible: { type: 'boolean' },
           },
           additionalProperties: false,
         },

@@ -30,6 +30,7 @@ export async function questRoutes(app: FastifyInstance) {
             title: { type: 'string' },
             description: { type: 'string', nullable: true },
             reward: { type: 'string', nullable: true },
+            visible: { type: 'boolean' },
           },
           additionalProperties: false,
         },
