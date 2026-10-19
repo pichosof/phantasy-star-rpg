@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { itemDamage, itemType } from './classify.js';
+
 export const ITEM_ORIGINS = ['starfinder', 'algol', 'homebrew'] as const;
 export const ITEM_REGIONS = ['motavia', 'dezolis', 'kolian'] as const;
 /**
@@ -136,6 +138,8 @@ export function toPlayerItem(i: Item) {
     originalName: i.localName ? i.name : null,
     origin: i.origin,
     kind: i.kind,
+    type: itemType(i),
+    damageType: itemDamage(i),
     group: i.group,
     category: i.category,
     level: i.level,
@@ -159,10 +163,17 @@ const PLAYER_AVAILABILITY: Partial<Record<ItemAccess, string>> = {
 };
 
 /** GM list without the heavy audit blob (open one item to read it). */
-const summary = (item: Item): Omit<Item, 'audit'> => {
+/** Kind → type and weapon damage family, for the catalogue filters. */
+const classified = <T extends Item | Omit<Item, 'audit'>>(i: T) => ({
+  ...i,
+  type: itemType(i),
+  damageType: itemDamage(i),
+});
+
+const summary = (item: Item) => {
   const rest: Partial<Item> = { ...item };
   delete rest.audit;
-  return rest as Omit<Item, 'audit'>;
+  return classified(rest as Omit<Item, 'audit'>);
 };
 
 export class ListItems {
@@ -179,7 +190,7 @@ export class GetItem {
     const item = await this.repo.get(id);
     if (!item || (!gm && (item.visibility !== 'public' || item.status !== 'published')))
       throw new ItemNotFoundError();
-    return gm ? item : toPlayerItem(item);
+    return gm ? classified(item) : toPlayerItem(item);
   }
 }
 

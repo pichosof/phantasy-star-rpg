@@ -63,6 +63,7 @@ describe('items', () => {
     expect(mine.map((i) => i.code)).toEqual([`${tag}-pub`]);
     for (const k of GM_FIELDS) expect(mine[0]).not.toHaveProperty(k);
     expect(mine[0].availability).toBe('Common trade');
+    expect(mine[0]).toMatchObject({ type: 'Other technology', damageType: null });
     expect(JSON.stringify(list)).not.toContain('Segredo do mestre');
 
     const gmList = (await api.gm({ method: 'GET', url: '/api/gm/items' })).json() as Array<
