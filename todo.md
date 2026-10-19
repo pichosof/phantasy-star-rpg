@@ -123,7 +123,7 @@ Follow-ups (not approved yet):
 
 **Done (2026-10-19):** `GET /api/search?q=` reuses the link repository (same visibility rules; GM notes for the GM only). Names/subtitles match word beginnings, body text whole words; names rank first. Front: Ctrl/Cmd+K palette (SearchPaletteHost) plus a search button in the desktop and mobile headers; results open in the entity preview drawer.
 
-### [ ] 4.2 Quick generators (GM only)
+### [x] 4.2 Quick generators (GM only)
 
 - **Name generator:** per world/culture (Motavian, Dezorian, Palman, Esper…), with editable word lists.
 - **NPC generator:** name, race, job, trait, hook. "Save as NPC" creates it **hidden** (`visible=false`).
@@ -132,6 +132,8 @@ Follow-ups (not approved yet):
 - Start client-side with data files; persist only the saved results.
 
 ---
+
+**Done (2026-10-19), front only:** GM → Generators (`src/generators/`): NPC, names (6 peoples), shop, encounter (opens in the combat tracker), Guild board. Seeded RNG + Markov + templates + per-device anti-repeat history. Shop stock = AoN Starfinder items curated for post-collapse Algol (`scripts/generators/curate.py`, 906 of 3,745 kept) + local goods with economy prices. Next: keep growing the data tables from new wiki pages.
 
 ## Backlog / housekeeping (offered, not yet approved)
 
