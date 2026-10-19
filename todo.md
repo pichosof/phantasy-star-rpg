@@ -20,13 +20,13 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - `tests/player.routes.test.ts` is outdated: update it to the current API.
 - Goal: `npm run check` passes locally and in GitHub Actions on both repos.
 
-### [ ] 0.2 One-command deploy
+### [x] 0.2 One-command deploy
 
 - Back: build the image → push to ACR `pichorpg2404acr` → update Container App `picho-rpg-api` (rg `AZR-BR`).
 - Front: build → deploy to Static Web App `picho-rpg-web`.
 - Provide one script, or `workflow_dispatch` workflows, that runs the checks before deploying.
 
-### [ ] 0.3 Restore backup from the GM UI
+### [x] 0.3 Restore backup from the GM UI
 
 - Backups already exist (`src/infra/backup/`, private container `db-backups`). Today the GM can download the DB and trigger a backup.
 - Add:

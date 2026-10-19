@@ -44,7 +44,7 @@ export async function errorHandlerPlugin(app: FastifyInstance) {
       app.log.error({ err }, 'Unhandled error');
       return reply.status(status).send({
         error: err.name || 'Error',
-        message: envSafeMessage(err, process.env.NODE_ENV),
+        message: envSafeMessage(err, status, process.env.NODE_ENV),
       });
     }
 
@@ -53,6 +53,7 @@ export async function errorHandlerPlugin(app: FastifyInstance) {
   });
 }
 
-function envSafeMessage(err: Error, nodeEnv?: string) {
-  return nodeEnv === 'production' ? 'Internal server error' : err.message;
+/** 4xx messages are meant for the client; 5xx details stay in the logs in production. */
+function envSafeMessage(err: Error, status: number, nodeEnv?: string) {
+  return nodeEnv === 'production' && status >= 500 ? 'Internal server error' : err.message;
 }

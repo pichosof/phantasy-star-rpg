@@ -18,6 +18,8 @@ export interface BackupTarget {
   readonly description: string;
   save(name: string, filePath: string, sha256: string): Promise<void>;
   list(): Promise<BackupEntry[]>; // newest first
+  /** Copies a backup to a local file (used by restore). */
+  download(name: string, filePath: string): Promise<void>;
   delete(name: string): Promise<void>;
 }
 
@@ -60,6 +62,11 @@ export class AzureBlobBackupTarget implements BackupTarget {
     return out.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
+  async download(name: string, filePath: string) {
+    await this.ensure();
+    await this.container.getBlockBlobClient(name).downloadToFile(filePath);
+  }
+
   async delete(name: string) {
     await this.container.deleteBlob(name, { deleteSnapshots: 'include' });
   }
@@ -89,6 +96,10 @@ export class LocalBackupTarget implements BackupTarget {
       }),
     );
     return out.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async download(name: string, filePath: string) {
+    await fsp.copyFile(path.join(this.dir, name), filePath);
   }
 
   async delete(name: string) {

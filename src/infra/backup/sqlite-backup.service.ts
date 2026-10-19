@@ -4,8 +4,10 @@ import fsp from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
+import Database from 'better-sqlite3';
+
 import { env } from '../config/env.js';
-import { sqlite } from '../db/index.js';
+import { ensureRuntimeTables, sqlite } from '../db/index.js';
 
 import { type BackupTarget, createBackupTarget } from './backup-target.js';
 
@@ -14,6 +16,23 @@ type Logger = { info: (msg: string) => void; error: (msg: string) => void };
 export type BackupResult =
   | { status: 'uploaded'; name: string; size: number }
   | { status: 'unchanged'; name: string };
+
+export interface RestoreResult {
+  restoredFrom: string;
+  /** Backup of the database as it was right before the restore. */
+  safetyBackup: string;
+}
+
+/** A restore input that is not a usable Picho-RPG database (→ 400). */
+export class InvalidBackupError extends Error {
+  readonly statusCode = 400;
+}
+
+/** Names produced by this service; anything else is rejected (no path tricks). */
+export const BACKUP_NAME = /^app-[0-9TZ-]+\.db$/;
+
+/** Tables every Picho-RPG database has had since the first releases. */
+const CORE_TABLES = ['players', 'cities', 'npcs', 'sessions', 'quests', 'lores', 'worlds'];
 
 function timestamp(d = new Date()) {
   return d.toISOString().replace(/[:.]/g, '-'); // 2026-10-18T04-12-00-000Z
@@ -90,6 +109,72 @@ export class SqliteBackupService {
     }
   }
 
+  listBackups() {
+    return this.target.list();
+  }
+
+  /**
+   * Replaces the live database with a backup (by name) or an uploaded file.
+   * 1. validates the candidate (SQLite header, integrity_check, core tables);
+   * 2. takes a safety backup of the current database;
+   * 3. copies the candidate over the live DB with the SQLite online backup API, so the
+   *    open connection stays valid and sees the restored data immediately.
+   */
+  async restore(
+    source: { name: string } | { file: string; label: string },
+  ): Promise<RestoreResult> {
+    if (this.inFlight) await this.inFlight.catch(() => undefined);
+    if (this.restoring) throw new InvalidBackupError('A restore is already running.');
+    this.restoring = true;
+
+    const candidate = path.join(os.tmpdir(), `picho-rpg-restore-${randomUUID()}.db`);
+    try {
+      let label: string;
+      if ('name' in source) {
+        if (!BACKUP_NAME.test(source.name)) throw new InvalidBackupError('Invalid backup name.');
+        const exists = (await this.target.list()).some((b) => b.name === source.name);
+        if (!exists) throw new InvalidBackupError(`Backup "${source.name}" not found.`);
+        await this.target.download(source.name, candidate);
+        label = source.name;
+      } else {
+        await fsp.copyFile(source.file, candidate);
+        label = source.label;
+      }
+
+      validateDatabaseFile(candidate);
+
+      const safety = await this.run('pre-restore');
+      await this.copyOverLive(candidate);
+      ensureRuntimeTables();
+
+      this.log.info(`[backup] restored ${label} (safety backup: ${safety.name})`);
+      return { restoredFrom: label, safetyBackup: safety.name };
+    } finally {
+      this.restoring = false;
+      await fsp.rm(candidate, { force: true });
+    }
+  }
+
+  private restoring = false;
+
+  private async copyOverLive(candidate: string, attempts = 5, delayMs = 2_000) {
+    const source = new Database(candidate, { readonly: true, fileMustExist: true });
+    try {
+      for (let i = 1; ; i++) {
+        try {
+          await source.backup(path.resolve(env.DATABASE_URL));
+          return;
+        } catch (e) {
+          const code = (e as { code?: string }).code ?? '';
+          if (!/BUSY|LOCKED/.test(code) || i >= attempts) throw e;
+          await new Promise((r) => setTimeout(r, delayMs * i));
+        }
+      }
+    } finally {
+      source.close();
+    }
+  }
+
   private async prune() {
     const old = (await this.target.list()).slice(Math.max(1, env.BACKUP_RETENTION));
     for (const entry of old) await this.target.delete(entry.name);
@@ -128,6 +213,43 @@ export class SqliteBackupService {
   stop() {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
+  }
+}
+
+/** Throws InvalidBackupError unless the file is a healthy Picho-RPG SQLite database. */
+export function validateDatabaseFile(filePath: string) {
+  const header = Buffer.alloc(16);
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    fs.readSync(fd, header, 0, 16, 0);
+  } finally {
+    fs.closeSync(fd);
+  }
+  if (header.subarray(0, 15).toString('latin1') !== 'SQLite format 3' || header[15] !== 0) {
+    throw new InvalidBackupError('Not a SQLite database file.');
+  }
+
+  let db: Database.Database | undefined;
+  try {
+    db = new Database(filePath, { readonly: true, fileMustExist: true });
+    const integrity = db.pragma('integrity_check', { simple: true });
+    if (integrity !== 'ok')
+      throw new InvalidBackupError(`Integrity check failed: ${String(integrity)}`);
+    const tables = new Set(
+      (
+        db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as {
+          name: string;
+        }[]
+      ).map((r) => r.name),
+    );
+    const missing = CORE_TABLES.filter((t) => !tables.has(t));
+    if (missing.length)
+      throw new InvalidBackupError(`Not a Picho-RPG database (missing: ${missing.join(', ')}).`);
+  } catch (e) {
+    if (e instanceof InvalidBackupError) throw e;
+    throw new InvalidBackupError(`Unreadable database: ${(e as Error).message}`);
+  } finally {
+    db?.close();
   }
 }
 

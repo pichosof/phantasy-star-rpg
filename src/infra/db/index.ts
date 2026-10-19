@@ -7,8 +7,12 @@ import * as schema from './schema.js';
 
 const sqlite = new Database(env.DATABASE_URL, { fileMustExist: false });
 
-// Tables added after the last migration snapshot; idempotent so it is safe on every boot.
-sqlite.exec(`
+/**
+ * Production does not run migrations: tables added later are created here, idempotently.
+ * Also called after a backup restore, since an older backup may predate them.
+ */
+export function ensureRuntimeTables() {
+  sqlite.exec(`
   CREATE TABLE IF NOT EXISTS image_focus (
     key TEXT PRIMARY KEY NOT NULL,
     x REAL NOT NULL,
@@ -16,6 +20,8 @@ sqlite.exec(`
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   )
 `);
+}
+ensureRuntimeTables();
 
 export const db = drizzle(sqlite, { schema });
 /** Raw better-sqlite3 handle — only for ops tasks like online backups. */
