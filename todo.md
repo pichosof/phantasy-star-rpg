@@ -67,7 +67,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 Follow-ups (not approved yet):
 
-- [ ] Combat stats on bestiary entries (today the tracker remembers the last stats used per creature).
+- [x] Combat stats on bestiary entries: `monster_stat_blocks` (GM-only), 63 stat blocks from the Bestiário de Motávia book (`scripts/bestiary/`). 17 older entries (subterranean/aquatic/useful wildlife) have no stat block in the book yet.
 - [ ] Read-only player view of the initiative order.
 
 ## 2. Living wiki

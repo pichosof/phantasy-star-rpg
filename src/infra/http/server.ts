@@ -35,6 +35,7 @@ import { playerRoutes } from './routes/player.routes';
 import { questCityRoutes } from './routes/quest-city.routes';
 import { questRoutes } from './routes/quest.routes';
 import { sessionRoutes } from './routes/session.routes';
+import { statBlocksRoutes } from './routes/stat-blocks.routes';
 import { tagsRoutes } from './routes/tags.routes';
 import { timelineRoutes } from './routes/timeline.routes';
 import { uploadRoutes } from './routes/upload.routes';
@@ -238,6 +239,7 @@ export async function buildServer() {
   await app.register(loreCityRoutes);
   await app.register(gmNotesRoutes);
   await app.register(encountersRoutes);
+  await app.register(statBlocksRoutes);
   await app.register(gmImagesRoutes);
   await app.register(characterSheetsRoutes);
   await app.register(libraryRoutes);

@@ -465,3 +465,14 @@ export const encounters = sqliteTable('encounters', {
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
 });
+
+/** GM-only combat stat blocks of a bestiary entry (one per life stage), as JSON. */
+export const monsterStatBlocks = sqliteTable('monster_stat_blocks', {
+  monsterId: integer('monster_id')
+    .primaryKey()
+    .references(() => bestiary.id, { onDelete: 'cascade' }),
+  blocks: text('blocks').notNull().default('[]'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});

@@ -1,0 +1,3320 @@
+{
+  "_note": "Stat blocks transcribed from the sheet images of Bestiario_Motavia_AW2284 (Digital Com Duun-Wyrm e SEED). Apply with scripts/bestiary/import-stat-blocks.mjs.",
+  "species": [
+    {
+      "species": "Krupp-Beetle",
+      "profiles": [
+        {
+          "label": "Adult",
+          "cr": "1",
+          "xp": 400,
+          "size": "Large",
+          "type": "Animal",
+          "initiative": 1,
+          "senses": "low-light vision; Perception +5",
+          "hp": 20,
+          "eac": 11,
+          "kac": 13,
+          "fort": 3,
+          "ref": 3,
+          "will": 1,
+          "speed": "9 m",
+          "attacks": [
+            {
+              "name": "Chifrada (gore)",
+              "bonus": 8,
+              "damage": "1d6+5 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Animal de Carga",
+              "text": "Carries loads comparable to a warhorse."
+            },
+            {
+              "name": "Investida de Defesa",
+              "text": "Uses a normal charge when cornered."
+            },
+            {
+              "name": "Instinto de Manada",
+              "text": "When startled, may trigger a stampede."
+            },
+            {
+              "name": "Sensível ao Fogo",
+              "text": "Avoids intense flames."
+            }
+          ],
+          "page": "0012_Krupp_Beetle_Adulto_Ficha_Visual.png"
+        }
+      ]
+    },
+    {
+      "species": "Krupp Larval",
+      "profiles": [
+        {
+          "label": "Larva",
+          "cr": "1/2",
+          "xp": 200,
+          "size": "Large",
+          "type": "Animal",
+          "initiative": 1,
+          "hp": 13,
+          "eac": 10,
+          "kac": 12,
+          "fort": 2,
+          "ref": 2,
+          "will": 0,
+          "speed": "4.5 m, burrow 1.5 m",
+          "attacks": [
+            {
+              "name": "Mandíbulas",
+              "bonus": 6,
+              "damage": "1d6+3 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Escavação Lenta",
+              "text": "Burrows 1.5 m in moist, loose soil."
+            },
+            {
+              "name": "Dependência de Umidade",
+              "text": "Prolonged dry heat causes fatigue."
+            },
+            {
+              "name": "Defesa Instintiva",
+              "text": "Uses its mandibles when cornered."
+            }
+          ],
+          "page": "0013_Krupp_Larval_Ficha_Visual.png"
+        }
+      ]
+    },
+    {
+      "species": "Sila-Weaver",
+      "profiles": [
+        {
+          "label": "Juvenil",
+          "cr": "1/3",
+          "xp": 135,
+          "size": "Small",
+          "type": "Animal (artrópode)",
+          "initiative": 3,
+          "senses": "visão no escuro 18 m; Percepção +5",
+          "hp": 10,
+          "eac": 12,
+          "kac": 13,
+          "fort": 1,
+          "ref": 4,
+          "will": 0,
+          "speed": "9 m, escalada 9 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 7,
+              "damage": "1d4 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Fio Raso",
+              "text": "Alvo a 4,5 m. Reflexos CD 11 ou deslocamento reduzido em 3 m por 1 rodada."
+            },
+            {
+              "name": "Percepção Vibracional",
+              "text": "Enquanto toca sua teia, percebe movimento a até 9 m."
+            },
+            {
+              "name": "Recuo pelos Fios (1/combate)",
+              "text": "Move até 4,5 m por uma linha de seda sem provocar ataques de oportunidade."
+            }
+          ],
+          "mods": {
+            "str": 0,
+            "dex": 3,
+            "con": 1,
+            "int": -5,
+            "wis": 0,
+            "cha": -3
+          },
+          "page": "0015_Sila_Weaver_01_Juvenil_CR_1-3.png"
+        },
+        {
+          "label": "Adulta manejada",
+          "cr": "1",
+          "xp": 400,
+          "size": "Medium",
+          "type": "Animal (artrópode domesticado)",
+          "initiative": 4,
+          "senses": "visão no escuro 18 m, percepção vibracional 18 m; Percepção +7",
+          "hp": 18,
+          "eac": 13,
+          "kac": 15,
+          "fort": 3,
+          "ref": 5,
+          "will": 1,
+          "speed": "9 m, escalada 9 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 8,
+              "damage": "1d6+1 P"
+            },
+            {
+              "name": "Fio Aderente",
+              "bonus": 8,
+              "damage": "alcance 6 m, alvo enredado (Reflexos CD 12 anula)"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Tecelagem Estrutural",
+              "text": "Produz seda estrutural, flexível ou adesiva conforme o manejo."
+            },
+            {
+              "name": "Temperamento Treinável",
+              "text": "Testes de manejo recebem +4 quando alimentada e em ambiente calmo."
+            },
+            {
+              "name": "Retirada pelos Fios (1/combate)",
+              "text": "Move até 6 m pela própria teia."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 4,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0016_Sila_Weaver_02_Adulta_Manejada_CR1.png"
+        },
+        {
+          "label": "Adulta selvagem",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Animal (artrópode)",
+          "initiative": 4,
+          "senses": "visão no escuro 18 m, percepção vibracional 18 m; Percepção +8",
+          "hp": 40,
+          "eac": 15,
+          "kac": 17,
+          "fort": 5,
+          "ref": 6,
+          "will": 2,
+          "speed": "12 m, escalada 12 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 10,
+              "damage": "1d8+3 P"
+            },
+            {
+              "name": "Disparo de Seda",
+              "bonus": 10,
+              "damage": "alcance 9 m, alvo enredado (Reflexos CD 14 anula)"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Emboscada de Teia",
+              "text": "+2 no ataque contra alvo enredado ou dentro do próprio ninho."
+            },
+            {
+              "name": "Embrulho Rápido (1/combate)",
+              "text": "Contra alvo enredado adjacente: 1d6 contundente e imobilizado até escapar."
+            },
+            {
+              "name": "Defesa da Prole",
+              "text": "Com ovos ou juvenis a até 9 m, +2 em ataques e Fortitude."
+            }
+          ],
+          "mods": {
+            "str": 1,
+            "dex": 4,
+            "con": 2,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0017_Sila_Weaver_03_Adulta_Selvagem_CR3.png"
+        },
+        {
+          "label": "Tecelã anciã",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Large",
+          "type": "Animal (artrópode)",
+          "initiative": 5,
+          "senses": "visão no escuro 18 m, percepção vibracional 24 m; Percepção +10",
+          "hp": 72,
+          "eac": 17,
+          "kac": 19,
+          "fort": 6,
+          "ref": 8,
+          "will": 4,
+          "speed": "12 m, escalada 12 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 13,
+              "damage": "1d10+4 P"
+            },
+            {
+              "name": "Disparo de Seda",
+              "bonus": 13,
+              "damage": "alcance 12 m, alvo enredado (Reflexos CD 15 anula)"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Muralha de Seda (1/combate)",
+              "text": "Barreira de fios em linha de 3 m: cobertura parcial e terreno difícil."
+            },
+            {
+              "name": "Percepção Vibracional Superior",
+              "text": "Percebe criaturas tocando a teia ou o ninho num raio de 24 m."
+            },
+            {
+              "name": "Defesa da Prole",
+              "text": "Protegendo ovos, jovens ou o núcleo do ninho: +2 em KAC e Vontade."
+            }
+          ],
+          "mods": {
+            "str": 3,
+            "dex": 5,
+            "con": 2,
+            "int": -3,
+            "wis": 2,
+            "cha": -2
+          },
+          "page": "0018_Sila_Weaver_04_Tecela_Ancia_CR5.png"
+        }
+      ]
+    },
+    {
+      "species": "Duh-Ant",
+      "profiles": [
+        {
+          "label": "Larval",
+          "cr": "1/3",
+          "xp": 135,
+          "size": "Small",
+          "type": "Larva colonial",
+          "initiative": -2,
+          "senses": "percepção química; Percepção +1",
+          "hp": 6,
+          "eac": 10,
+          "kac": 12,
+          "fort": 5,
+          "ref": 0,
+          "will": 0,
+          "speed": "3 m",
+          "attacks": [
+            {
+              "name": "Mordida defensiva",
+              "bonus": 2,
+              "damage": "1d3 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Chamado de Socorro (Ex)",
+              "text": "Ameaçada, emite secreções de alarme: operárias próximas recebem +2 em Percepção para localizar a ameaça por 1 minuto."
+            },
+            {
+              "name": "Secreção Nutritiva (Ex)",
+              "text": "Produz secreções nutritivas usadas pela colônia."
+            },
+            {
+              "name": "Dependente da Câmara (Ex)",
+              "text": "Fora da câmara de cria sofre 1 de dano por hora."
+            }
+          ],
+          "mods": {
+            "str": 0,
+            "dex": -2,
+            "con": 1,
+            "int": -5,
+            "wis": 0,
+            "cha": -4
+          },
+          "page": "0022_Duh_Ant_Larval_CR_1-3.png"
+        },
+        {
+          "label": "Operária",
+          "cr": "1/2",
+          "xp": 200,
+          "size": "Medium",
+          "type": "Artrópode colonial",
+          "initiative": 2,
+          "senses": "visão na penumbra, percepção química",
+          "hp": 13,
+          "eac": 10,
+          "kac": 12,
+          "fort": 2,
+          "ref": 4,
+          "will": 0,
+          "speed": "9 m",
+          "attacks": [
+            {
+              "name": "Mandíbulas",
+              "bonus": 4,
+              "damage": "1d4+1 C/P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Construtora de Resina (Ex)",
+              "text": "Secreta resina estrutural para reforçar túneis e vedar passagens (ação)."
+            },
+            {
+              "name": "Defesa Coletiva (Ex)",
+              "text": "+1 na CA quando adjacente a outra operária Duh-Ant."
+            },
+            {
+              "name": "Trilhas Feromonais (Ex)",
+              "text": "Segue rotas químicas da colônia mesmo no escuro."
+            }
+          ],
+          "skills": "Atletismo +3, Furtividade +6, Sobrevivência +2",
+          "mods": {
+            "str": 1,
+            "dex": 2,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0023_Duh_Ant_Operaria_CR_1-2.png"
+        },
+        {
+          "label": "Soldado",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Artrópode colonial",
+          "initiative": 4,
+          "senses": "visão na penumbra, percepção química, tremorsentido 6 m; Percepção +7",
+          "hp": 40,
+          "eac": 14,
+          "kac": 16,
+          "fort": 5,
+          "ref": 7,
+          "will": 2,
+          "speed": "12 m, escalada 6 m",
+          "attacks": [
+            {
+              "name": "Mandíbulas",
+              "bonus": 9,
+              "damage": "1d8+6 C/P"
+            },
+            {
+              "name": "Jato de Ácido (6 m)",
+              "bonus": 7,
+              "damage": "1d6 ácido"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Investida de Patrulha (Ex)",
+              "text": "Move até o dobro do deslocamento em linha reta e ataca com mandíbulas; se acertar, Reflexos CD 16 ou empurrado 3 m e desequilibrado."
+            },
+            {
+              "name": "Jato de Ácido (Ex)",
+              "text": "Ação padrão, ataque à distância até 6 m, 1d6 ácido; corrói materiais não orgânicos."
+            },
+            {
+              "name": "Coordenação de Patrulha (Ex)",
+              "text": "A até 6 m de outro soldado: +2 em ataque e Percepção."
+            }
+          ],
+          "skills": "Atletismo +8, Furtividade +10, Sobrevivência +6, Percepção +7",
+          "mods": {
+            "str": 3,
+            "dex": 4,
+            "con": 2,
+            "int": -3,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0024_Duh_Ant_Soldado_CR3.png"
+        },
+        {
+          "label": "Bate-Estaca",
+          "cr": "7",
+          "xp": 3200,
+          "size": "Large",
+          "type": "Artrópode colonial",
+          "initiative": 1,
+          "senses": "visão na penumbra, percepção química, tremorsentido 9 m",
+          "hp": 105,
+          "eac": 19,
+          "kac": 21,
+          "fort": 10,
+          "ref": 6,
+          "will": 6,
+          "speed": "9 m",
+          "attacks": [
+            {
+              "name": "Impacto",
+              "bonus": 16,
+              "damage": "2d10+10 B"
+            },
+            {
+              "name": "Mandíbulas",
+              "bonus": 16,
+              "damage": "2d8+10 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Golpe de Estaca (Ex)",
+              "text": "Ao acertar o impacto, empurra o alvo até 4,5 m; colidindo com superfície sólida, +2d6 contusão e fica caído."
+            },
+            {
+              "name": "Carapaça de Cerco (Ex)",
+              "text": "+4 na EAC contra corpo a corpo; imune a derrubar e empurrar, exceto desprevenido."
+            },
+            {
+              "name": "Guardião da Câmara (Ex)",
+              "text": "A até 9 m da câmara real: +2 em ataque e +4 na EAC; reação para dar cobertura total à rainha."
+            },
+            {
+              "name": "Tremor de Impacto (Ex)",
+              "text": "Ao acertar impacto no solo, criaturas a até 6 m: Fortitude CD 19 ou desequilibradas até o fim do próximo turno."
+            }
+          ],
+          "skills": "Atletismo +15, Intimidação +11, Sobrevivência +8",
+          "mods": {
+            "str": 6,
+            "dex": 1,
+            "con": 5,
+            "int": -3,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0025_Duh_Ant_Bate_Estaca_CR7.png"
+        },
+        {
+          "label": "Rainha selvagem",
+          "cr": "15",
+          "xp": 51200,
+          "size": "Large",
+          "type": "Matriarca colonial",
+          "initiative": 0,
+          "senses": "visão na penumbra, percepção química, tremorsentido 18 m; Percepção +20",
+          "hp": 275,
+          "eac": 29,
+          "kac": 31,
+          "fort": 17,
+          "ref": 12,
+          "will": 14,
+          "speed": "6 m",
+          "attacks": [
+            {
+              "name": "Mandíbulas",
+              "bonus": 27,
+              "damage": "3d10+19 S/P"
+            },
+            {
+              "name": "Névoa Ácida",
+              "bonus": null,
+              "damage": "6d6 ácido, área 6 m (CD 23 metade)"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Comando Feromonal (Ex)",
+              "text": "Aliados Duh-Ant a até 60 m: +4 em ataque, dano e resistência."
+            },
+            {
+              "name": "Névoa Ácida (Ex)",
+              "text": "6d6 ácido em área de 6 m (CD 23 metade); a cada 1d4 rodadas."
+            },
+            {
+              "name": "Alarme da Colônia (Ex)",
+              "text": "Ao sofrer dano significativo, em 1d4 rodadas chegam 1d6 castas da colônia."
+            },
+            {
+              "name": "Integração da Colmeia (Ex)",
+              "text": "Enquanto viva, castas da colônia recebem +2 em resistência e são imunes a medo."
+            },
+            {
+              "name": "Defesa da Prole (Ex)",
+              "text": "Redução de dano 10 contra ataques de criaturas que não sejam Duh-Ant."
+            }
+          ],
+          "skills": "Intimidação +22, Percepção +20, Sobrevivência +18",
+          "mods": {
+            "str": 8,
+            "dex": 0,
+            "con": 8,
+            "int": 0,
+            "wis": 4,
+            "cha": 3
+          },
+          "page": "0026_Duh_Ant_Rainha_Selvagem_CR15.png"
+        }
+      ]
+    },
+    {
+      "species": "Dune-Hopper",
+      "profiles": [
+        {
+          "label": "Adulto",
+          "cr": "1/2",
+          "xp": 200,
+          "size": "Medium",
+          "type": "Animal",
+          "initiative": 3,
+          "hp": 13,
+          "eac": 10,
+          "kac": 12,
+          "fort": 2,
+          "ref": 4,
+          "will": 0,
+          "speed": "9 m",
+          "attacks": [
+            {
+              "name": "Coice defensivo",
+              "bonus": 6,
+              "damage": "1d6+1 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Salto Migratório (Ex)",
+              "text": "Ação de movimento: salta até 15 m horizontalmente."
+            },
+            {
+              "name": "Coice Reflexo (Ex)",
+              "text": "Ameaçado de perto, golpeia com a perna traseira."
+            },
+            {
+              "name": "Percepção de Umidade (Ex)",
+              "text": "Bônus em Sobrevivência para localizar áreas de alimentação na migração."
+            }
+          ],
+          "mods": {
+            "str": 0,
+            "dex": 3,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0030_Dune_Hopper_Ficha_Visual_CR_1-2.png"
+        }
+      ]
+    },
+    {
+      "species": "Stone-Roach",
+      "profiles": [
+        {
+          "label": "Ninfa",
+          "cr": "1/3",
+          "xp": 135,
+          "size": "Tiny",
+          "type": "Animal",
+          "initiative": 3,
+          "senses": "visão na penumbra; Percepção +3",
+          "hp": 6,
+          "eac": 10,
+          "kac": 11,
+          "fort": 3,
+          "ref": 3,
+          "will": 0,
+          "speed": "6 m, escalada 3 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 4,
+              "damage": "1d4 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Camuflagem Sedimentar (Ex)",
+              "text": "+2 em Furtividade imóvel e oculto entre rochas."
+            },
+            {
+              "name": "Fuga Instintiva",
+              "text": "Procura abrigo diante de luz intensa, predadores ou ferimentos."
+            }
+          ],
+          "skills": "Furtividade +7, Atletismo +3, Sobrevivência +3",
+          "mods": {
+            "str": 0,
+            "dex": 3,
+            "con": 1,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0033_Stone_Roach_02_Fichas_Visuais_Proposta.png"
+        },
+        {
+          "label": "Adulto",
+          "cr": "1/2",
+          "xp": 200,
+          "size": "Tiny",
+          "type": "Animal",
+          "initiative": 3,
+          "senses": "visão na penumbra; Percepção +4",
+          "hp": 13,
+          "eac": 10,
+          "kac": 12,
+          "fort": 4,
+          "ref": 4,
+          "will": 0,
+          "speed": "9 m, escalada 3 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 6,
+              "damage": "1d4+1 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Camuflagem Sedimentar (Ex)",
+              "text": "+2 em Furtividade imóvel entre rochas com cobertura ou ocultação."
+            },
+            {
+              "name": "Fuga Instintiva",
+              "text": "Afasta-se de clarões, predadores e ameaças físicas."
+            }
+          ],
+          "skills": "Furtividade +9, Atletismo +4, Sobrevivência +4",
+          "mods": {
+            "str": 1,
+            "dex": 3,
+            "con": 2,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0033_Stone_Roach_02_Fichas_Visuais_Proposta.png"
+        }
+      ]
+    },
+    {
+      "species": "Aranha-Leão",
+      "profiles": [
+        {
+          "label": "Filhote",
+          "cr": "1",
+          "xp": 400,
+          "size": "Medium",
+          "type": "Aberração biológica",
+          "initiative": 1,
+          "senses": "visão no escuro 12 m; Percepção +5",
+          "hp": 20,
+          "eac": 12,
+          "kac": 14,
+          "fort": 3,
+          "ref": 3,
+          "will": 1,
+          "speed": "12 m, escavar 3 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 7,
+              "damage": "1d6+3 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Emboscada Instintiva",
+              "text": "Oculto ou em areia solta: +2 nos ataques na primeira rodada."
+            },
+            {
+              "name": "Juba Sensorial",
+              "text": "+4 em Percepção para criaturas que se movem a até 12 m em contato com o solo, mesmo sem linha de visão."
+            },
+            {
+              "name": "Fuga na Areia",
+              "text": "Ação livre ao ser alvo de ataque: move até metade do deslocamento se terminar em areia solta."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 1,
+            "con": 2,
+            "int": -4,
+            "wis": 0,
+            "cha": -3
+          },
+          "page": "0035_Aranha_Leao_Filhote_CR1_COM_ATRIBUTOS.png"
+        },
+        {
+          "label": "Juvenil",
+          "cr": "3",
+          "xp": 800,
+          "size": "Large",
+          "type": "Aberração biológica",
+          "initiative": 2,
+          "senses": "visão no escuro 18 m; Percepção +9",
+          "hp": 42,
+          "eac": 14,
+          "kac": 16,
+          "fort": 6,
+          "ref": 6,
+          "will": 3,
+          "speed": "12 m, escavar 4,5 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 10,
+              "damage": "1d8+6 P"
+            },
+            {
+              "name": "Garras dianteiras",
+              "bonus": 8,
+              "damage": "1d6+6 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Salto de Emboscada (1/rodada)",
+              "text": "Salta até 9 m e ataca corpo a corpo no fim; se acertar, alvo derrubado."
+            },
+            {
+              "name": "Rastreamento Vibracional",
+              "text": "Detecta criaturas a até 18 m pelo solo, mesmo com cobertura total; +4 em Percepção para rastrear."
+            },
+            {
+              "name": "Arrastar Presa",
+              "text": "Ao acertar mordida, arrasta o alvo (Grande ou menor) até 6 m."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 2,
+            "con": 1,
+            "int": -3,
+            "wis": 0,
+            "cha": -2
+          },
+          "page": "0036_Aranha_Leao_Juvenil_CR3_COM_ATRIBUTOS.png"
+        },
+        {
+          "label": "Adulta",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Large",
+          "type": "Aberração biológica",
+          "initiative": 6,
+          "senses": "visão no escuro 36 m; Percepção +12",
+          "hp": 68,
+          "eac": 17,
+          "kac": 19,
+          "fort": 14,
+          "ref": 11,
+          "will": 9,
+          "speed": "12 m, escavar 6 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 13,
+              "damage": "2d6+8 P"
+            },
+            {
+              "name": "Garras dianteiras",
+              "bonus": 11,
+              "damage": "1d8+8 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Camuflagem de Duna (Ex)",
+              "text": "Em areia/dunas: +4 em Furtividade e cobertura total enquanto imóvel."
+            },
+            {
+              "name": "Agarrar (Ex)",
+              "text": "Ao acertar as garras, tenta agarrar (manobra +13); agarrado fica imobilizado e sofre 2d6+8 cortante no início de cada turno dela."
+            },
+            {
+              "name": "Juba Sensorial Superior (Ex)",
+              "text": "+4 em Percepção; não pode ser surpreendida em dunas."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 2,
+            "con": 3,
+            "int": -2,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0037_Aranha_Leao_Adulta_CR5_COM_ATRIBUTOS.png"
+        },
+        {
+          "label": "Veterana das Rotas",
+          "cr": "8",
+          "xp": 4800,
+          "size": "Huge",
+          "type": "Aberração biológica",
+          "initiative": 2,
+          "senses": "visão no escuro 36 m; Percepção +12",
+          "hp": 112,
+          "eac": 20,
+          "kac": 22,
+          "fort": 8,
+          "ref": 8,
+          "will": 6,
+          "speed": "12 m, escavar 6 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 17,
+              "damage": "2d8+11 P"
+            },
+            {
+              "name": "Garras dianteiras",
+              "bonus": 15,
+              "damage": "2d6+11 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Escolha de Presa (1/rodada)",
+              "text": "Após observar 1 rodada: +2 em ataques contra o alvo e ignora camuflagem leve."
+            },
+            {
+              "name": "Contramedidas Aprendidas",
+              "text": "+4 em Vontade contra efeitos que já sofreu antes."
+            },
+            {
+              "name": "Emboscada Profunda",
+              "text": "Enterrada: +10 em Furtividade; primeiro ataque ao emergir causa +2d6."
+            }
+          ],
+          "mods": {
+            "str": 6,
+            "dex": 2,
+            "con": 4,
+            "int": -2,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0038_Aranha_Leao_Veterana_CR8_COM_ATRIBUTOS.png"
+        },
+        {
+          "label": "Anciã das Dunas",
+          "cr": "11",
+          "xp": 12800,
+          "size": "Huge",
+          "type": "Aberração biológica",
+          "initiative": 2,
+          "senses": "visão no escuro 36 m; Percepção +15",
+          "hp": 168,
+          "eac": 24,
+          "kac": 26,
+          "fort": 12,
+          "ref": 10,
+          "will": 14,
+          "speed": "12 m, escavar 6 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 21,
+              "damage": "3d8+14 P"
+            },
+            {
+              "name": "Garras dianteiras",
+              "bonus": 19,
+              "damage": "2d8+14 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Memória Territorial",
+              "text": "No seu território: +4 em Percepção e não pode ser surpreendida."
+            },
+            {
+              "name": "Antecipação Sísmica",
+              "text": "+8 em Percepção por audição; sente criaturas no solo a até 36 m."
+            },
+            {
+              "name": "Silêncio de Emboscada",
+              "text": "Move até metade do deslocamento sem provocar ataques de oportunidade; +10 em Furtividade em areia."
+            }
+          ],
+          "mods": {
+            "str": 8,
+            "dex": 2,
+            "con": 5,
+            "int": -1,
+            "wis": 3,
+            "cha": -2
+          },
+          "page": "0039_Aranha_Leao_Ancia_CR11_COM_ATRIBUTOS.png"
+        },
+        {
+          "label": "Lendária",
+          "cr": "14",
+          "xp": 38400,
+          "size": "Gargantuan",
+          "type": "Aberração biológica",
+          "initiative": 8,
+          "senses": "visão no escuro 36 m; Percepção +25",
+          "hp": 235,
+          "eac": 27,
+          "kac": 29,
+          "fort": 16,
+          "ref": 14,
+          "will": 12,
+          "speed": "12 m, escavar 7,5 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 25,
+              "damage": "4d8+18 P"
+            },
+            {
+              "name": "Garras dianteiras",
+              "bonus": 23,
+              "damage": "3d8+18 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Predadora de Rotas",
+              "text": "Ignora cobertura total de areia/rocha não mágica; +8 em Percepção para rastrear."
+            },
+            {
+              "name": "Terror Sísmico",
+              "text": "Ao se mover, tremor em raio de 18 m: Fortitude CD 22 ou cai prona."
+            },
+            {
+              "name": "Juba Sensorial Ancestral",
+              "text": "+8 em Percepção; não pode ser surpreendida no solo; invisíveis a até 18 m não têm camuflagem contra ela."
+            }
+          ],
+          "mods": {
+            "str": 8,
+            "dex": 4,
+            "con": 6,
+            "int": -1,
+            "wis": 3,
+            "cha": -2
+          },
+          "page": "0040_Aranha_Leao_Lendaria_CR14_COM_ATRIBUTOS.png"
+        }
+      ]
+    },
+    {
+      "species": "Zerrak Mantis",
+      "profiles": [
+        {
+          "label": "Juvenil",
+          "cr": "2",
+          "xp": 600,
+          "size": "Medium",
+          "type": "Animal (artrópode)",
+          "initiative": 4,
+          "hp": 25,
+          "eac": 13,
+          "kac": 15,
+          "fort": 6,
+          "ref": 6,
+          "will": 1,
+          "speed": "12 m, escalada 3 m",
+          "attacks": [
+            {
+              "name": "Braços-foice",
+              "bonus": 10,
+              "damage": "1d6+4 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Imobilidade Predatória",
+              "text": "Imóvel em cascalho/rochas: +4 em Furtividade."
+            },
+            {
+              "name": "Contrafoice",
+              "text": "Quando erram um ataque corpo a corpo contra ela, faz ataque de oportunidade com as foices."
+            },
+            {
+              "name": "Fraqueza",
+              "text": "Luz intensa nos olhos compostos causa desorientação; fixa-se em um único alvo em movimento."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 4,
+            "con": 1,
+            "int": -4,
+            "wis": 0,
+            "cha": -2
+          },
+          "page": "0041_Zerrak_Mantis_Juvenil_CR2.png"
+        },
+        {
+          "label": "Adulta",
+          "cr": "6",
+          "xp": 2400,
+          "size": "Large",
+          "type": "Animal (artrópode)",
+          "initiative": 5,
+          "hp": 90,
+          "eac": 18,
+          "kac": 20,
+          "fort": 10,
+          "ref": 10,
+          "will": 5,
+          "speed": "15 m, escalada 6 m",
+          "attacks": [
+            {
+              "name": "Braços-foice",
+              "bonus": 16,
+              "damage": "1d8+9 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Duplo-Corte",
+              "text": "Ataque completo com as duas foices com penalidade -2 em vez de -4."
+            },
+            {
+              "name": "Explosão Predatória (1/combate)",
+              "text": "Ação padrão: move até 6 m e golpeia com a foice."
+            },
+            {
+              "name": "Imobilidade Predatória",
+              "text": "Bônus em Furtividade imóvel entre rochas."
+            },
+            {
+              "name": "Fraqueza",
+              "text": "Luz intensa nos olhos causa desorientação."
+            }
+          ],
+          "mods": {
+            "str": 3,
+            "dex": 5,
+            "con": 2,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0042_Zerrak_Mantis_Adulta_CR6.png"
+        },
+        {
+          "label": "Lendária",
+          "cr": "12",
+          "xp": 19200,
+          "size": "Huge",
+          "type": "Animal (artrópode)",
+          "initiative": 8,
+          "hp": 200,
+          "eac": 26,
+          "kac": 28,
+          "fort": 16,
+          "ref": 16,
+          "will": 11,
+          "speed": "18 m, escalada 9 m",
+          "attacks": [
+            {
+              "name": "Braços-foice",
+              "bonus": 25,
+              "damage": "6d4+17 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Tempestade de Foices",
+              "text": "Ataque completo com as duas foices contra todos os inimigos em 6 m; 6d4+17 cortante cada."
+            },
+            {
+              "name": "Reflexo de Caçadora",
+              "text": "+4 na EAC contra ataques à distância; ação imediata: move 9 m ao ser alvo de ataque."
+            },
+            {
+              "name": "Fixação Predatória",
+              "text": "Alvo escolhido: +6 nos ataques contra ele; ele sofre -2 em Furtividade contra ela."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 8,
+            "con": 4,
+            "int": -4,
+            "wis": 3,
+            "cha": -2
+          },
+          "page": "0043_Zerrak_Mantis_Lendaria_CR12.png"
+        }
+      ]
+    },
+    {
+      "species": "Mirage Wasp",
+      "profiles": [
+        {
+          "label": "Larva",
+          "cr": "1/4",
+          "xp": 100,
+          "size": "Small",
+          "type": "Larva colonial",
+          "initiative": -1,
+          "hp": 8,
+          "eac": 10,
+          "kac": 11,
+          "fort": 2,
+          "ref": 0,
+          "will": 0,
+          "speed": "—",
+          "attacks": [],
+          "abilities": [
+            {
+              "name": "Secreção de alerta",
+              "text": "Ameaçar uma câmara larval altera o comportamento de toda a colmeia."
+            },
+            {
+              "name": "Corpo nutritivo",
+              "text": ""
+            }
+          ],
+          "mods": {
+            "str": 0,
+            "dex": -1,
+            "con": 1,
+            "int": -5,
+            "wis": 0,
+            "cha": -4
+          },
+          "page": "0049_Mirage_Wasp_06_Larva_e_Enxame.png"
+        },
+        {
+          "label": "Operária",
+          "cr": "1",
+          "xp": 400,
+          "size": "Medium",
+          "type": "Inseto colonial",
+          "initiative": 3,
+          "hp": 20,
+          "eac": 12,
+          "kac": 14,
+          "fort": 3,
+          "ref": 5,
+          "will": 1,
+          "speed": "9 m, voo 12 m",
+          "attacks": [
+            {
+              "name": "Ferrão defensivo",
+              "bonus": null,
+              "damage": "ataque leve; irritação e distração temporária"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Feromônio de trilha",
+              "text": "Marca caminhos entre alimento, água e colmeia."
+            },
+            {
+              "name": "Coesão de colmeia",
+              "text": "Bônus leve quando opera perto de outras Mirage Wasp."
+            }
+          ],
+          "mods": {
+            "str": 1,
+            "dex": 3,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -1
+          },
+          "page": "0045_Mirage_Wasp_02_Operaria_CR1.png"
+        },
+        {
+          "label": "Caçadora",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Medium",
+          "type": "Inseto colonial",
+          "initiative": 4,
+          "hp": 55,
+          "eac": 16,
+          "kac": 18,
+          "fort": 6,
+          "ref": 8,
+          "will": 3,
+          "speed": "9 m, voo 18 m",
+          "attacks": [
+            {
+              "name": "Mergulho de perfuração (ferrão/mandíbulas)",
+              "bonus": null,
+              "damage": "ataque em deslocamento aéreo"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Marca da Mirage",
+              "text": "Ao acertar, marca quimicamente a presa para outras Caçadoras focarem o mesmo alvo."
+            },
+            {
+              "name": "Desorientação química",
+              "text": "Feromônio que atrapalha orientação, percepção e posicionamento da vítima."
+            },
+            {
+              "name": "Mergulho de perfuração",
+              "text": "Ataque em deslocamento com ferrão ou mandíbulas, aproveitando velocidade aérea."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 4,
+            "con": 2,
+            "int": -3,
+            "wis": 1,
+            "cha": 0
+          },
+          "page": "0046_Mirage_Wasp_03_Cacadora_CR4.png"
+        },
+        {
+          "label": "Enxame",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Swarm",
+          "type": "Enxame",
+          "initiative": 4,
+          "hp": 70,
+          "eac": 17,
+          "kac": 18,
+          "fort": 5,
+          "ref": 7,
+          "will": 4,
+          "speed": "voo",
+          "attacks": [
+            {
+              "name": "Ataque em massa",
+              "bonus": null,
+              "damage": "enxame"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Cobertura de asas",
+              "text": ""
+            },
+            {
+              "name": "Sobrecarga química",
+              "text": ""
+            },
+            {
+              "name": "Pânico de colmeia",
+              "text": "Funciona melhor como ameaça ambiental ou encontro de pressão contínua."
+            }
+          ],
+          "page": "0049_Mirage_Wasp_06_Larva_e_Enxame.png"
+        },
+        {
+          "label": "Guardiã da Colmeia",
+          "cr": "7",
+          "xp": 3200,
+          "size": "Large",
+          "type": "Inseto colonial",
+          "initiative": 3,
+          "hp": 105,
+          "eac": 19,
+          "kac": 21,
+          "fort": 10,
+          "ref": 8,
+          "will": 5,
+          "speed": "9 m, voo 12 m",
+          "attacks": [
+            {
+              "name": "Ferrão pesado",
+              "bonus": null,
+              "damage": "menos refinado que o da Caçadora, porém mais brutal"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Interceptação",
+              "text": "Bloqueia avanço inimigo e protege entradas da colmeia."
+            },
+            {
+              "name": "Nuvem irritante",
+              "text": "Feromônios densos que perturbam inimigos próximos."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 3,
+            "con": 4,
+            "int": -3,
+            "wis": 1,
+            "cha": 0
+          },
+          "page": "0047_Mirage_Wasp_04_Guardia_CR7.png"
+        },
+        {
+          "label": "Rainha",
+          "cr": "13",
+          "xp": 25600,
+          "size": "Huge",
+          "type": "Inseto colonial",
+          "initiative": 3,
+          "hp": 235,
+          "eac": 27,
+          "kac": 29,
+          "fort": 15,
+          "ref": 11,
+          "will": 10,
+          "speed": "6 m",
+          "attacks": [],
+          "abilities": [
+            {
+              "name": "Comando feromonal maior",
+              "text": "Reorganiza castas aliadas e melhora a eficiência coletiva da colmeia."
+            },
+            {
+              "name": "Sinal de ruptura",
+              "text": "Tenta quebrar coesão e coordenação de invasores."
+            },
+            {
+              "name": "Frenesi do ninho",
+              "text": "Ativa resposta máxima de defesa quando a Rainha é ameaçada."
+            },
+            {
+              "name": "Névoa de Mirage",
+              "text": "Satura o ambiente com compostos que confundem percepção e reação."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 3,
+            "con": 6,
+            "int": -1,
+            "wis": 3,
+            "cha": 2
+          },
+          "page": "0048_Mirage_Wasp_05_Rainha_CR13.png"
+        }
+      ]
+    },
+    {
+      "species": "Skelgra Jackal-Bug",
+      "profiles": [
+        {
+          "label": "Jovem",
+          "cr": "1",
+          "xp": 400,
+          "size": "Medium",
+          "type": "Animal",
+          "initiative": 4,
+          "senses": "visão no escuro 18 m; Percepção +6",
+          "hp": 20,
+          "eac": 12,
+          "kac": 14,
+          "fort": 3,
+          "ref": 4,
+          "will": 1,
+          "speed": "12 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 8,
+              "damage": "1d6+3 P/S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Faro de Sangue",
+              "text": "+4 em Percepção para localizar criaturas feridas ou carcaças frescas."
+            },
+            {
+              "name": "Mordida de Prova",
+              "text": "Contra criatura que ainda não agiu na rodada: +1d4 de dano."
+            },
+            {
+              "name": "Assédio Inicial",
+              "text": "Após acertar mordida, passo de 1,5 m sem provocar ataques de oportunidade."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 2,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0051_02_Skelgra_Jovem_CR1.png"
+        },
+        {
+          "label": "Caçador de Caravana",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Large",
+          "type": "Animal",
+          "initiative": 7,
+          "senses": "visão no escuro 18 m; Percepção +11",
+          "hp": 55,
+          "eac": 16,
+          "kac": 18,
+          "fort": 6,
+          "ref": 7,
+          "will": 3,
+          "speed": "15 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 12,
+              "damage": "1d6+8 P/S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Rasgar Tendão",
+              "text": "Ao acertar criatura terrestre: Reflexos CD 13 ou deslocamento -3 m por 1 rodada."
+            },
+            {
+              "name": "Flanco de Bando",
+              "text": "+2 no ataque contra criaturas flanqueadas por outro Skelgra."
+            },
+            {
+              "name": "Derrubar Carga",
+              "text": "Contra montarias/Krupp/carga pesada: +2 de dano e Fortitude CD 13 ou cambaleante até o fim do próximo turno."
+            },
+            {
+              "name": "Recuo Coordenado (1/rodada)",
+              "text": "Quando um aliado Skelgra acerta corpo a corpo, move 3 m sem provocar."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 3,
+            "con": 2,
+            "int": -3,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "0052_03_Skelgra_Cacador_Caravana_CR4.png"
+        },
+        {
+          "label": "Veterano do Bando",
+          "cr": "8",
+          "xp": 4800,
+          "size": "Large",
+          "type": "Animal",
+          "initiative": 6,
+          "senses": "visão no escuro 18 m; Percepção +16",
+          "hp": 115,
+          "eac": 20,
+          "kac": 22,
+          "fort": 10,
+          "ref": 9,
+          "will": 5,
+          "speed": "15 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 16,
+              "damage": "2d10+10 P/S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Leitura de Fraqueza",
+              "text": "Início do turno: escolhe criatura ferida visível; +2 nos ataques contra ela até o fim do turno."
+            },
+            {
+              "name": "Coordenação Predatória",
+              "text": "Aliados Skelgra a 9 m: +1 no ataque contra criaturas adjacentes ao veterano."
+            },
+            {
+              "name": "Salto de Rocha (1/rodada)",
+              "text": "Move 4,5 m em linha reta ignorando terreno difícil e morde."
+            },
+            {
+              "name": "Mordida de Arrasto",
+              "text": "Ao acertar criatura Média ou menor, empurra ou puxa 1,5 m."
+            },
+            {
+              "name": "Presença de Matilha",
+              "text": "Consciente: aliados Skelgra a 9 m recebem +2 em Percepção e Iniciativa."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 3,
+            "con": 4,
+            "int": -2,
+            "wis": 2,
+            "cha": -1
+          },
+          "page": "0053_04_Skelgra_Veterano_Bando_CR8.png"
+        }
+      ]
+    },
+    {
+      "species": "Razor-Centipede",
+      "profiles": [
+        {
+          "label": "Jovem",
+          "cr": "1",
+          "xp": 400,
+          "size": "Small",
+          "type": "Animal",
+          "initiative": 4,
+          "senses": "visão no escuro 18 m, vibração 6 m; Percepção +5",
+          "hp": 20,
+          "eac": 11,
+          "kac": 13,
+          "fort": 3,
+          "ref": 3,
+          "will": 1,
+          "speed": "12 m, escalada 6 m",
+          "attacks": [
+            {
+              "name": "Forcípulas",
+              "bonus": 8,
+              "damage": "1d6+2 P/S + veneno local"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Corpo de Fenda",
+              "text": "Atravessa frestas de 15 cm; dentro delas move metade e não ataca."
+            },
+            {
+              "name": "Veneno Local",
+              "text": "Fort CD 10: -1,5 m de movimento por 1 rodada. Fadiga tardia de 6 h."
+            },
+            {
+              "name": "Bote das Ruínas",
+              "text": "Ação completa: move até 6 m saindo da cobertura e ataca."
+            },
+            {
+              "name": "Recuo para a Fenda",
+              "text": "1/rodada: recua até 3 m após morder."
+            },
+            {
+              "name": "Sentir Vibrações",
+              "text": "Detecta movimento através de pedra conectada até 6 m."
+            }
+          ],
+          "skills": "Furtividade +10, Acrobacia +5, Atletismo +5",
+          "mods": {
+            "str": 1,
+            "dex": 4,
+            "con": 2,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0055_01_Razor_Centipede_Juvenil_CR1.png"
+        },
+        {
+          "label": "Predadora das Ruínas",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Medium",
+          "type": "Animal",
+          "initiative": 5,
+          "senses": "visão no escuro 18 m, vibração 9 m; Percepção +10",
+          "hp": 50,
+          "eac": 16,
+          "kac": 18,
+          "fort": 6,
+          "ref": 6,
+          "will": 3,
+          "speed": "15 m, escalada 9 m",
+          "attacks": [
+            {
+              "name": "Forcípulas",
+              "bonus": 12,
+              "damage": "1d6+7 P/S + veneno local"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Corpo de Fenda",
+              "text": "Atravessa frestas de 25 cm; dentro delas move metade e não ataca."
+            },
+            {
+              "name": "Veneno Local",
+              "text": "Fort CD 13: -3 m por 2 rodadas; possível fadiga e necrose por 48 h."
+            },
+            {
+              "name": "Bote das Ruínas",
+              "text": "Ação completa: move até 6 m saindo da cobertura e ataca."
+            },
+            {
+              "name": "Recuo para a Fenda",
+              "text": "1/rodada: recua até 3 m após morder."
+            },
+            {
+              "name": "Sentir Vibrações",
+              "text": "Detecta movimento através de pedra conectada até 9 m."
+            }
+          ],
+          "skills": "Furtividade +15, Acrobacia +10, Atletismo +10",
+          "mods": {
+            "str": 3,
+            "dex": 5,
+            "con": 1,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0056_02_Razor_Centipede_Adulta_CR4.png"
+        },
+        {
+          "label": "Anciã das Galerias",
+          "cr": "8",
+          "xp": 4800,
+          "size": "Large",
+          "type": "Animal",
+          "initiative": 6,
+          "senses": "visão no escuro 18 m, vibração 12 m; Percepção +16",
+          "hp": 125,
+          "eac": 20,
+          "kac": 22,
+          "fort": 10,
+          "ref": 10,
+          "will": 7,
+          "speed": "15 m, escalada 12 m",
+          "attacks": [
+            {
+              "name": "Forcípulas",
+              "bonus": 19,
+              "damage": "3d4+12 P/S + veneno local"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Corpo de Fenda",
+              "text": "Atravessa frestas de 40 cm; dentro delas move metade e não ataca."
+            },
+            {
+              "name": "Veneno Local",
+              "text": "Fort CD 16: -3 m por 3 rodadas, off-target 1 rodada; fadiga tardia 72 h."
+            },
+            {
+              "name": "Bote das Ruínas",
+              "text": "Ação completa: move até 6 m saindo da cobertura e ataca."
+            },
+            {
+              "name": "Recuo para a Fenda",
+              "text": "1/rodada: recua até 3 m após morder."
+            },
+            {
+              "name": "Leitura de Estruturas",
+              "text": "+2 em Percepção para movimentos transmitidos por pedra ou ruínas."
+            }
+          ],
+          "skills": "Furtividade +21, Acrobacia +16, Atletismo +16",
+          "mods": {
+            "str": 4,
+            "dex": 6,
+            "con": 2,
+            "int": -4,
+            "wis": 2,
+            "cha": -2
+          },
+          "page": "0057_03_Razor_Centipede_Ancia_de_Ruina_CR8.png"
+        }
+      ]
+    },
+    {
+      "species": "Sink-Beetle",
+      "profiles": [
+        {
+          "label": "Jovem",
+          "cr": "1/2",
+          "xp": 200,
+          "size": "Small",
+          "type": "Animal",
+          "initiative": 1,
+          "senses": "sentido cego (vibração) 6 m, visão na penumbra; Percepção +4",
+          "hp": 13,
+          "eac": 10,
+          "kac": 12,
+          "fort": 2,
+          "ref": 2,
+          "will": 0,
+          "speed": "6 m, escavação 3 m",
+          "attacks": [
+            {
+              "name": "Mordida dorsal",
+              "bonus": 6,
+              "damage": "1d6+2 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Funil Instintivo (Ex)",
+              "text": "Diâmetro 1,5 m; nas encostas Reflexos CD 9 ou escorrega 1,5 m ao centro."
+            },
+            {
+              "name": "Bote Ascendente (Ex)",
+              "text": "Emerge de baixo quando a presa perde tração."
+            },
+            {
+              "name": "Sensibilidade à Luz (Ex)",
+              "text": "Clarões intensos podem deixá-lo ofuscado."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 1,
+            "con": 3,
+            "int": -5,
+            "wis": 0,
+            "cha": -3
+          },
+          "page": "0059_02_Sink_Beetle_Jovem_CR_1_2.png"
+        },
+        {
+          "label": "Adulto",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Animal",
+          "initiative": 1,
+          "senses": "sentido cego (vibração) 9 m, visão na penumbra; Percepção +8",
+          "hp": 40,
+          "eac": 14,
+          "kac": 16,
+          "fort": 5,
+          "ref": 5,
+          "will": 2,
+          "speed": "6 m, escavação 4,5 m",
+          "attacks": [
+            {
+              "name": "Mordida dorsal",
+              "bonus": 11,
+              "damage": "1d6+7 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Funil de Afundamento (Ex)",
+              "text": "Nas encostas Reflexos CD 12 ou escorrega 1,5 m ao centro."
+            },
+            {
+              "name": "Bote Ascendente (Ex)",
+              "text": "Quando a presa perde tração no funil, emerge e faz a mordida dorsal."
+            },
+            {
+              "name": "Projeção de Areia (Ex)",
+              "text": "1/rodada, arremessa areia para desestabilizar criatura na encosta."
+            },
+            {
+              "name": "Sensibilidade à Luz (Ex)",
+              "text": "Clarões intensos podem deixá-lo ofuscado."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 1,
+            "con": 2,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0060_03_Sink_Beetle_Adulto_CR3.png"
+        },
+        {
+          "label": "Ancião de Poço",
+          "cr": "7",
+          "xp": 3200,
+          "size": "Large",
+          "type": "Animal",
+          "initiative": 2,
+          "senses": "sentido cego (vibração) 12 m, visão na penumbra; Percepção +14",
+          "hp": 105,
+          "eac": 19,
+          "kac": 21,
+          "fort": 9,
+          "ref": 9,
+          "will": 6,
+          "speed": "6 m, escavação 4,5 m",
+          "attacks": [
+            {
+              "name": "Mordida dorsal",
+              "bonus": 17,
+              "damage": "2d6+12 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Funil de Afundamento Maior (Ex)",
+              "text": "Nas encostas Reflexos CD 15 ou escorrega 1,5 m ao centro."
+            },
+            {
+              "name": "Bote Ascendente (Ex)",
+              "text": "Emerge do funil e faz a mordida dorsal."
+            },
+            {
+              "name": "Desabamento Controlado (Ex)",
+              "text": "Agita a areia do funil: criaturas nas encostas testam Reflexos CD 15."
+            },
+            {
+              "name": "Sensibilidade à Luz (Ex)",
+              "text": "Clarões intensos podem deixá-lo ofuscado."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 2,
+            "con": 4,
+            "int": -4,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0061_04_Sink_Beetle_Anciao_CR7.png"
+        }
+      ]
+    },
+    {
+      "species": "Sky-Hooker",
+      "profiles": [
+        {
+          "label": "Juvenil",
+          "cr": "1",
+          "xp": 400,
+          "size": "Small",
+          "type": "Animal aviário carniceiro",
+          "initiative": 4,
+          "senses": "visão na penumbra; Percepção +5",
+          "hp": 20,
+          "eac": 11,
+          "kac": 13,
+          "fort": 5,
+          "ref": 5,
+          "will": 1,
+          "speed": "6 m, voo 15 m (média)",
+          "attacks": [
+            {
+              "name": "Bico",
+              "bonus": 8,
+              "damage": "1d6+3 P/S"
+            },
+            {
+              "name": "Garras",
+              "bonus": 5,
+              "damage": "1d4+2 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Mergulho Rasante",
+              "text": "Ataque em voo com grande velocidade."
+            },
+            {
+              "name": "Fisgada de Carga",
+              "text": "Agarra e pode arrastar presas menores ou cargas leves."
+            },
+            {
+              "name": "Planador Térmico",
+              "text": "Plana por longos períodos em correntes de ar quente."
+            },
+            {
+              "name": "Fraturar Carapaças",
+              "text": "Bico capaz de quebrar carapaças de artrópodes."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 4,
+            "con": 1,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0064_02_Sky_Hooker_Juvenil_CR1.png"
+        },
+        {
+          "label": "Adulto",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Animal aviário carniceiro",
+          "initiative": 4,
+          "senses": "visão na penumbra; Percepção +8",
+          "hp": 40,
+          "eac": 14,
+          "kac": 16,
+          "fort": 7,
+          "ref": 7,
+          "will": 2,
+          "speed": "6 m, voo 21 m (média)",
+          "attacks": [
+            {
+              "name": "Bico",
+              "bonus": 11,
+              "damage": "1d6+5 P/S"
+            },
+            {
+              "name": "Garras",
+              "bonus": 8,
+              "damage": "1d4+3 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Mergulho Rasante",
+              "text": "Ataque em voo com grande velocidade."
+            },
+            {
+              "name": "Fisgada de Carga",
+              "text": "Agarra e pode arrastar presas menores ou cargas leves."
+            },
+            {
+              "name": "Bicada aos Olhos (1/combate, CD 12)",
+              "text": "Ataque preciso que impõe penalidades."
+            },
+            {
+              "name": "Planador Térmico",
+              "text": "Plana por longos períodos."
+            },
+            {
+              "name": "Fraturar Carapaças",
+              "text": "Quebra carapaças de artrópodes."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 4,
+            "con": 1,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0065_03_Sky_Hooker_Adulto_CR3.png"
+        },
+        {
+          "label": "Veterano",
+          "cr": "6",
+          "xp": 2400,
+          "size": "Large",
+          "type": "Animal aviário carniceiro",
+          "initiative": 5,
+          "senses": "visão na penumbra; Percepção +13",
+          "hp": 90,
+          "eac": 18,
+          "kac": 20,
+          "fort": 10,
+          "ref": 10,
+          "will": 5,
+          "speed": "6 m, voo 24 m (média)",
+          "attacks": [
+            {
+              "name": "Bico",
+              "bonus": 16,
+              "damage": "1d8+9 P/S"
+            },
+            {
+              "name": "Garras",
+              "bonus": 13,
+              "damage": "1d6+7 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Mergulho Rasante",
+              "text": "Ataque em voo com grande velocidade."
+            },
+            {
+              "name": "Fisgada de Carga",
+              "text": "Agarra e pode arrastar presas menores ou cargas leves."
+            },
+            {
+              "name": "Bicada aos Olhos (1/combate, CD 14)",
+              "text": "Ataque preciso que impõe penalidades."
+            },
+            {
+              "name": "Planador Térmico",
+              "text": "Plana por longos períodos."
+            },
+            {
+              "name": "Fraturar Carapaças",
+              "text": "Quebra carapaças de artrópodes."
+            }
+          ],
+          "mods": {
+            "str": 3,
+            "dex": 5,
+            "con": 2,
+            "int": -5,
+            "wis": 2,
+            "cha": -3
+          },
+          "page": "0066_04_Sky_Hooker_Veterano_CR6.png"
+        }
+      ]
+    },
+    {
+      "species": "Night-Moth Swarm",
+      "profiles": [
+        {
+          "label": "Enxame",
+          "cr": "2",
+          "xp": 600,
+          "size": "Swarm (Diminutive)",
+          "type": "Animal (enxame)",
+          "initiative": 4,
+          "senses": "visão no escuro 18 m, visão na penumbra; Percepção +7",
+          "hp": 25,
+          "eac": 12,
+          "kac": 14,
+          "fort": 4,
+          "ref": 4,
+          "will": 1,
+          "speed": "voo 12 m (média); espaço cubo 3 m",
+          "attacks": [
+            {
+              "name": "Ataque de enxame",
+              "bonus": null,
+              "damage": "1d6 B não letal; distração CD 11"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Defesas de Enxame (Ex)",
+              "text": "Difícil de atingir; benefícios da natureza coletiva."
+            },
+            {
+              "name": "Imunidades de Enxame (Ex)",
+              "text": "Imune a efeitos de alvo único, sono, paralisia, medo e efeitos mentais."
+            },
+            {
+              "name": "Abafar Chama (Ex)",
+              "text": "Extingue chamas desprotegidas ao passar por elas."
+            },
+            {
+              "name": "Pó das Asas (Ex)",
+              "text": "Escamas irritantes que distraem criaturas próximas."
+            },
+            {
+              "name": "Aversão à Luz Intensa (Ex)",
+              "text": "Evita luz solar direta e luz muito intensa; pode se dispersar."
+            },
+            {
+              "name": "Dispersão por Vento (Ex)",
+              "text": "Ventos fortes reduzem a coesão e o forçam a se afastar."
+            }
+          ],
+          "mods": {
+            "str": -4,
+            "dex": 4,
+            "con": 2,
+            "int": -5,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "0069_02_Night_Moth_Swarm_Ficha_CR2.png"
+        }
+      ]
+    },
+    {
+      "species": "Duun-Wyrm",
+      "profiles": [
+        {
+          "label": "Titânico (segmento)",
+          "cr": "20",
+          "xp": 307200,
+          "size": "Colossal",
+          "type": "Animal primordial de silício",
+          "initiative": 1,
+          "senses": "percepção sísmica 120 m, visão no escuro 36 m; Percepção +25",
+          "hp": 465,
+          "eac": 35,
+          "kac": 37,
+          "fort": 22,
+          "ref": 18,
+          "will": 17,
+          "speed": "18 m, escavação ultrassônica 36 m; alcance 15 m",
+          "attacks": [
+            {
+              "name": "Impacto segmentar",
+              "bonus": 30,
+              "damage": "6d12+20 B"
+            },
+            {
+              "name": "Boca filtradora",
+              "bonus": 30,
+              "damage": "8d10+20 B/P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Resistências",
+              "text": "Ácido 15, fogo 15, frio 15; RD 10/—; Regeneração Primordial 25."
+            },
+            {
+              "name": "Tremor Sônico (Ex)",
+              "text": "Criaturas no solo em 36 m: Reflexos CD 25 ou caem e deslizam 3 m."
+            },
+            {
+              "name": "Onda de Sedimento (Ex)",
+              "text": "Poeira e areia: Fortitude CD 25 ou ofuscado por 1 rodada."
+            },
+            {
+              "name": "Filtragem Planetária (Ex)",
+              "text": "Processa sedimentos, águas profundas, resíduos e contaminação."
+            },
+            {
+              "name": "Uso em campanha",
+              "text": "Os números são de um segmento exposto. Evento geológico vivo: 0 PV força retração local, não destrói o organismo."
+            }
+          ],
+          "mods": {
+            "str": 10,
+            "dex": 1,
+            "con": 8,
+            "int": -5,
+            "wis": 3,
+            "cha": -2
+          },
+          "page": "0077_02_Duun_Wyrm_Fichas_CR20_CR25_Aprovadas.png"
+        },
+        {
+          "label": "Excepcional (segmento)",
+          "cr": "25",
+          "xp": 1638400,
+          "size": "Colossal",
+          "type": "Animal primordial de silício",
+          "initiative": 2,
+          "senses": "percepção sísmica 240 m, visão no escuro 60 m; Percepção +31",
+          "hp": 700,
+          "eac": 42,
+          "kac": 44,
+          "fort": 28,
+          "ref": 21,
+          "will": 22,
+          "speed": "24 m, escavação ultrassônica 60 m; alcance 24 m",
+          "attacks": [
+            {
+              "name": "Impacto segmentar",
+              "bonus": 37,
+              "damage": "10d12+28 B"
+            },
+            {
+              "name": "Boca filtradora",
+              "bonus": 37,
+              "damage": "12d10+28 B/P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Resistências",
+              "text": "Ácido 20, fogo 20, frio 20; RD 15/—; Regeneração Primordial 50."
+            },
+            {
+              "name": "Tremor Catastrófico (Ex)",
+              "text": "Criaturas no solo em 60 m: Reflexos CD 28 ou caem e deslizam 6 m."
+            },
+            {
+              "name": "Colapso de Duna (Ex)",
+              "text": "Áreas arenosas em 24 m viram terreno difícil e instável por 1 rodada."
+            },
+            {
+              "name": "Filtragem Planetária Excepcional (Ex)",
+              "text": "Processa e redistribui matéria em escala regional."
+            },
+            {
+              "name": "Uso em campanha",
+              "text": "Segmento exposto; tratar como evento geológico vivo."
+            }
+          ],
+          "mods": {
+            "str": 14,
+            "dex": 2,
+            "con": 10,
+            "int": -5,
+            "wis": 4,
+            "cha": -2
+          },
+          "page": "0077_02_Duun_Wyrm_Fichas_CR20_CR25_Aprovadas.png"
+        }
+      ]
+    },
+    {
+      "species": "Igglanova",
+      "new": {
+        "type": "SEED / Família Igglanova",
+        "habitat": "Instalações SEED reativadas"
+      },
+      "profiles": [
+        {
+          "label": "Matriz",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Large",
+          "type": "Aberração biológica",
+          "initiative": 1,
+          "hp": 50,
+          "eac": 16,
+          "kac": 18,
+          "fort": 6,
+          "ref": 6,
+          "will": 3,
+          "speed": "6 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 12,
+              "damage": "1d6+9 P"
+            },
+            {
+              "name": "Garra",
+              "bonus": 12,
+              "damage": "1d6+9 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Eclosão de Ninhada",
+              "text": "Ação padrão, 1/combate: produz até 2 Xanafalgues CR 1/2 adjacentes."
+            },
+            {
+              "name": "Consciência Distribuída",
+              "text": "Recebe os sentidos dos Xanafalgues a até 18 m."
+            },
+            {
+              "name": "Reabsorção de Biomassa",
+              "text": "Ação de movimento, 1/combate: incorpora Xanafalgue adjacente e recupera 6 PV."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 0,
+            "con": 4,
+            "int": -2,
+            "wis": 1,
+            "cha": -1
+          },
+          "page": "SEED/0080_1 Igglanova.png"
+        }
+      ]
+    },
+    {
+      "species": "Xanafalgue",
+      "new": {
+        "type": "SEED / Família Igglanova",
+        "habitat": "Instalações SEED reativadas"
+      },
+      "profiles": [
+        {
+          "label": "Prole",
+          "cr": "1/2",
+          "xp": 200,
+          "size": "Small",
+          "type": "Aberração biológica",
+          "initiative": 3,
+          "hp": 13,
+          "eac": 10,
+          "kac": 12,
+          "fort": 2,
+          "ref": 4,
+          "will": 0,
+          "speed": "9 m",
+          "attacks": [
+            {
+              "name": "Mordida",
+              "bonus": 6,
+              "damage": "1d6+3 P"
+            },
+            {
+              "name": "Garras",
+              "bonus": 6,
+              "damage": "1d4+3 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Muda Traumática",
+              "text": "Reação, 1/combate: ao sofrer dano, desloca-se 3 m sem provocar."
+            },
+            {
+              "name": "Marcação Orgânica",
+              "text": "A mordida marca o alvo; 1/rodada o primeiro Xanafalgue aliado que atacá-lo recebe +2."
+            }
+          ],
+          "mods": {
+            "str": 1,
+            "dex": 3,
+            "con": 1,
+            "int": -4,
+            "wis": 0,
+            "cha": -2
+          },
+          "page": "SEED/0081_2 Xanafalgue.png"
+        }
+      ]
+    },
+    {
+      "species": "Zoran Bult",
+      "new": {
+        "type": "SEED / Família Igglanova",
+        "habitat": "Instalações SEED reativadas"
+      },
+      "profiles": [
+        {
+          "label": "Blindagem viva",
+          "cr": "2",
+          "xp": 600,
+          "size": "Medium",
+          "type": "Aberração biológica",
+          "initiative": 1,
+          "hp": 25,
+          "eac": 13,
+          "kac": 15,
+          "fort": 5,
+          "ref": 3,
+          "will": 1,
+          "speed": "6 m",
+          "attacks": [
+            {
+              "name": "Mandíbulas",
+              "bonus": 10,
+              "damage": "1d6+6 P"
+            },
+            {
+              "name": "Garras",
+              "bonus": 10,
+              "damage": "1d4+6 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Placas Parasitas",
+              "text": "1/combate ao acertar mandíbulas: Fortitude CD 11 ou enredado 1 rodada."
+            },
+            {
+              "name": "Transferência de Carapaça",
+              "text": "Reação 1/combate: Igglanova adjacente atacada recebe +2 KAC; ele sofre -2 KAC até o próximo turno."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 1,
+            "con": 3,
+            "int": -3,
+            "wis": 0,
+            "cha": -2
+          },
+          "page": "SEED/0082_4 Zoran Bult.png"
+        }
+      ]
+    },
+    {
+      "species": "Guilgenova",
+      "new": {
+        "type": "SEED / Família Igglanova",
+        "habitat": "Instalações SEED reativadas"
+      },
+      "profiles": [
+        {
+          "label": "Matriz industrial",
+          "cr": "7",
+          "xp": 3200,
+          "size": "Large",
+          "type": "Aberração biológica",
+          "initiative": 3,
+          "hp": 115,
+          "eac": 21,
+          "kac": 23,
+          "fort": 8,
+          "ref": 6,
+          "will": 10,
+          "speed": "6 m; alcance 3 m",
+          "attacks": [
+            {
+              "name": "Tentáculos neurais",
+              "bonus": 17,
+              "damage": "2d6+12 B"
+            },
+            {
+              "name": "Mordida vestigial",
+              "bonus": 17,
+              "damage": "1d8+12 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Eclosão Superior",
+              "text": "Ação padrão 1/combate: 1 Gicefalgue ou 2 Xanafalgues adjacentes."
+            },
+            {
+              "name": "Consciência Distribuída Ampliada",
+              "text": "Compartilha sentidos com aliados SEED até 24 m."
+            },
+            {
+              "name": "Pulso de Dominação Gestacional",
+              "text": "Ação padrão 1/combate: emanação 6 m, Vontade CD 15 ou 4d6 não tipado e abalado 1 rodada (metade no sucesso)."
+            },
+            {
+              "name": "Reabsorção Neural",
+              "text": "Ação de movimento 1/combate: reabsorve cria adjacente, recupera 12 PV e encerra abalado/enredado."
+            },
+            {
+              "name": "Domínio da Ninhada",
+              "text": "Aliados SEED a 12 m: +1 em ataques e Vontade."
+            },
+            {
+              "name": "Ruptura de Emergência",
+              "text": "Ao chegar a metade dos PV, se não usou Eclosão Superior, produz 1 Xanafalgue."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 1,
+            "con": 2,
+            "int": 1,
+            "wis": 4,
+            "cha": 2
+          },
+          "page": "SEED/0083_5 Guilgenova.png"
+        }
+      ]
+    },
+    {
+      "species": "Gicefalgue",
+      "new": {
+        "type": "SEED / Família Igglanova",
+        "habitat": "Instalações SEED reativadas"
+      },
+      "profiles": [
+        {
+          "label": "Evolução sináptica",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Medium",
+          "type": "Aberração biológica",
+          "initiative": 4,
+          "hp": 50,
+          "eac": 16,
+          "kac": 18,
+          "fort": 5,
+          "ref": 6,
+          "will": 4,
+          "speed": "9 m",
+          "attacks": [
+            {
+              "name": "Tentáculos",
+              "bonus": 12,
+              "damage": "1d6+7 B"
+            },
+            {
+              "name": "Mordida neural",
+              "bonus": 12,
+              "damage": "1d6+7 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Muda Sináptica",
+              "text": "Reação 1/combate após sofrer dano: move 3 m sem provocar e ganha ocultação 20% até o próximo turno."
+            },
+            {
+              "name": "Marcação Orgânica",
+              "text": "Mordida marca o alvo; primeiro aliado SEED que atacá-lo recebe +2."
+            },
+            {
+              "name": "Pulso de Pânico",
+              "text": "Ação padrão 1/combate: cone 6 m, Vontade CD 13 ou 2d6 não tipado e abalado 1 rodada."
+            },
+            {
+              "name": "Rede de Reconhecimento",
+              "text": "Compartilha sentidos com Igglanova ou Guilgenova a até 12 m."
+            }
+          ],
+          "mods": {
+            "str": 3,
+            "dex": 5,
+            "con": 1,
+            "int": -1,
+            "wis": 1,
+            "cha": 0
+          },
+          "page": "SEED/0084_6 Gicefalgue.png"
+        }
+      ]
+    },
+    {
+      "species": "Zoran Bult Exarca",
+      "new": {
+        "type": "SEED / Família Igglanova",
+        "habitat": "Instalações SEED reativadas"
+      },
+      "profiles": [
+        {
+          "label": "Exarca",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Large",
+          "type": "Aberração biológica",
+          "initiative": 2,
+          "hp": 72,
+          "eac": 18,
+          "kac": 20,
+          "fort": 8,
+          "ref": 4,
+          "will": 6,
+          "speed": "6 m; alcance 3 m",
+          "attacks": [
+            {
+              "name": "Tentáculos",
+              "bonus": 14,
+              "damage": "1d6+10 B"
+            },
+            {
+              "name": "Mandíbula vestigial",
+              "bonus": 14,
+              "damage": "1d4+10 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Placas Parasitas Psiocondutoras",
+              "text": "1/combate ao acertar tentáculos: Fortitude CD 13 ou enredado e -1 na próxima Vontade contra psiônica SEED."
+            },
+            {
+              "name": "Guarda da Matriz",
+              "text": "Reação 1/rodada: matriz adjacente atacada recebe +2 EAC/KAC; Exarca sofre -2 KAC."
+            },
+            {
+              "name": "Prisão Sináptica",
+              "text": "Ação padrão 1/combate, alvo agarrado: Vontade CD 13 ou staggered."
+            },
+            {
+              "name": "Ruído Psiônico de Custódia",
+              "text": "Ação padrão 1/combate: emanação 6 m, Vontade CD 13 ou abalado 1 rodada."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 1,
+            "con": 3,
+            "int": -1,
+            "wis": 2,
+            "cha": -1
+          },
+          "page": "SEED/0085_7 Zoran Bult Exarca.png"
+        }
+      ]
+    },
+    {
+      "species": "Blob",
+      "new": {
+        "type": "SEED / Família Blob",
+        "habitat": "Tubulações e fossas de instalações SEED"
+      },
+      "profiles": [
+        {
+          "label": "Unidade residual",
+          "cr": "1",
+          "xp": 400,
+          "size": "Small",
+          "type": "Limo (ooze)",
+          "initiative": 1,
+          "hp": 20,
+          "eac": 11,
+          "kac": 13,
+          "fort": 5,
+          "ref": 1,
+          "will": -1,
+          "speed": "4,5 m, escalada 3 m",
+          "attacks": [
+            {
+              "name": "Pseudópode",
+              "bonus": 8,
+              "damage": "1d6+4 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Adesão Residual",
+              "text": "1/combate ao acertar: Reflexos CD 10 ou -1,5 m de deslocamento até o próximo turno."
+            },
+            {
+              "name": "Coalescência Programada",
+              "text": "Dois Blobs adjacentes (ação padrão cada) fundem-se numa Meta Slug com a soma dos PV (máx. 40)."
+            },
+            {
+              "name": "Compressão Orgânica",
+              "text": "Atravessa frestas de 10 cm, a 1,5 m por ação de movimento."
+            }
+          ],
+          "mods": {
+            "str": 3,
+            "dex": 1,
+            "con": 4,
+            "int": null,
+            "wis": 0,
+            "cha": -3
+          },
+          "page": "SEED/0087_1 Blob.png"
+        }
+      ]
+    },
+    {
+      "species": "Fract Ooze",
+      "new": {
+        "type": "SEED / Família Blob",
+        "habitat": "Tanques e fossas de processamento SEED"
+      },
+      "profiles": [
+        {
+          "label": "Dispersor fraturável",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Large",
+          "type": "Limo (ooze)",
+          "initiative": 0,
+          "hp": 70,
+          "eac": 17,
+          "kac": 19,
+          "fort": 9,
+          "ref": 5,
+          "will": 2,
+          "speed": "6 m, escalada 3 m",
+          "attacks": [
+            {
+              "name": "Pancada multicamadas",
+              "bonus": 14,
+              "damage": "1d6+10 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Fratura Reflexa",
+              "text": "1/combate: ao terminar de receber dano com 2 a 35 PV, divide-se em 2 Meta Slugs que repartem os PV."
+            },
+            {
+              "name": "Extravasamento Corrosivo",
+              "text": "Ação padrão 1/combate: emanação 3 m, Reflexos CD 13, 2d6 ácido (metade no sucesso)."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 0,
+            "con": 3,
+            "int": null,
+            "wis": 0,
+            "cha": -4
+          },
+          "page": "SEED/0088_2 Fract Ooze.png"
+        }
+      ]
+    },
+    {
+      "species": "Meta Slug",
+      "new": {
+        "type": "SEED / Família Blob",
+        "habitat": "Galerias de resíduos SEED"
+      },
+      "profiles": [
+        {
+          "label": "Concentrador de biomassa",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Limo (ooze)",
+          "initiative": 1,
+          "hp": 40,
+          "eac": 14,
+          "kac": 16,
+          "fort": 7,
+          "ref": 3,
+          "will": 0,
+          "speed": "6 m, escalada 3 m",
+          "attacks": [
+            {
+              "name": "Pseudópode concentrador",
+              "bonus": 11,
+              "damage": "1d6+7 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Assimilação Dirigida",
+              "text": "Ação de movimento 1/combate: incorpora Blob adjacente e recupera até 8 PV (máx. 40)."
+            },
+            {
+              "name": "Secreção de Convergência",
+              "text": "1/combate ao acertar: Reflexos CD 12 ou enredado até o próximo turno."
+            },
+            {
+              "name": "Convergência por Fusão",
+              "text": "Formada por dois Blobs; não se funde com outra Meta Slug em combate."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 1,
+            "con": 3,
+            "int": null,
+            "wis": 0,
+            "cha": -3
+          },
+          "page": "SEED/0089_3 Meta Slug.png"
+        }
+      ]
+    },
+    {
+      "species": "Ismounos",
+      "new": {
+        "type": "SEED / Família Ismounos",
+        "habitat": "Tanques e reservatórios biológicos SEED"
+      },
+      "profiles": [
+        {
+          "label": "Tanque vivo",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Large",
+          "type": "Aberração biológica",
+          "initiative": 1,
+          "hp": 50,
+          "eac": 16,
+          "kac": 18,
+          "fort": 6,
+          "ref": 6,
+          "will": 5,
+          "speed": "3 m, natação 9 m",
+          "attacks": [
+            {
+              "name": "Filamentos prensores",
+              "bonus": 12,
+              "damage": "1d6+9 B"
+            },
+            {
+              "name": "Boca filtrante",
+              "bonus": 12,
+              "damage": "1d6+9 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Filamentos Prensores",
+              "text": "Se o ataque atingir KAC+4 do alvo, também agarra."
+            },
+            {
+              "name": "Pulso de Rejeitos",
+              "text": "Ação padrão 1/combate: cone 4,5 m, Reflexos CD 13, 2d6 ácido; na falha também enredado."
+            },
+            {
+              "name": "Respiração Anfíbia",
+              "text": "Respira na água e no ar."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 1,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0091_1 Dossiê Xenobiológico_ Ismounos, Tanque Vivo.png"
+        }
+      ]
+    },
+    {
+      "species": "Depcen",
+      "new": {
+        "type": "SEED / Família Ismounos",
+        "habitat": "Canais de drenagem e ruínas alagadas"
+      },
+      "profiles": [
+        {
+          "label": "Predador de drenagem",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Aberração biológica",
+          "initiative": 2,
+          "hp": 40,
+          "eac": 14,
+          "kac": 16,
+          "fort": 5,
+          "ref": 5,
+          "will": 4,
+          "speed": "6 m, natação 12 m",
+          "attacks": [
+            {
+              "name": "Mordida de captura",
+              "bonus": 11,
+              "damage": "1d6+7 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Mandíbula de Captura",
+              "text": "Se a mordida atingir KAC+4 do alvo, também agarra."
+            },
+            {
+              "name": "Rompante de Drenagem",
+              "text": "1/combate: investindo nadando 3 m em linha reta, +1d4 contundente na mordida."
+            },
+            {
+              "name": "Respiração Anfíbia",
+              "text": "Respira no ar e na água."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 2,
+            "con": 1,
+            "int": -4,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0092_2 Dossiê de Xenobiologia_ Depcen.png"
+        }
+      ]
+    },
+    {
+      "species": "Toadstool",
+      "new": {
+        "type": "SEED / Fungos de Reprocessamento",
+        "habitat": "Instalações SEED"
+      },
+      "profiles": [
+        {
+          "label": "Colonizador fúngico",
+          "cr": "2",
+          "xp": 600,
+          "size": "Medium",
+          "type": "Planta",
+          "initiative": 0,
+          "hp": 25,
+          "eac": 13,
+          "kac": 15,
+          "fort": 6,
+          "ref": 4,
+          "will": 1,
+          "speed": "3 m",
+          "attacks": [
+            {
+              "name": "Caule prensil",
+              "bonus": 10,
+              "damage": "1d6+4 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Neuroinibição de Contato",
+              "text": "1/combate ao acertar: Fortitude CD 11 ou cambaleante até o próximo turno."
+            },
+            {
+              "name": "Véu de Esporos",
+              "text": "Reação 1/combate ao sofrer dano adjacente: ocultação 20% até o próximo turno."
+            },
+            {
+              "name": "Esporulação Agônica",
+              "text": "Ao morrer, nuvem 1,5 m: Fortitude CD 11 ou desorientado até o fim do próximo turno."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 0,
+            "con": 4,
+            "int": null,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0094_1 toadstool.png"
+        }
+      ]
+    },
+    {
+      "species": "Shrieker",
+      "new": {
+        "type": "SEED / Fungos de Reprocessamento",
+        "habitat": "Instalações SEED"
+      },
+      "profiles": [
+        {
+          "label": "Dispersor ressonante",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Large",
+          "type": "Planta",
+          "initiative": 0,
+          "hp": 50,
+          "eac": 16,
+          "kac": 18,
+          "fort": 8,
+          "ref": 6,
+          "will": 3,
+          "speed": "3 m; alcance 3 m",
+          "attacks": [
+            {
+              "name": "Filamentos prensores",
+              "bonus": 12,
+              "damage": "1d6+7 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Grito Esporulante",
+              "text": "Ação padrão 1/combate: cone 6 m, Fortitude CD 13 ou 2d6 sônico e desorientado (metade no sucesso)."
+            },
+            {
+              "name": "Luz Estranha",
+              "text": "Ação padrão 1/combate: criatura a 9 m, Vontade CD 13 ou cambaleante."
+            },
+            {
+              "name": "Última Exalação",
+              "text": "Fim da rodada após morrer: 3 m, Fortitude CD 13 ou 1d6 sônico e desorientado."
+            },
+            {
+              "name": "Micélio Persistente",
+              "text": "Fora de combate o micélio dura dias ou semanas."
+            }
+          ],
+          "mods": {
+            "str": 3,
+            "dex": 0,
+            "con": 5,
+            "int": null,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0095_2 shrieker.png"
+        }
+      ]
+    },
+    {
+      "species": "Monsterfly",
+      "new": {
+        "type": "SEED / Família Monsterfly",
+        "habitat": "Ruínas SEED e carcaças"
+      },
+      "profiles": [
+        {
+          "label": "Necrófaga",
+          "cr": "1",
+          "xp": 400,
+          "size": "Small",
+          "type": "Vermin",
+          "initiative": 4,
+          "senses": "visão no escuro 18 m, percepção às cegas (olfato) 9 m",
+          "hp": 20,
+          "eac": 11,
+          "kac": 13,
+          "fort": 5,
+          "ref": 3,
+          "will": 1,
+          "speed": "6 m, voo 12 m (média)",
+          "attacks": [
+            {
+              "name": "Probóscide",
+              "bonus": 8,
+              "damage": "1d6+2 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Rasante Enzimático",
+              "text": "Ação padrão 1/combate: voa 4,5 m e ataca; acerto +1d4 ácido."
+            },
+            {
+              "name": "Rastreio Necrófago",
+              "text": "+4 em Percepção para cadáveres, sangue e decomposição."
+            }
+          ],
+          "mods": {
+            "str": 1,
+            "dex": 4,
+            "con": 2,
+            "int": null,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0097_1 monterfly.png"
+        }
+      ]
+    },
+    {
+      "species": "Forced Fly",
+      "new": {
+        "type": "SEED / Família Monsterfly",
+        "habitat": "Instalações SEED"
+      },
+      "profiles": [
+        {
+          "label": "Descontaminadora incendiária",
+          "cr": "3",
+          "xp": 800,
+          "size": "Medium",
+          "type": "Vermin",
+          "initiative": 2,
+          "hp": 40,
+          "eac": 14,
+          "kac": 16,
+          "fort": 7,
+          "ref": 5,
+          "will": 2,
+          "speed": "6 m, voo 12 m (média)",
+          "attacks": [
+            {
+              "name": "Jato ígneo (9 m)",
+              "bonus": 11,
+              "damage": "1d4+3 fogo"
+            },
+            {
+              "name": "Mandíbulas prensórias",
+              "bonus": 8,
+              "damage": "1d6+4 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Câmaras de Reagentes",
+              "text": "2 cargas; jato ígneo gasta 1 (ação padrão). Repõe com 10 min de repouso."
+            },
+            {
+              "name": "Pulso de Esterilização",
+              "text": "Ação padrão 1/combate, 2 cargas: cone 4,5 m, Reflexos CD 12, 2d6 fogo."
+            }
+          ],
+          "mods": {
+            "str": 1,
+            "dex": 2,
+            "con": 4,
+            "int": null,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0098_2 forced fly.png"
+        }
+      ]
+    },
+    {
+      "species": "Helex",
+      "new": {
+        "type": "SEED / Família Monsterfly",
+        "habitat": "Cavernas e fendas termais de Dezólis"
+      },
+      "profiles": [
+        {
+          "label": "Díptero termogênico",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Large",
+          "type": "Vermin",
+          "initiative": 3,
+          "hp": 70,
+          "eac": 17,
+          "kac": 19,
+          "fort": 9,
+          "ref": 7,
+          "will": 4,
+          "speed": "6 m, voo 9 m",
+          "attacks": [
+            {
+              "name": "Descarga (9 m)",
+              "bonus": 14,
+              "damage": "1d6+5 fogo (1 carga)"
+            },
+            {
+              "name": "Probóscide",
+              "bonus": 11,
+              "damage": "1d6+7 P"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Reserva Termogênica",
+              "text": "3 cargas; com carga: resistência a frio 5 e voo 9 m; sem cargas voo 6 m."
+            },
+            {
+              "name": "Coluna de Descontaminação",
+              "text": "Ação padrão 1/combate, 2 cargas: cone 6 m, Reflexos CD 13, 3d6 fogo."
+            }
+          ],
+          "mods": {
+            "str": 2,
+            "dex": 3,
+            "con": 5,
+            "int": null,
+            "wis": 1,
+            "cha": -3
+          },
+          "page": "SEED/0099_3 helex.png"
+        }
+      ]
+    },
+    {
+      "species": "Flatterplant",
+      "new": {
+        "type": "SEED / Plantas Mutantes",
+        "habitat": "Instalações SEED degradadas"
+      },
+      "profiles": [
+        {
+          "label": "Predadora recicladora",
+          "cr": "2",
+          "xp": 600,
+          "size": "Medium",
+          "type": "Planta",
+          "initiative": 1,
+          "senses": "sentido às cegas (vibração) 9 m",
+          "hp": 25,
+          "eac": 13,
+          "kac": 15,
+          "fort": 6,
+          "ref": 4,
+          "will": 1,
+          "speed": "3 m; alcance 3 m",
+          "attacks": [
+            {
+              "name": "Folha-prensa",
+              "bonus": 10,
+              "damage": "1d6+6 B"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Folhas-Prensa",
+              "text": "Se o ataque atingir KAC+4, também agarra."
+            },
+            {
+              "name": "Tapete Radicular",
+              "text": "Ação padrão 1/combate: emanação 3 m, Reflexos CD 11 ou enredado; terreno difícil por 2 rodadas."
+            },
+            {
+              "name": "Imunidades de Planta",
+              "text": "Mental, paralisia, veneno, polimorfia, sono, atordoamento."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 1,
+            "con": 2,
+            "int": -4,
+            "wis": 0,
+            "cha": -3
+          },
+          "page": "SEED/0101_1 Dossiê de Xenobiologia_ Flatterplant.png"
+        }
+      ]
+    },
+    {
+      "species": "Flyscreamer",
+      "new": {
+        "type": "SEED / Plantas Mutantes",
+        "habitat": "Instalações SEED"
+      },
+      "profiles": [
+        {
+          "label": "Aberração vegetal ressonante",
+          "cr": "4",
+          "xp": 1200,
+          "size": "Medium",
+          "type": "Planta",
+          "initiative": 2,
+          "hp": 50,
+          "eac": 16,
+          "kac": 18,
+          "fort": 7,
+          "ref": 5,
+          "will": 3,
+          "speed": "6 m; alcance 3 m",
+          "attacks": [
+            {
+              "name": "Folhas cortantes",
+              "bonus": 12,
+              "damage": "1d6+8 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Voz Ressonante",
+              "text": "Ação padrão 1/combate: cone 6 m, Fortitude CD 13, 2d6 sônico; na falha ensurdecido 1 rodada."
+            },
+            {
+              "name": "Hálito Ácido",
+              "text": "Ação padrão 1/combate: cone 4,5 m, Reflexos CD 13, 2d6 ácido."
+            },
+            {
+              "name": "Seiva Entorpecente",
+              "text": "1/combate após acertar: Fortitude CD 13 ou cambaleante 1 rodada."
+            },
+            {
+              "name": "Imunidades de Planta",
+              "text": "Mental, sono, veneno, paralisia, atordoamento."
+            }
+          ],
+          "mods": {
+            "str": 4,
+            "dex": 2,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "SEED/0102_2 Dossiê do Flyscreamer.png"
+        }
+      ]
+    },
+    {
+      "species": "Tech Plant",
+      "new": {
+        "type": "SEED / Plantas Mutantes",
+        "habitat": "Sistemas criogênicos SEED (Dezólis)"
+      },
+      "profiles": [
+        {
+          "label": "Criogênica",
+          "cr": "5",
+          "xp": 1600,
+          "size": "Large",
+          "type": "Planta",
+          "initiative": 1,
+          "senses": "vibração em estruturas conectadas 12 m",
+          "hp": 70,
+          "eac": 17,
+          "kac": 19,
+          "fort": 9,
+          "ref": 4,
+          "will": 6,
+          "speed": "3 m; alcance 3 m",
+          "attacks": [
+            {
+              "name": "Raízes-lâmina",
+              "bonus": 14,
+              "damage": "1d6+10 S"
+            }
+          ],
+          "abilities": [
+            {
+              "name": "Jato Criogênico",
+              "text": "Ação padrão 1/combate: cone 6 m, Reflexos CD 13, 3d6 frio; na falha -3 m de deslocamento por 1 rodada."
+            },
+            {
+              "name": "Seiva Imobilizante",
+              "text": "1/combate ao acertar: Fortitude CD 13 ou enredado 1 rodada."
+            },
+            {
+              "name": "Imunidades de Planta",
+              "text": "Mental, sono, veneno, paralisia, atordoamento."
+            }
+          ],
+          "mods": {
+            "str": 5,
+            "dex": 1,
+            "con": 3,
+            "int": -4,
+            "wis": 1,
+            "cha": -2
+          },
+          "page": "SEED/0103_3 Dossiê da Tech Plant Criogênica.png"
+        }
+      ]
+    }
+  ]
+}

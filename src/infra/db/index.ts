@@ -33,6 +33,11 @@ export function ensureRuntimeTables() {
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   );
+  CREATE TABLE IF NOT EXISTS monster_stat_blocks (
+    monster_id INTEGER PRIMARY KEY NOT NULL REFERENCES bestiary(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+    blocks TEXT NOT NULL DEFAULT '[]',
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `);
 }
 ensureRuntimeTables();

@@ -2,6 +2,7 @@ import { CreateMonster } from '../core/use-cases/bestiary/create-monster';
 import { DeleteMonster } from '../core/use-cases/bestiary/delete-monster';
 import { ListMonsters } from '../core/use-cases/bestiary/list-monsters';
 import { SetMonsterDiscovered } from '../core/use-cases/bestiary/set-monster-discovered';
+import { ListStatBlocks, SetStatBlocks } from '../core/use-cases/bestiary/stat-blocks';
 import { UpdateMonster } from '../core/use-cases/bestiary/update-monster';
 import { UpdateMonsterImage } from '../core/use-cases/bestiary/update-monster-image';
 import { CreateCharacterSheet } from '../core/use-cases/character-sheets/create-character-sheet';
@@ -93,6 +94,7 @@ import { NpcDrizzleRepository } from '../infra/repositories/npc.drizzle.reposito
 import { PlayerDrizzleRepository } from '../infra/repositories/player.drizzle.repository';
 import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repository';
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
+import { StatBlockDrizzleRepository } from '../infra/repositories/stat-block.drizzle.repository';
 import { TagsDrizzleRepository } from '../infra/repositories/tags.drizzle.repository';
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
 import { WikiPageDrizzleRepository } from '../infra/repositories/wiki-page.drizzle.repository';
@@ -201,6 +203,9 @@ export type Registry = {
   saveEncounter: SaveEncounter;
   deleteEncounter: DeleteEncounter;
   gmNoteRepo: GmNoteDrizzleRepository;
+  statBlockRepo: StatBlockDrizzleRepository;
+  listStatBlocks: ListStatBlocks;
+  setStatBlocks: SetStatBlocks;
   createGmNote: CreateGmNote;
   listGmNotes: ListGmNotes;
   updateGmNote: UpdateGmNote;
@@ -353,6 +358,9 @@ class Container {
     saveEncounter: (c) => new SaveEncounter(c.resolve('encounterRepo')),
     deleteEncounter: (c) => new DeleteEncounter(c.resolve('encounterRepo')),
     gmNoteRepo: () => new GmNoteDrizzleRepository(),
+    statBlockRepo: () => new StatBlockDrizzleRepository(),
+    listStatBlocks: (c) => new ListStatBlocks(c.resolve('statBlockRepo')),
+    setStatBlocks: (c) => new SetStatBlocks(c.resolve('statBlockRepo')),
     createGmNote: (c) => new CreateGmNote(c.resolve('gmNoteRepo')),
     listGmNotes: (c) => new ListGmNotes(c.resolve('gmNoteRepo')),
     updateGmNote: (c) => new UpdateGmNote(c.resolve('gmNoteRepo')),
