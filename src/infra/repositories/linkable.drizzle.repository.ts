@@ -19,6 +19,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
       beasts,
       timeline,
       notes,
+      items,
     ] = await Promise.all([
       db.select().from(s.cities),
       db.select().from(s.npcs),
@@ -32,6 +33,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
       db.select().from(s.bestiary),
       db.select().from(s.timelineEvents),
       gm ? db.select().from(s.gmNotes) : Promise.resolve([]),
+      db.select().from(s.items),
     ]);
 
     const out: LinkableEntity[] = [];
@@ -162,6 +164,18 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         name: r.title,
         text: join(r.content),
         visible: false,
+        readable: true,
+      });
+    // Items: players find published public items only, by their Motávia name; text is the
+    // player description (never GM notes or the audit).
+    for (const r of items)
+      out.push({
+        type: 'item',
+        id: r.id,
+        name: r.localName ?? r.name,
+        subtitle: r.kind,
+        text: join(r.description),
+        visible: r.visibility === 'public' && r.status === 'published',
         readable: true,
       });
     return out;

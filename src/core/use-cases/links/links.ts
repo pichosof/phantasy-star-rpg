@@ -50,6 +50,7 @@ const TYPE_PRIORITY: EntityType[] = [
   'session',
   'timeline',
   'gmNote',
+  'item',
 ];
 
 /** Entities the caller may see: players never get hidden ones, nor text they may not read. */

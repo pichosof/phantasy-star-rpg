@@ -502,3 +502,48 @@ export const playerProgress = sqliteTable('player_progress', {
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
 });
+
+/**
+ * Item catalogue (Starfinder gear, Algol goods, homebrew). One row per item; the API splits
+ * player fields from GM fields (access, reference price, audit, notes). Players only ever
+ * get rows with visibility 'public' and status 'published'. Generators read the GM view.
+ */
+export const items = sqliteTable('items', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  /** Stable catalogue code (audit id 0001–1014, HB-… for homebrew). */
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  localName: text('local_name'),
+  origin: text('origin').notNull().default('homebrew'),
+  kind: text('kind').notNull(),
+  group: text('grp'),
+  category: text('category'),
+  level: integer('level').notNull().default(0),
+  damage: text('damage'),
+  unit: text('unit'),
+  region: text('region').notNull().default('motavia'),
+  description: text('description'),
+  rules: text('rules'),
+  sourceUrl: text('source_url'),
+  localPrice: integer('local_price'),
+  availabilityNote: text('availability_note'),
+  // GM only
+  refPrice: integer('ref_price'),
+  access: text('access').notNull().default('none'),
+  channel: text('channel'),
+  tags: text('tags').notNull().default('[]'),
+  shops: text('shops').notNull().default('[]'),
+  loot: text('loot').notNull().default('[]'),
+  policies: text('policies'),
+  flags: text('flags'),
+  gmNotes: text('gm_notes'),
+  audit: text('audit'),
+  visibility: text('visibility').notNull().default('gm'),
+  status: text('status').notNull().default('proposal'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});

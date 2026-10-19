@@ -23,6 +23,7 @@ import { encountersRoutes } from './routes/encounters.routes';
 import { gmImagesRoutes } from './routes/gm-images.routes';
 import { gmNotesRoutes } from './routes/gm-notes.routes';
 import { imageFocusRoutes } from './routes/image-focus.routes';
+import { itemsRoutes } from './routes/items.routes';
 import { libraryRoutes } from './routes/library.routes';
 import { linksRoutes } from './routes/links.routes';
 import { loreCityRoutes } from './routes/lore-city.routes';
@@ -243,6 +244,7 @@ export async function buildServer() {
   await app.register(encountersRoutes);
   await app.register(linksRoutes);
   await app.register(progressRoutes);
+  await app.register(itemsRoutes);
   await app.register(statBlocksRoutes);
   await app.register(gmImagesRoutes);
   await app.register(characterSheetsRoutes);

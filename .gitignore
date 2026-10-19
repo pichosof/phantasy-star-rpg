@@ -151,3 +151,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 data/test-uploads/
 data/test-backups/
+
+# Item catalogue seed: contains GM-only notes and audit (public repo). Kept outside git.
+scripts/items/items.seed.json

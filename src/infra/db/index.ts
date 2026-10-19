@@ -52,6 +52,39 @@ export function ensureRuntimeTables() {
     note TEXT,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   );
+  CREATE TABLE IF NOT EXISTS items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    local_name TEXT,
+    origin TEXT NOT NULL DEFAULT 'homebrew',
+    kind TEXT NOT NULL,
+    grp TEXT,
+    category TEXT,
+    level INTEGER NOT NULL DEFAULT 0,
+    damage TEXT,
+    unit TEXT,
+    region TEXT NOT NULL DEFAULT 'motavia',
+    description TEXT,
+    rules TEXT,
+    source_url TEXT,
+    local_price INTEGER,
+    availability_note TEXT,
+    ref_price INTEGER,
+    access TEXT NOT NULL DEFAULT 'none',
+    channel TEXT,
+    tags TEXT NOT NULL DEFAULT '[]',
+    shops TEXT NOT NULL DEFAULT '[]',
+    loot TEXT NOT NULL DEFAULT '[]',
+    policies TEXT,
+    flags TEXT,
+    gm_notes TEXT,
+    audit TEXT,
+    visibility TEXT NOT NULL DEFAULT 'gm',
+    status TEXT NOT NULL DEFAULT 'proposal',
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `);
 }
 

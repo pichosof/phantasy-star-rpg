@@ -16,6 +16,7 @@ export const ENTITY_TYPES = [
   'beast',
   'timeline',
   'gmNote',
+  'item',
 ] as const;
 export type EntityType = (typeof ENTITY_TYPES)[number];
 

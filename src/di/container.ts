@@ -35,6 +35,14 @@ import { CreateGmNote } from '../core/use-cases/gm-notes/create-gm-note';
 import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
 import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
 import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
+import {
+  CreateItem,
+  DeleteItem,
+  GetItem,
+  ImportItems,
+  ListItems,
+  UpdateItem,
+} from '../core/use-cases/items/items';
 import { GetEntityLinks, GetLinkIndex } from '../core/use-cases/links/links';
 import { SearchEntities } from '../core/use-cases/links/search';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
@@ -98,6 +106,7 @@ import { DungeonDrizzleRepository } from '../infra/repositories/dungeon.drizzle.
 import { EncounterDrizzleRepository } from '../infra/repositories/encounter.drizzle.repository';
 import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
 import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
+import { ItemDrizzleRepository } from '../infra/repositories/item.drizzle.repository';
 import { LibraryDocumentRepository } from '../infra/repositories/library-document.drizzle.repository';
 import { LinkableDrizzleRepository } from '../infra/repositories/linkable.drizzle.repository';
 import { LinksDrizzleRepository } from '../infra/repositories/links.drizzle.repository';
@@ -232,6 +241,13 @@ export type Registry = {
   saveSessionDiary: SaveSessionDiary;
   summarizeSessionDiary: SummarizeSessionDiary;
   statBlockRepo: StatBlockDrizzleRepository;
+  itemRepo: ItemDrizzleRepository;
+  listItems: ListItems;
+  getItem: GetItem;
+  createItem: CreateItem;
+  updateItem: UpdateItem;
+  deleteItem: DeleteItem;
+  importItems: ImportItems;
   listStatBlocks: ListStatBlocks;
   setStatBlocks: SetStatBlocks;
   createGmNote: CreateGmNote;
@@ -403,10 +419,17 @@ class Container {
         new AnthropicDiarySummarizer(),
         async () =>
           (await c.resolve('linkableRepo').listAll(true))
-            .filter((e) => e.type !== 'gmNote' && e.type !== 'session')
+            .filter((e) => e.type !== 'gmNote' && e.type !== 'session' && e.type !== 'item')
             .map((e) => e.name),
       ),
     statBlockRepo: () => new StatBlockDrizzleRepository(),
+    itemRepo: () => new ItemDrizzleRepository(),
+    listItems: (c) => new ListItems(c.resolve('itemRepo')),
+    getItem: (c) => new GetItem(c.resolve('itemRepo')),
+    createItem: (c) => new CreateItem(c.resolve('itemRepo')),
+    updateItem: (c) => new UpdateItem(c.resolve('itemRepo')),
+    deleteItem: (c) => new DeleteItem(c.resolve('itemRepo')),
+    importItems: (c) => new ImportItems(c.resolve('itemRepo')),
     listStatBlocks: (c) => new ListStatBlocks(c.resolve('statBlockRepo')),
     setStatBlocks: (c) => new SetStatBlocks(c.resolve('statBlockRepo')),
     createGmNote: (c) => new CreateGmNote(c.resolve('gmNoteRepo')),

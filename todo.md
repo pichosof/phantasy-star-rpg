@@ -135,6 +135,24 @@ Follow-ups (not approved yet):
 
 **Done (2026-10-19), front only:** GM → Generators (`src/generators/`): NPC, names (6 peoples), shop, encounter (opens in the combat tracker), Guild board. Seeded RNG + Markov + templates + per-device anti-repeat history. Shop stock = AoN Starfinder items curated for post-collapse Algol (`scripts/generators/curate.py`, 906 of 3,745 kept) + local goods with economy prices. Next: keep growing the data tables from new wiki pages.
 
+### [x] 4.3 Item catalogue (canon v1.0) + loot generator
+
+**Done (2026-10-19):** new `items` entity (table created at boot). One row per item with player fields (name, Motávia name, description, rules, level, region, local price) and GM fields (canon access, reference price, channel, loot sites, shops, policies, audit flags, GM notes, audit blob, visibility, status).
+
+- Players: `GET /api/items` and `/api/items/:id` return only `visibility=public` **and** `status=published` items, through an explicit field whitelist (`toPlayerItem`). Tests check that no GM field leaks. Global search lists items with the same rule.
+- GM: `/api/gm/items` CRUD and `POST /api/gm/items/import` (upsert by `code`, up to 200 per call).
+- Front: Tools → Items (player catalogue); GM Area → Items catalogue (filters, bulk publish, editor with Player/GM/Audit tabs, homebrew creation).
+- Generators read the catalogue: shop stock follows canon access (free anywhere, made-to-order in specialist shops and big cities, occasional offers only on the grey market; institutional and relic never). The GM can remove or add lines and scale prices before saving. New **Loot** tab: SEED facility, orbital satellite, cave, old cellar; items come from each item's `loot` sites near the party level.
+- Seed: `scripts/items/items.seed.json`, **gitignored** because it carries GM-only notes and the repo is public; master copy in OneDrive `RPG/Itens/Seed/` (1,014 audited items + 10 artisan armours proposed under P_ARMADURA). 389 published on day one (public, sold freely or to order in Motávia). Rebuild with `scripts/items/build_seed.py`.
+
+**Production seeding (after deploy):**
+
+```bash
+SEED_FILE=<path to items.seed.json> API_URL=https://<api host> ORIGIN=https://rpg.picho.org CLIENT_SECRET=<client secret> GM_API_KEY=<gm key> npm run items:seed
+```
+
+Run `DRY_RUN=1 npm run items:seed` first to see the batches. Re-running updates items by code, so it overwrites edits the GM made to seeded items.
+
 ## Backlog / housekeeping (offered, not yet approved)
 
 - [ ] Delete the 5 orphan player-sheet PDFs in the Blob (3 are truncated at exactly 30 MiB). **Ask before deleting.**
