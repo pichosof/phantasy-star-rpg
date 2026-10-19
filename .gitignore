@@ -15,6 +15,7 @@ data/test.db
 # Local uploads / temporary working dirs (runtime user content)
 data/uploads/
 data/tmp/
+data/backups/
 
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
