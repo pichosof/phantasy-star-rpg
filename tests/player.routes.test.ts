@@ -1,134 +1,125 @@
-import type { FastifyInstance } from 'fastify';
-import { beforeAll, afterAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { buildServer } from '../src/infra/http/server';
+import { createTestApi, type TestApi } from './helpers';
 
-let app: FastifyInstance | undefined;
+type PlayerDto = {
+  id: number;
+  name: string;
+  level: number;
+  background?: string | null;
+  visible?: boolean;
+};
 
-describe('Player routes', () => {
-  beforeAll(async () => {
-    app = await buildServer();
-    await app.ready();
-  });
+let api: TestApi;
 
-  afterAll(async () => {
-    if (app) {
-      await app.close();
-      app = undefined;
-    }
-  });
+beforeAll(async () => {
+  api = await createTestApi();
+});
+afterAll(async () => {
+  await api.close();
+});
 
-  it('GET /api/health', async () => {
-    const res = await app!.inject({ method: 'GET', url: '/api/health' });
+const createPlayer = async (payload: Record<string, unknown>) => {
+  const res = await api.gm({ method: 'POST', url: '/api/players', payload });
+  expect(res.statusCode).toBe(201);
+  return res.json() as PlayerDto;
+};
+
+describe('health and client gate', () => {
+  it('GET /api/health needs no credentials', async () => {
+    const res = await api.app.inject({ method: 'GET', url: '/api/health' });
     expect(res.statusCode).toBe(200);
-    const body = res.json();
-    expect(body.ok).toBe(true);
+    expect(res.json().ok).toBe(true);
   });
 
-  it('POST /api/players -> create and list', async () => {
-    const create = await app!.inject({
+  it('rejects /api requests without the client secret', async () => {
+    const res = await api.app.inject({ method: 'GET', url: '/api/players' });
+    expect(res.statusCode).toBe(403);
+  });
+
+  it('rejects a wrong GM key', async () => {
+    const res = await api.player({
       method: 'POST',
-      url: '/api/players',
-      payload: { name: 'Alys', level: 3 },
+      url: '/api/auth/login',
+      payload: { apiKey: 'wrong' },
     });
-    expect(create.statusCode).toBe(201);
+    expect(res.statusCode).toBe(401);
+  });
+});
 
-    const list = await app!.inject({ method: 'GET', url: '/api/players' });
-    expect(list.statusCode).toBe(200);
-    const items = list.json();
-    expect(Array.isArray(items)).toBe(true);
-    expect(items.some((p) => p.name === 'Alys')).toBe(true);
-    expect(items.some((p) => p.level === 3)).toBe(true);
-  });
-  it('POST /api/players -> create with background', async () => {
-    const create = await app!.inject({
-      method: 'POST',
-      url: '/api/players',
-      payload: { name: 'Rolf', level: 5, background: 'Hero from the North' },
-    });
-    expect(create.statusCode).toBe(201);
-
-    const list = await app!.inject({ method: 'GET', url: '/api/players' });
-    expect(list.statusCode).toBe(200);
-    const items = list.json();
-    expect(items.some((p) => p.name === 'Rolf')).toBe(true);
-    expect(items.some((p) => p.background === 'Hero from the North')).toBe(true);
-  });
-  it('GET /api/players/:id -> get non-existent player', async () => {
-    const res = await app!.inject({ method: 'GET', url: '/api/players/999999' });
-    expect(res.statusCode).toBe(404);
-    const body = res.json();
-    expect(body.message).toBe('Route GET:/api/players/999999 not found');
-  });
-  it('GET /api/players/:id -> get player with invalid ID', async () => {
-    const res = await app!.inject({ method: 'GET', url: '/api/players/invalid-id' });
-    expect(res.statusCode).toBe(404);
-    const body = res.json();
-    expect(body.message).toBe('Route GET:/api/players/invalid-id not found');
-  });
-  it('GET /api/players -> list players with no players', async () => {
-    const res = await app!.inject({ method: 'GET', url: '/api/players' });
+describe('players', () => {
+  it('lists nothing on an empty database', async () => {
+    const res = await api.gm({ method: 'GET', url: '/api/players' });
     expect(res.statusCode).toBe(200);
-    const body = res.json();
-    expect(Array.isArray(body)).toBe(true);
-    expect(body.length).toBe(0);
+    expect(res.json()).toEqual([]);
   });
-  it('DELETE /api/players/:id -> delete non-existent player', async () => {
-    const res = await app!.inject({ method: 'DELETE', url: '/api/players/999999' });
-    expect(res.statusCode).toBe(404);
-    const body = res.json();
-    expect(body.message).toBe('Route DELETE:/api/players/999999 not found');
-  });
-  it('DELETE /api/players/:id -> delete player with invalid ID', async () => {
-    const res = await app!.inject({ method: 'DELETE', url: '/api/players/invalid-id' });
-    expect(res.statusCode).toBe(404);
-    const body = res.json();
-    expect(body.message).toBe('Route DELETE:/api/players/invalid-id not found');
-  });
-  it('GET /api/players -> list players with multiple players', async () => {
-    const create1 = await app!.inject({
-      method: 'POST',
-      url: '/api/players',
-      payload: { name: 'Player One', level: 1 },
-    });
-    expect(create1.statusCode).toBe(201);
-    const create2 = await app!.inject({
-      method: 'POST',
-      url: '/api/players',
-      payload: { name: 'Player Two', level: 2 },
-    });
-    expect(create2.statusCode).toBe(201);
 
-    const list = await app!.inject({ method: 'GET', url: '/api/players' });
-    expect(list.statusCode).toBe(200);
-    const items = list.json();
-    expect(Array.isArray(items)).toBe(true);
-    expect(items.length).toBeGreaterThanOrEqual(2);
-    expect(items.some((p) => p.name === 'Player One')).toBe(true);
-    expect(items.some((p) => p.name === 'Player Two')).toBe(true);
+  it('GM creates players and lists them', async () => {
+    const alys = await createPlayer({ name: 'Alys', level: 3 });
+    await createPlayer({ name: 'Rolf', level: 5, background: 'Hero from the North' });
+
+    const items = (await api.gm({ method: 'GET', url: '/api/players' })).json() as PlayerDto[];
+    expect(items).toHaveLength(2);
+    expect(items.find((p) => p.id === alys.id)?.level).toBe(3);
+    expect(items.find((p) => p.name === 'Rolf')?.background).toBe('Hero from the North');
   });
-  it('GET /api/players -> list players with single player', async () => {
-    const create = await app!.inject({
+
+  it('a player (non-GM) cannot create', async () => {
+    const res = await api.player({
       method: 'POST',
       url: '/api/players',
-      payload: { name: 'Single Player', level: 1 },
+      payload: { name: 'Nope' },
     });
-    expect(create.statusCode).toBe(201);
-    const player = create.json();
-
-    const list = await app!.inject({ method: 'GET', url: '/api/players' });
-    expect(list.statusCode).toBe(200);
-    const items = list.json();
-    expect(Array.isArray(items)).toBe(true);
-    expect(items.length).toBe(1);
-    expect(items[0].id).toBe(player.id);
-    expect(items[0].name).toBe('Single Player');
+    expect(res.statusCode).toBe(401);
   });
-  it('GET /api/players -> list players with no players', async () => {
-    const res = await app!.inject({ method: 'GET', url: '/api/players' });
-    expect(res.statusCode).toBe(200);
-    const body = res.json();
-    expect(Array.isArray(body)).toBe(true);
-    expect(body.length).toBe(0);
+
+  it('validates the body', async () => {
+    const res = await api.gm({ method: 'POST', url: '/api/players', payload: { level: 2 } });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('hidden players are filtered out for non-GM callers', async () => {
+    const shown = await createPlayer({ name: 'Shown' });
+    const hidden = await createPlayer({ name: 'Hidden' });
+    expect(hidden.visible).toBe(false);
+    // Players are created hidden; reveal one.
+    const vis = await api.gm({
+      method: 'PATCH',
+      url: `/api/players/${shown.id}/visibility`,
+      payload: { visible: true },
+    });
+    expect(vis.statusCode).toBe(204);
+
+    const asPlayer = (
+      await api.player({ method: 'GET', url: '/api/players' })
+    ).json() as PlayerDto[];
+    expect(asPlayer.map((p) => p.id)).toEqual([shown.id]);
+
+    const asGM = (await api.gm({ method: 'GET', url: '/api/players' })).json() as PlayerDto[];
+    expect(asGM.map((p) => p.id).sort()).toEqual([shown.id, hidden.id].sort());
+  });
+
+  it('GM updates a player', async () => {
+    const p = await createPlayer({ name: 'Chaz', level: 1 });
+    const res = await api.gm({
+      method: 'PATCH',
+      url: `/api/players/${p.id}`,
+      payload: { level: 7 },
+    });
+    expect(res.statusCode).toBe(204);
+    const items = (await api.gm({ method: 'GET', url: '/api/players' })).json() as PlayerDto[];
+    expect(items.find((x) => x.id === p.id)?.level).toBe(7);
+  });
+
+  it('GM deletes a player', async () => {
+    const p = await createPlayer({ name: 'Temp' });
+    const res = await api.gm({ method: 'DELETE', url: `/api/players/${p.id}` });
+    expect([200, 204]).toContain(res.statusCode);
+    expect((await api.gm({ method: 'GET', url: '/api/players' })).json()).toEqual([]);
+  });
+
+  it('rejects a non-numeric id', async () => {
+    const res = await api.gm({ method: 'DELETE', url: '/api/players/not-a-number' });
+    expect(res.statusCode).toBe(400);
   });
 });

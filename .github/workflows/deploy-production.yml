@@ -14,7 +14,9 @@ on:
       - 'package.json'
       - 'scripts/**'
       - 'src/**'
+      - 'tests/**'
       - 'tsconfig.json'
+      - 'vitest.config.ts'
   workflow_dispatch:
 
 concurrency:
@@ -47,6 +49,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm run test:run
 
   deploy:
     name: Build image and deploy API
