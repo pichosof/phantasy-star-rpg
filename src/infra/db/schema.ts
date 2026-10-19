@@ -476,3 +476,14 @@ export const monsterStatBlocks = sqliteTable('monster_stat_blocks', {
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
 });
+
+/** GM's loose notes for a session, turned into the session summary (GM only). */
+export const sessionDiaries = sqliteTable('session_diaries', {
+  sessionId: integer('session_id')
+    .primaryKey()
+    .references(() => sessions.id, { onDelete: 'cascade' }),
+  notes: text('notes').notNull().default(''),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});

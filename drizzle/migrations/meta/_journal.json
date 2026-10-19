@@ -120,6 +120,13 @@
       "when": 1792385701518,
       "tag": "0016_monster_stat_blocks",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1792391598443,
+      "tag": "0017_session_diaries",
+      "breakpoints": true
     }
   ]
 }

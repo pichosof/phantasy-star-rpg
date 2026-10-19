@@ -35,6 +35,7 @@ import { CreateGmNote } from '../core/use-cases/gm-notes/create-gm-note';
 import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
 import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
 import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
+import { GetEntityLinks, GetLinkIndex } from '../core/use-cases/links/links';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
 import { DeleteLore } from '../core/use-cases/lore/delete-lore';
 import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
@@ -67,6 +68,11 @@ import { CreateSession } from '../core/use-cases/session/create-session';
 import { DeleteSession } from '../core/use-cases/session/delete-session';
 import { ListSessions } from '../core/use-cases/session/list-sessions';
 import { UpdateSession } from '../core/use-cases/session/update-session';
+import {
+  GetSessionDiary,
+  SaveSessionDiary,
+  SummarizeSessionDiary,
+} from '../core/use-cases/session-diary/session-diary';
 import { CreateTimelineEvent } from '../core/use-cases/timeline/create-timeline-event';
 import { DeleteTimelineEvent } from '../core/use-cases/timeline/delete-timeline-event';
 import { ListTimelineEvents } from '../core/use-cases/timeline/list-timeline-events';
@@ -79,6 +85,7 @@ import { CreateWorld } from '../core/use-cases/world/create-world';
 import { ListWorlds } from '../core/use-cases/world/list-worlds';
 import { UpdateWorld } from '../core/use-cases/world/update-world';
 import { UpdateWorldImage } from '../core/use-cases/world/update-world-image';
+import { AnthropicDiarySummarizer } from '../infra/ai/anthropic-diary-summarizer';
 import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
 import { CityDrizzleRepository } from '../infra/repositories/city.drizzle.repository';
 import { DungeonDrizzleRepository } from '../infra/repositories/dungeon.drizzle.repository';
@@ -86,6 +93,7 @@ import { EncounterDrizzleRepository } from '../infra/repositories/encounter.driz
 import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
 import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
 import { LibraryDocumentRepository } from '../infra/repositories/library-document.drizzle.repository';
+import { LinkableDrizzleRepository } from '../infra/repositories/linkable.drizzle.repository';
 import { LinksDrizzleRepository } from '../infra/repositories/links.drizzle.repository';
 import { LoreDrizzleRepository } from '../infra/repositories/lore.drizzle.repository';
 import { MapMarkerDrizzleRepository } from '../infra/repositories/map-marker.drizzle.repository';
@@ -93,6 +101,7 @@ import { MonsterDrizzleRepository } from '../infra/repositories/monster.drizzle.
 import { NpcDrizzleRepository } from '../infra/repositories/npc.drizzle.repository';
 import { PlayerDrizzleRepository } from '../infra/repositories/player.drizzle.repository';
 import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repository';
+import { SessionDiaryDrizzleRepository } from '../infra/repositories/session-diary.drizzle.repository';
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
 import { StatBlockDrizzleRepository } from '../infra/repositories/stat-block.drizzle.repository';
 import { TagsDrizzleRepository } from '../infra/repositories/tags.drizzle.repository';
@@ -203,6 +212,13 @@ export type Registry = {
   saveEncounter: SaveEncounter;
   deleteEncounter: DeleteEncounter;
   gmNoteRepo: GmNoteDrizzleRepository;
+  linkableRepo: LinkableDrizzleRepository;
+  getLinkIndex: GetLinkIndex;
+  getEntityLinks: GetEntityLinks;
+  sessionDiaryRepo: SessionDiaryDrizzleRepository;
+  getSessionDiary: GetSessionDiary;
+  saveSessionDiary: SaveSessionDiary;
+  summarizeSessionDiary: SummarizeSessionDiary;
   statBlockRepo: StatBlockDrizzleRepository;
   listStatBlocks: ListStatBlocks;
   setStatBlocks: SetStatBlocks;
@@ -358,6 +374,21 @@ class Container {
     saveEncounter: (c) => new SaveEncounter(c.resolve('encounterRepo')),
     deleteEncounter: (c) => new DeleteEncounter(c.resolve('encounterRepo')),
     gmNoteRepo: () => new GmNoteDrizzleRepository(),
+    linkableRepo: () => new LinkableDrizzleRepository(),
+    getLinkIndex: (c) => new GetLinkIndex(c.resolve('linkableRepo')),
+    getEntityLinks: (c) => new GetEntityLinks(c.resolve('linkableRepo')),
+    sessionDiaryRepo: () => new SessionDiaryDrizzleRepository(),
+    getSessionDiary: (c) => new GetSessionDiary(c.resolve('sessionDiaryRepo')),
+    saveSessionDiary: (c) => new SaveSessionDiary(c.resolve('sessionDiaryRepo')),
+    summarizeSessionDiary: (c) =>
+      new SummarizeSessionDiary(
+        c.resolve('sessionDiaryRepo'),
+        new AnthropicDiarySummarizer(),
+        async () =>
+          (await c.resolve('linkableRepo').listAll(true))
+            .filter((e) => e.type !== 'gmNote' && e.type !== 'session')
+            .map((e) => e.name),
+      ),
     statBlockRepo: () => new StatBlockDrizzleRepository(),
     listStatBlocks: (c) => new ListStatBlocks(c.resolve('statBlockRepo')),
     setStatBlocks: (c) => new SetStatBlocks(c.resolve('statBlockRepo')),

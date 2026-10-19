@@ -72,7 +72,7 @@ Follow-ups (not approved yet):
 
 ## 2. Living wiki
 
-### [ ] 2.1 Entity links in Markdown: `[[Piata]]`, `[[Rook]]`
+### [x] 2.1 Entity links in Markdown: `[[Piata]]`, `[[Rook]]`
 
 - Extend front `RichText` (`src/components/common/RichText/`) with a remark plugin that resolves `[[Name]]` and `[[Name|label]]` against an entity index (cities, NPCs, players, dungeons, quests, lore, wiki, monsters, sessions).
 - The index:
@@ -85,19 +85,21 @@ Follow-ups (not approved yet):
   - The EntityDrawer gets an "Appears in" section listing the sources, visibility-filtered.
 - Add an editor helper: autocomplete after typing `[[`.
 
-### [ ] 2.2 Automatic session diary
+### [x] 2.2 Automatic session diary
 
 - In a session, the GM types loose bullet points; one action turns them into a Markdown summary, with links to the NPCs, cities and quests mentioned (uses 2.1).
 - Step 1, no AI: detect entity names from the 2.1 index and wrap them in `[[ ]]`, and format the notes into sections.
 - Step 2, optional: an AI summary. It needs an API key in env (`src/infra/config/env.ts`) and an adapter under `infra/`. **Ask the owner about cost before adding it.**
 - The GM always reviews and edits the result before saving.
 
-### [ ] 2.3 Timeline linked to sessions and quests
+### [x] 2.3 Timeline linked to sessions and quests
 
 - Link `timeline_events` to sessions, quests, cities and NPCs: either M:N tables or the 2.1 `entity_links`.
 - On a city, NPC or quest drawer, add a "History" tab listing related events and sessions in chronological order, to answer "what already happened in Piata?".
 
 ---
+
+**Done (2026-10-19):** `[[Name]]` / `[[Name|label]]` / `[[npc:Name]]` links render in every RichText and open a preview drawer (EntityPeekHost); a global `[[` autocomplete works in any textarea (GM). "Appears in" and "History" are computed on demand (`GET /api/links/:type/:id`, explicit links + plain-name mentions, visibility-filtered) and shown as drawer tabs via `EntityDrawer linkRef`. Session diary: GM tab "Diary" in sessions with autosaved notes, free "Format & link", and "Summarize with AI" (Anthropic, `ANTHROPIC_API_KEY`, rate-limited) — the GM reviews before it replaces the summary. AI is used only there.
 
 ## 3. Players
 

@@ -161,27 +161,29 @@ Pre-commit hook runs `lint-staged` (ESLint + Prettier on touched files).
 
 Read at boot from `.env` via `src/infra/config/env.ts`. Treated as required unless a default is provided:
 
-| Variable                          | Default          | Purpose                                                            |
-| --------------------------------- | ---------------- | ------------------------------------------------------------------ |
-| `PORT`                            | `3010`           | HTTP port.                                                         |
-| `NODE_ENV`                        | `development`    | `development` / `production` / `test`. Drives logging + behaviour. |
-| `DATABASE_URL`                    | `./data/app.db`  | Path to the SQLite file.                                           |
-| `CORS_ORIGIN`                     | `*`              | Origin allow-list.                                                 |
-| `FILE_STORAGE_DRIVER`             | `local`          | `local` or `azure-blob`.                                           |
-| `UPLOADS_LOCAL_DIR`               | `./data/uploads` | Path used when driver is `local`.                                  |
-| `AZURE_STORAGE_CONNECTION_STRING` | empty            | Required when driver is `azure-blob`.                              |
-| `AZURE_STORAGE_CONTAINER`         | `uploads`        | Blob container name.                                               |
-| `AZURE_STORAGE_ACCESS_TIER`       | `Cool`           | `Hot` / `Cool` / `Archive`.                                        |
-| `MAX_UPLOAD_MB`                   | `30`             | Multipart cap; mirrored as `VITE_UPLOAD_MAX_MB` on the frontend.   |
-| `GM_API_KEY`                      | —                | Long random string. Source of the GM unlock secret.                |
-| `CLIENT_SECRET`                   | —                | Shared with the frontend (`VITE_CLIENT_SECRET`).                   |
-| `JWT_SECRET`                      | —                | Signs the GM JWTs.                                                 |
-| `JWT_EXPIRES_IN`                  | `8h`             | JWT TTL.                                                           |
-| `BACKUP_ENABLED`                  | prod only        | Periodic SQLite backups (boot, every interval, and on SIGTERM).    |
-| `BACKUP_INTERVAL_HOURS`           | `6`              | Interval between backups while the process is up.                  |
-| `BACKUP_RETENTION`                | `30`             | Number of backups kept; older ones are pruned.                     |
-| `AZURE_BACKUP_CONTAINER`          | `db-backups`     | **Private** Blob container (never served by `/files/*`).           |
-| `BACKUP_LOCAL_DIR`                | `./data/backups` | Backup target when the storage driver is `local`.                  |
+| Variable                          | Default            | Purpose                                                            |
+| --------------------------------- | ------------------ | ------------------------------------------------------------------ |
+| `PORT`                            | `3010`             | HTTP port.                                                         |
+| `NODE_ENV`                        | `development`      | `development` / `production` / `test`. Drives logging + behaviour. |
+| `DATABASE_URL`                    | `./data/app.db`    | Path to the SQLite file.                                           |
+| `CORS_ORIGIN`                     | `*`                | Origin allow-list.                                                 |
+| `FILE_STORAGE_DRIVER`             | `local`            | `local` or `azure-blob`.                                           |
+| `UPLOADS_LOCAL_DIR`               | `./data/uploads`   | Path used when driver is `local`.                                  |
+| `AZURE_STORAGE_CONNECTION_STRING` | empty              | Required when driver is `azure-blob`.                              |
+| `AZURE_STORAGE_CONTAINER`         | `uploads`          | Blob container name.                                               |
+| `AZURE_STORAGE_ACCESS_TIER`       | `Cool`             | `Hot` / `Cool` / `Archive`.                                        |
+| `MAX_UPLOAD_MB`                   | `30`               | Multipart cap; mirrored as `VITE_UPLOAD_MAX_MB` on the frontend.   |
+| `GM_API_KEY`                      | —                  | Long random string. Source of the GM unlock secret.                |
+| `CLIENT_SECRET`                   | —                  | Shared with the frontend (`VITE_CLIENT_SECRET`).                   |
+| `JWT_SECRET`                      | —                  | Signs the GM JWTs.                                                 |
+| `JWT_EXPIRES_IN`                  | `8h`               | JWT TTL.                                                           |
+| `BACKUP_ENABLED`                  | prod only          | Periodic SQLite backups (boot, every interval, and on SIGTERM).    |
+| `BACKUP_INTERVAL_HOURS`           | `6`                | Interval between backups while the process is up.                  |
+| `BACKUP_RETENTION`                | `30`               | Number of backups kept; older ones are pruned.                     |
+| `AZURE_BACKUP_CONTAINER`          | `db-backups`       | **Private** Blob container (never served by `/files/*`).           |
+| `BACKUP_LOCAL_DIR`                | `./data/backups`   | Backup target when the storage driver is `local`.                  |
+| `ANTHROPIC_API_KEY`               | empty              | Enables the AI session-diary summary (GM). Empty = feature off.    |
+| `ANTHROPIC_MODEL`                 | `claude-haiku-5-5` | Model used for the session-diary summary.                          |
 
 `CORS_ORIGIN` is a comma-separated allow-list (e.g. `https://rpg.picho.org`); it also drives the Origin/Referer check in `client-auth` for state-changing requests in production.
 

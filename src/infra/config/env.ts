@@ -33,4 +33,8 @@ export const env = {
   BACKUP_RETENTION: Number(required('BACKUP_RETENTION', '30')),
   AZURE_BACKUP_CONTAINER: required('AZURE_BACKUP_CONTAINER', 'db-backups'),
   BACKUP_LOCAL_DIR: required('BACKUP_LOCAL_DIR', './data/backups'),
+
+  // ── AI session diary (optional: without a key the feature is simply off) ──
+  ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? '',
+  ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL ?? 'claude-haiku-5-5',
 };

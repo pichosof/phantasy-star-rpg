@@ -38,6 +38,11 @@ export function ensureRuntimeTables() {
     blocks TEXT NOT NULL DEFAULT '[]',
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   );
+  CREATE TABLE IF NOT EXISTS session_diaries (
+    session_id INTEGER PRIMARY KEY NOT NULL REFERENCES sessions(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+    notes TEXT NOT NULL DEFAULT '',
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `);
 }
 
