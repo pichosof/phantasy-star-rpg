@@ -17,6 +17,11 @@ export async function linksRoutes(app: FastifyInstance) {
     container.resolve('getLinkIndex').execute(Boolean(req.isGM)),
   );
 
+  // Global search (Ctrl+K): names first, then text; visibility-filtered.
+  app.get('/api/search', { schema: { tags: ['Links'] } }, async (req: Req) =>
+    container.resolve('searchEntities').execute(req.query, Boolean(req.isGM)),
+  );
+
   // Preview of one entity + "Appears in" + history (timeline, sessions).
   app.get(
     '/api/links/:type/:id',

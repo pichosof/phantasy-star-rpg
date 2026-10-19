@@ -53,7 +53,7 @@ const TYPE_PRIORITY: EntityType[] = [
 ];
 
 /** Entities the caller may see: players never get hidden ones, nor text they may not read. */
-function visibleTo(all: LinkableEntity[], gm: boolean): LinkableEntity[] {
+export function visibleTo(all: LinkableEntity[], gm: boolean): LinkableEntity[] {
   if (gm) return all;
   return all
     .filter((e) => e.visible)

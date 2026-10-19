@@ -36,6 +36,7 @@ import { DeleteGmNote } from '../core/use-cases/gm-notes/delete-gm-note';
 import { ListGmNotes } from '../core/use-cases/gm-notes/list-gm-notes';
 import { UpdateGmNote } from '../core/use-cases/gm-notes/update-gm-note';
 import { GetEntityLinks, GetLinkIndex } from '../core/use-cases/links/links';
+import { SearchEntities } from '../core/use-cases/links/search';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
 import { DeleteLore } from '../core/use-cases/lore/delete-lore';
 import { LinkLoreToCity } from '../core/use-cases/lore/link-lore-to-city';
@@ -225,6 +226,7 @@ export type Registry = {
   setSessionRewards: SetSessionRewards;
   getLinkIndex: GetLinkIndex;
   getEntityLinks: GetEntityLinks;
+  searchEntities: SearchEntities;
   sessionDiaryRepo: SessionDiaryDrizzleRepository;
   getSessionDiary: GetSessionDiary;
   saveSessionDiary: SaveSessionDiary;
@@ -391,6 +393,7 @@ class Container {
     setSessionRewards: (c) => new SetSessionRewards(c.resolve('progressRepo')),
     getLinkIndex: (c) => new GetLinkIndex(c.resolve('linkableRepo')),
     getEntityLinks: (c) => new GetEntityLinks(c.resolve('linkableRepo')),
+    searchEntities: (c) => new SearchEntities(c.resolve('linkableRepo')),
     sessionDiaryRepo: () => new SessionDiaryDrizzleRepository(),
     getSessionDiary: (c) => new GetSessionDiary(c.resolve('sessionDiaryRepo')),
     saveSessionDiary: (c) => new SaveSessionDiary(c.resolve('sessionDiaryRepo')),

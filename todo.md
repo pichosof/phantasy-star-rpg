@@ -115,11 +115,13 @@ Follow-ups (not approved yet):
 
 ## 4. Navigation and prep
 
-### [ ] 4.1 Global search (Ctrl+K / Cmd+K)
+### [x] 4.1 Global search (Ctrl+K / Cmd+K)
 
 - Backend: `GET /api/search?q=` across NPCs, cities, dungeons, monsters, players, quests, sessions, lore, wiki, timeline, plus GM notes for the GM only. Visibility-filtered.
 - SQLite FTS5 is a good fit; a `LIKE` search is enough for the current data size.
 - Front: a command palette modal available everywhere, with keyboard navigation and results grouped by type. On mobile, open it from a header search icon.
+
+**Done (2026-10-19):** `GET /api/search?q=` reuses the link repository (same visibility rules; GM notes for the GM only). Names/subtitles match word beginnings, body text whole words; names rank first. Front: Ctrl/Cmd+K palette (SearchPaletteHost) plus a search button in the desktop and mobile headers; results open in the entity preview drawer.
 
 ### [ ] 4.2 Quick generators (GM only)
 

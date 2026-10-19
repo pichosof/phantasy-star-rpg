@@ -195,3 +195,46 @@ describe('session diary', () => {
     expect(res.statusCode).toBe(502);
   });
 });
+
+describe('global search', () => {
+  const search = (q: string, gm = false) =>
+    (gm ? api.gm : api.player)({ method: 'GET', url: `/api/search?q=${encodeURIComponent(q)}` });
+
+  it('finds by name (accent/case-insensitive) and ranks names above text', async () => {
+    await seed();
+    const res = await search('oren tal');
+    expect(res.statusCode).toBe(200);
+    const hits = res.json() as { type: string; name: string }[];
+    expect(hits[0]).toMatchObject({ type: 'npc', name: 'Oren Tal' });
+    expect(hits.map((h) => h.name)).toContain('Session 1'); // mentioned in the summary
+  });
+
+  it('players never find hidden entities; the GM does', async () => {
+    await seed();
+    expect((await search('Cael')).json().map((h: { name: string }) => h.name)).not.toContain(
+      'Cael Varen',
+    );
+    expect((await search('Cael', true)).json().map((h: { name: string }) => h.name)).toContain(
+      'Cael Varen',
+    );
+  });
+
+  it('matches word beginnings, not the middle of words', async () => {
+    await seed();
+    expect((await search('ore')).json().map((h: { name: string }) => h.name)).toContain('Oren Tal');
+    expect((await search('ren')).json().map((h: { name: string }) => h.name)).not.toContain(
+      'Oren Tal',
+    );
+    // body text needs whole words: "Pia" is not enough to hit the session that mentions "Piata"
+    expect((await search('pia')).json().map((h: { name: string }) => h.name)).not.toContain(
+      'Session 1',
+    );
+    expect((await search('piata')).json().map((h: { name: string }) => h.name)).toContain(
+      'Session 1',
+    );
+  });
+
+  it('rejects too-short queries', async () => {
+    expect((await search('a')).statusCode).toBe(400);
+  });
+});
