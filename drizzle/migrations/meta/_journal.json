@@ -127,6 +127,13 @@
       "when": 1792391598443,
       "tag": "0017_session_diaries",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1792393854573,
+      "tag": "0018_player_progress",
+      "breakpoints": true
     }
   ]
 }

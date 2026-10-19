@@ -487,3 +487,18 @@ export const sessionDiaries = sqliteTable('session_diaries', {
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
 });
+
+/** XP and credits awarded to a player, usually per session (visible to players; GM edits). */
+export const playerProgress = sqliteTable('player_progress', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  playerId: integer('player_id')
+    .notNull()
+    .references(() => players.id, { onDelete: 'cascade' }),
+  sessionId: integer('session_id').references(() => sessions.id, { onDelete: 'set null' }),
+  xp: integer('xp').notNull().default(0),
+  credits: integer('credits').notNull().default(0),
+  note: text('note'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});

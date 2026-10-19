@@ -103,13 +103,15 @@ Follow-ups (not approved yet):
 
 ## 3. Players
 
-### [ ] 3.1 Player progression: XP and credits per session
+### [x] 3.1 Player progression: XP and credits per session
 
 - New `player_progress` table: `player_id`, `session_id`, `xp`, `credits`, `note`, timestamps.
 - When closing a session, the GM gives XP and credits to each player in one form.
 - The player drawer gets a "Progress" tab with the history and totals. Optionally update the Starfinder sheet's `xpEarned` / `credits`.
 
 ---
+
+**Done (2026-10-19):** `player_progress` table; `GET /api/players/:id/progress` (players see visible players, hidden session titles blanked), `GET|PUT /api/gm/sessions/:id/rewards` (idempotent per session). Front: session GM tab "Rewards" (bulk XP/credits, optional delta write to the Starfinder sheet with the same name) and player tab "Progress" (totals + history, visible to everyone).
 
 ## 4. Navigation and prep
 

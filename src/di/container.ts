@@ -58,6 +58,11 @@ import { SetPlayerQuestStatus } from '../core/use-cases/player/set-player-quest-
 import { UpdatePlayer } from '../core/use-cases/player/update-player';
 import { UpdatePlayerImage } from '../core/use-cases/player/update-player-image';
 import { UpdatePlayerSheet } from '../core/use-cases/player/update-player-sheet';
+import {
+  GetPlayerProgress,
+  GetSessionRewards,
+  SetSessionRewards,
+} from '../core/use-cases/progress/player-progress';
 import { CompleteQuest } from '../core/use-cases/quest/complete-quest';
 import { CreateQuest } from '../core/use-cases/quest/create-quest';
 import { LinkQuestToCity } from '../core/use-cases/quest/link-quest-to-city';
@@ -100,6 +105,7 @@ import { MapMarkerDrizzleRepository } from '../infra/repositories/map-marker.dri
 import { MonsterDrizzleRepository } from '../infra/repositories/monster.drizzle.repository';
 import { NpcDrizzleRepository } from '../infra/repositories/npc.drizzle.repository';
 import { PlayerDrizzleRepository } from '../infra/repositories/player.drizzle.repository';
+import { ProgressDrizzleRepository } from '../infra/repositories/progress.drizzle.repository';
 import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repository';
 import { SessionDiaryDrizzleRepository } from '../infra/repositories/session-diary.drizzle.repository';
 import { SessionDrizzleRepository } from '../infra/repositories/session.drizzle.repository';
@@ -213,6 +219,10 @@ export type Registry = {
   deleteEncounter: DeleteEncounter;
   gmNoteRepo: GmNoteDrizzleRepository;
   linkableRepo: LinkableDrizzleRepository;
+  progressRepo: ProgressDrizzleRepository;
+  getPlayerProgress: GetPlayerProgress;
+  getSessionRewards: GetSessionRewards;
+  setSessionRewards: SetSessionRewards;
   getLinkIndex: GetLinkIndex;
   getEntityLinks: GetEntityLinks;
   sessionDiaryRepo: SessionDiaryDrizzleRepository;
@@ -375,6 +385,10 @@ class Container {
     deleteEncounter: (c) => new DeleteEncounter(c.resolve('encounterRepo')),
     gmNoteRepo: () => new GmNoteDrizzleRepository(),
     linkableRepo: () => new LinkableDrizzleRepository(),
+    progressRepo: () => new ProgressDrizzleRepository(),
+    getPlayerProgress: (c) => new GetPlayerProgress(c.resolve('progressRepo')),
+    getSessionRewards: (c) => new GetSessionRewards(c.resolve('progressRepo')),
+    setSessionRewards: (c) => new SetSessionRewards(c.resolve('progressRepo')),
     getLinkIndex: (c) => new GetLinkIndex(c.resolve('linkableRepo')),
     getEntityLinks: (c) => new GetEntityLinks(c.resolve('linkableRepo')),
     sessionDiaryRepo: () => new SessionDiaryDrizzleRepository(),

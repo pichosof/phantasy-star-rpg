@@ -43,6 +43,15 @@ export function ensureRuntimeTables() {
     notes TEXT NOT NULL DEFAULT '',
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   );
+  CREATE TABLE IF NOT EXISTS player_progress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    player_id INTEGER NOT NULL REFERENCES players(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+    session_id INTEGER REFERENCES sessions(id) ON UPDATE NO ACTION ON DELETE SET NULL,
+    xp INTEGER NOT NULL DEFAULT 0,
+    credits INTEGER NOT NULL DEFAULT 0,
+    note TEXT,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `);
 }
 
