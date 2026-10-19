@@ -24,7 +24,8 @@
     "test": "cross-env NODE_ENV=test DATABASE_URL=./data/test.db vitest",
     "test:run": "cross-env NODE_ENV=test DATABASE_URL=./data/test.db vitest run",
     "test:cov": "cross-env NODE_ENV=test DATABASE_URL=./data/test.db vitest run --coverage",
-    "check": "npm run lint && npm run build && npm run test:run"
+    "check": "npm run lint && npm run build && npm run test:run",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.31.0",
