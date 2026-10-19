@@ -447,3 +447,21 @@ export const imageFocus = sqliteTable('image_focus', {
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
 });
+
+/** Combat tracker: one row per encounter; the live state is a JSON blob saved by the GM client. */
+export const encounterStatuses = ['active', 'ended'] as const;
+export const encounters = sqliteTable('encounters', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+  sessionId: integer('session_id').references(() => sessions.id, { onDelete: 'set null' }),
+  status: text('status', { enum: encounterStatuses }).notNull().default('active'),
+  state: text('state').notNull().default('{}'), // JSON EncounterState
+  /** Optimistic concurrency: every save must send the version it started from. */
+  version: integer('version').notNull().default(1),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});

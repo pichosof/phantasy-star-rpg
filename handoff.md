@@ -68,6 +68,7 @@ Use a copy of the DB, never the production file.
 
 ## State at handoff
 
-- Both repos are clean and in sync with `origin/main`.
-- The local servers are stopped.
-- Next step: start [todo.md](todo.md) with item 0.1 (tests/CI), then 1.1 (combat tracker), unless the owner says otherwise.
+- Foundations (todo 0.x) and the combat tracker (1.1) are done.
+- The error handler is now global (fastify-plugin, registered before the routes). Before that it never ran, so every Zod error became a 500. Responses keep Fastify's `{ statusCode, error, message }` shape.
+- Release with `npm run release` (both repos) after committing; `-- --dry-run` checks only.
+- Next step: [todo.md](todo.md) section 2 (living wiki), unless the owner says otherwise.

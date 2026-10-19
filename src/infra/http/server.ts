@@ -19,6 +19,7 @@ import { cityWorldRoutes } from './routes/city-world.routes';
 import { cityRoutes } from './routes/city.routes';
 import { databaseRoutes } from './routes/database.routes';
 import { dungeonRoutes } from './routes/dungeon.routes';
+import { encountersRoutes } from './routes/encounters.routes';
 import { gmImagesRoutes } from './routes/gm-images.routes';
 import { gmNotesRoutes } from './routes/gm-notes.routes';
 import { imageFocusRoutes } from './routes/image-focus.routes';
@@ -202,6 +203,9 @@ export async function buildServer() {
   // ── Health check (no rate limit applied — exempt via low cost) ───────────────
   app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
 
+  // ── Error → JSON mapper: must be registered before any route to apply to it ──
+  await app.register(errorHandlerPlugin);
+
   // ── Client auth (x-client-id) ────────────────────────────────────────────────
   await app.register(clientAuthPlugin);
 
@@ -233,6 +237,7 @@ export async function buildServer() {
   await app.register(questCityRoutes);
   await app.register(loreCityRoutes);
   await app.register(gmNotesRoutes);
+  await app.register(encountersRoutes);
   await app.register(gmImagesRoutes);
   await app.register(characterSheetsRoutes);
   await app.register(libraryRoutes);
@@ -240,8 +245,6 @@ export async function buildServer() {
   await app.register(tagsRoutes);
   await app.register(imageFocusRoutes);
   await app.register(databaseRoutes);
-
-  await app.register(errorHandlerPlugin);
 
   return app;
 }

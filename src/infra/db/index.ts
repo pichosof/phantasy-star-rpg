@@ -22,7 +22,17 @@ export function ensureRuntimeTables() {
     x REAL NOT NULL,
     y REAL NOT NULL,
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
-  )
+  );
+  CREATE TABLE IF NOT EXISTS encounters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    session_id INTEGER REFERENCES sessions(id) ON UPDATE NO ACTION ON DELETE SET NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    state TEXT NOT NULL DEFAULT '{}',
+    version INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `);
 }
 ensureRuntimeTables();

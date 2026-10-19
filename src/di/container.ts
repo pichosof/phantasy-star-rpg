@@ -20,6 +20,13 @@ import { SetCityDiscovered } from '../core/use-cases/cities/set-city-discovered'
 import { UpdateCity } from '../core/use-cases/cities/update-city';
 import { UpdateCityImage } from '../core/use-cases/cities/update-city-image';
 import { SetVisibility } from '../core/use-cases/common/set-visibility';
+import {
+  CreateEncounter,
+  DeleteEncounter,
+  GetEncounter,
+  ListEncounters,
+  SaveEncounter,
+} from '../core/use-cases/encounters/encounter-use-cases';
 import { DeleteGmImage } from '../core/use-cases/gm-images/delete-gm-image';
 import { ListGmImages } from '../core/use-cases/gm-images/list-gm-images';
 import { UploadGmImage } from '../core/use-cases/gm-images/upload-gm-image';
@@ -74,6 +81,7 @@ import { UpdateWorldImage } from '../core/use-cases/world/update-world-image';
 import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
 import { CityDrizzleRepository } from '../infra/repositories/city.drizzle.repository';
 import { DungeonDrizzleRepository } from '../infra/repositories/dungeon.drizzle.repository';
+import { EncounterDrizzleRepository } from '../infra/repositories/encounter.drizzle.repository';
 import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
 import { GmNoteDrizzleRepository } from '../infra/repositories/gm-note.drizzle.repository';
 import { LibraryDocumentRepository } from '../infra/repositories/library-document.drizzle.repository';
@@ -186,6 +194,12 @@ export type Registry = {
   setWorldVisibility: SetVisibility;
 
   // GM Notes
+  encounterRepo: EncounterDrizzleRepository;
+  createEncounter: CreateEncounter;
+  listEncounters: ListEncounters;
+  getEncounter: GetEncounter;
+  saveEncounter: SaveEncounter;
+  deleteEncounter: DeleteEncounter;
   gmNoteRepo: GmNoteDrizzleRepository;
   createGmNote: CreateGmNote;
   listGmNotes: ListGmNotes;
@@ -332,6 +346,12 @@ class Container {
       new SetVisibility(c.resolve('worldRepo' /* CORRIGE: 'worldRepo' se tiver */)),
 
     // GM Notes
+    encounterRepo: () => new EncounterDrizzleRepository(),
+    createEncounter: (c) => new CreateEncounter(c.resolve('encounterRepo')),
+    listEncounters: (c) => new ListEncounters(c.resolve('encounterRepo')),
+    getEncounter: (c) => new GetEncounter(c.resolve('encounterRepo')),
+    saveEncounter: (c) => new SaveEncounter(c.resolve('encounterRepo')),
+    deleteEncounter: (c) => new DeleteEncounter(c.resolve('encounterRepo')),
     gmNoteRepo: () => new GmNoteDrizzleRepository(),
     createGmNote: (c) => new CreateGmNote(c.resolve('gmNoteRepo')),
     listGmNotes: (c) => new ListGmNotes(c.resolve('gmNoteRepo')),

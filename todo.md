@@ -42,7 +42,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## 1. Combat tracker (top priority feature)
 
-### [ ] 1.1 Combat tracker
+### [x] 1.1 Combat tracker
 
 - **Goal:** run combats at the table: initiative order, rounds/turns, HP/SP/RP, conditions.
 - **Participants:**
@@ -62,6 +62,13 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done
 - **UI:** a desktop/tablet-first layout with a usable phone layout; reuse `EntityCard` / `MobileCard`.
 
 ---
+
+**Done (2026-10-19):** GM → Combat (`/gm/combat`). Back: `encounters` table + `/api/gm/encounters` (optimistic `version`, 409 on stale saves). Front: `src/pages/gm/combat/` (engine, `useEncounterSync` autosave + localStorage recovery + conflict choice). E2E-tested in Chrome (reload, offline + closed tab, two devices, phone layout).
+
+Follow-ups (not approved yet):
+
+- [ ] Combat stats on bestiary entries (today the tracker remembers the last stats used per creature).
+- [ ] Read-only player view of the initiative order.
 
 ## 2. Living wiki
 
