@@ -11,7 +11,12 @@ const DIR = path.dirname(new URL(import.meta.url).pathname).replace(/^\/([A-Z]:)
 const SECRET = fs.readFileSync(secretFile, 'utf8').trim();
 const data = JSON.parse(fs.readFileSync(path.join(DIR, 'stat-blocks.json'), 'utf8'));
 
-const base = { 'content-type': 'application/json', 'x-client-id': SECRET };
+// Production also checks Origin on API calls; override with ORIGIN=... if needed.
+const base = {
+  'content-type': 'application/json',
+  'x-client-id': SECRET,
+  origin: process.env.ORIGIN ?? 'https://rpg.picho.org',
+};
 const login = await fetch(`${API}/api/auth/login`, {
   method: 'POST',
   headers: base,

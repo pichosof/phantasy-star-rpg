@@ -40,7 +40,26 @@ export function ensureRuntimeTables() {
   );
 `);
 }
-ensureRuntimeTables();
+
+/**
+ * On boot the DB file (Azure Files in production) may still be locked by the previous
+ * revision during a rollout. Creating tables needs a write lock, so a failure here must not
+ * kill the process (the new revision would never become healthy and the old one would never
+ * release the file). Retry in the background until it works.
+ */
+function ensureRuntimeTablesWithRetry(attempt = 1) {
+  try {
+    ensureRuntimeTables();
+    if (attempt > 1) console.info(`[db] runtime tables ready (attempt ${attempt})`);
+  } catch (e) {
+    const delay = Math.min(60_000, 2_000 * attempt);
+    console.warn(
+      `[db] runtime tables not created yet (${(e as Error).message}); retrying in ${delay / 1000}s`,
+    );
+    setTimeout(() => ensureRuntimeTablesWithRetry(attempt + 1), delay).unref();
+  }
+}
+ensureRuntimeTablesWithRetry();
 
 export const db = drizzle(sqlite, { schema });
 /** Raw better-sqlite3 handle — only for ops tasks like online backups. */
