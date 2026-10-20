@@ -10,13 +10,7 @@ properties:
       allowInsecure: false
       targetPort: 3010
       transport: auto
-    registries:
-      - server: '__REGISTRY_SERVER__'
-        username: '__REGISTRY_USERNAME__'
-        passwordSecretRef: acr-password
     secrets:
-      - name: acr-password
-        value: '__REGISTRY_PASSWORD__'
       - name: azure-storage-connection-string
         value: '__AZURE_STORAGE_CONNECTION_STRING__'
       - name: gm-api-key

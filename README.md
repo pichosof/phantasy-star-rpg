@@ -342,7 +342,8 @@ For Azure Container Apps:
 [`deploy-production.yml`](.github/workflows/deploy-production.yml) deploys every push to `main` to Azure Container Apps:
 
 - Azure login uses GitHub OIDC with an Azure identity federated to this repository's `main` branch.
-- The workflow builds and pushes an image tagged with `${GITHUB_SHA}` to Azure Container Registry.
+- The workflow builds and pushes an image tagged with `${GITHUB_SHA}` to GitHub Container Registry (`ghcr.io/<owner>/<repo>`) using the built-in `GITHUB_TOKEN`.
+- The GHCR package must be **public**: Container Apps pulls the image without registry credentials. The workflow checks this before deploying and fails without touching the running revision if the package is private.
 - The workflow updates the configured Azure Container App.
 - Secrets remain in Azure Container Apps and are referenced as `secretref:*`; secret values are never stored in the repository.
 
@@ -354,9 +355,6 @@ Required GitHub Actions secrets:
 | `AZURE_TENANT_ID`                      | Azure tenant ID.                                          |
 | `AZURE_SUBSCRIPTION_ID`                | Azure subscription ID.                                    |
 | `AZURE_RESOURCE_GROUP`                 | Resource group that owns the API resources.               |
-| `ACR_NAME`                             | Azure Container Registry name.                            |
-| `ACR_LOGIN_SERVER`                     | Azure Container Registry login server.                    |
-| `ACR_IMAGE_NAME`                       | Container image repository name.                          |
 | `AZURE_CONTAINER_APP_NAME`             | Azure Container Apps API resource name.                   |
 | `API_HEALTH_URL`                       | Production health-check URL.                              |
 | `API_PORT`                             | API container port.                                       |

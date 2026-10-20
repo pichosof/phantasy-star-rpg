@@ -26,6 +26,7 @@ concurrency:
 permissions:
   contents: read
   id-token: write
+  packages: write
 
 jobs:
   validate:
@@ -73,20 +74,37 @@ jobs:
       - name: Ensure Azure Container Apps CLI
         run: az extension add --name containerapp --upgrade --output none
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build and push container image
         id: image
         shell: bash
-        env:
-          ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
-          ACR_NAME: ${{ secrets.ACR_NAME }}
-          IMAGE_NAME: ${{ secrets.ACR_IMAGE_NAME }}
         run: |
-          image="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}"
+          # GHCR image names must be lowercase.
+          image="ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_SHA}"
           echo "image=${image}" >> "${GITHUB_OUTPUT}"
 
-          az acr login --name "${ACR_NAME}" --output none
           docker build --tag "${image}" .
           docker push "${image}"
+
+      - name: Check image is publicly pullable
+        shell: bash
+        run: |
+          # Container Apps pulls without credentials, so the GHCR package must be public.
+          repo="${GITHUB_REPOSITORY,,}"
+          token="$(curl --silent "https://ghcr.io/token?scope=repository:${repo}:pull" | jq -r .token)"
+          if ! curl --fail --silent --output /dev/null \
+            --header "Authorization: Bearer ${token}" \
+            --header "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
+            "https://ghcr.io/v2/${repo}/manifests/${GITHUB_SHA}"; then
+            echo "::error::ghcr.io/${repo} is not public. Set the package visibility to Public, then re-run this job."
+            exit 1
+          fi
 
       - name: Deploy container revision
         shell: bash
