@@ -1,0 +1,64 @@
+name: Cost guard (API min replicas)
+
+# Keeps the API always on (minReplicas=1) while the month-to-date Azure cost of the
+# resource group stays under the budget; above it, falls back to scale-to-zero
+# (cold starts). The month-to-date cost resets on the 1st, which turns it back on.
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: cost-guard
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  # Budget in BRL. Cost data lags up to ~24h, so switch off a little before the limit.
+  BUDGET_BRL: '50'
+  MARGIN_BRL: '3'
+
+jobs:
+  guard:
+    name: Check month-to-date cost
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Ensure Azure Container Apps CLI
+        run: az extension add --name containerapp --upgrade --output none
+
+      - name: Set min replicas from cost
+        shell: bash
+        env:
+          SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+        run: |
+          scope="subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${AZURE_RESOURCE_GROUP}"
+          cost="$(az rest --method post \
+            --url "https://management.azure.com/${scope}/providers/Microsoft.CostManagement/query?api-version=2023-03-01" \
+            --body '{"type":"ActualCost","timeframe":"MonthToDate","dataset":{"granularity":"None","aggregation":{"c":{"name":"Cost","function":"Sum"}}}}' \
+            --query 'properties.rows[0][0]' --output tsv)"
+          cost="${cost:-0}"
+
+          want="$(awk -v c="${cost}" -v b="${BUDGET_BRL}" -v m="${MARGIN_BRL}" 'BEGIN { print (c >= b - m) ? 0 : 1 }')"
+          current="$(az containerapp show --name "${CONTAINER_APP_NAME}" --resource-group "${AZURE_RESOURCE_GROUP}" \
+            --query 'properties.template.scale.minReplicas' --output tsv)"
+          current="${current:-0}"
+
+          echo "Month-to-date: R\$ ${cost} (budget R\$ ${BUDGET_BRL}). minReplicas: ${current} -> ${want}"
+          if [ "${current}" != "${want}" ]; then
+            az containerapp update --name "${CONTAINER_APP_NAME}" --resource-group "${AZURE_RESOURCE_GROUP}" \
+              --min-replicas "${want}" --output none
+            echo "::notice::minReplicas set to ${want} (month-to-date R\$ ${cost})."
+          fi

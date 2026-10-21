@@ -346,6 +346,7 @@ For Azure Container Apps:
 - The GHCR package must be **public**: Container Apps pulls the image without registry credentials. The workflow checks this before deploying and fails without touching the running revision if the package is private.
 - The workflow updates the configured Azure Container App.
 - Secrets remain in Azure Container Apps and are referenced as `secretref:*`; secret values are never stored in the repository.
+- [`cost-guard.yml`](.github/workflows/cost-guard.yml) runs every 6 hours: while the resource group's month-to-date cost stays under the budget (R$ 50, minus a R$ 3 margin for billing lag) the API keeps `minReplicas=1`; above it, it drops to `minReplicas=0` (cold starts). The month-to-date cost resets on the 1st, which switches it back on.
 
 Required GitHub Actions secrets:
 
