@@ -90,6 +90,16 @@ export function discord(): DiscordConfig {
 
 export const siteUrl = (type: EntityType) => `${discord().siteUrl}${PAGE[type]}`;
 
+/** The site's icon (Dezolis mark), as published by the front end. */
+export const brandIcon = () => `${discord().siteUrl}/logo192.png`;
+
+/** Puts the site icon next to every card header (image-only mosaic embeds have no header). */
+export function branded(embeds: APIEmbed[] | undefined): APIEmbed[] | undefined {
+  return embeds?.map((e) =>
+    e.author && !e.author.icon_url ? { ...e, author: { ...e.author, icon_url: brandIcon() } } : e,
+  );
+}
+
 export class UnsupportedImageUrlError extends Error {
   constructor(url: string) {
     super(`Unsupported image URL: ${url}`);

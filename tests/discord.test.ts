@@ -469,3 +469,18 @@ describe('pictures', () => {
     expect(JSON.stringify(reply)).not.toContain('/files/x.png');
   });
 });
+
+describe('branding', () => {
+  it('every card header carries the site icon; mosaic images stay bare', async () => {
+    const { branded } = await import('../src/infra/discord/format');
+    expect(
+      branded([
+        { author: { name: 'City' }, title: 'Piata' },
+        { url: 'x', image: { url: 'y' } },
+      ]),
+    ).toEqual([
+      { author: { name: 'City', icon_url: 'https://site.test/logo192.png' }, title: 'Piata' },
+      { url: 'x', image: { url: 'y' } },
+    ]);
+  });
+});

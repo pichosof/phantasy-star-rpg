@@ -28,6 +28,7 @@ import { container } from '../../di/container.js';
 import { COMMANDS } from './commands.js';
 import {
   type BotReply,
+  branded,
   COLOR,
   discord,
   errorReply,
@@ -97,7 +98,7 @@ const isDiscordError = (err: unknown, ...codes: number[]) =>
 function toDiscord(reply: BotReply): InteractionReplyOptions {
   return {
     content: reply.content,
-    embeds: reply.embeds,
+    embeds: branded(reply.embeds),
     components: reply.components,
     allowedMentions: { parse: [] },
     ...(reply.ephemeral ? { flags: MessageFlags.Ephemeral } : {}),
@@ -446,7 +447,9 @@ export class DiscordBot {
     if ('error' in embeds) return errorReply(embeds.error);
     try {
       await user.send({
-        ...(embeds.length ? { embeds } : { content: '📜 **Handout from the GM**' }),
+        ...(embeds.length
+          ? { embeds: branded(embeds) }
+          : { content: '📜 **Handout from the GM**' }),
         ...(image ? { files: [{ attachment: image.url, name: image.name }] } : {}),
       });
     } catch (e) {
@@ -472,7 +475,7 @@ export class DiscordBot {
       const id = Number(i.customId.slice(COMBAT_REFRESH_PREFIX.length));
       const reply = await combatReply(id);
       if (!reply.encounterId) return i.reply(toDiscord(reply));
-      return i.update({ embeds: reply.embeds, components: reply.components });
+      return i.update({ embeds: branded(reply.embeds), components: reply.components });
     }
   }
 
@@ -508,7 +511,7 @@ export class DiscordBot {
       throw new Error(`Announce channel ${channelId} is not a channel the bot can post in`);
     this.announced.set(key, Date.now());
     await channel.send({
-      embeds: entityEmbeds(links, { headline: `✨ New discovery · ${TYPE_LABEL[type]}` }),
+      embeds: branded(entityEmbeds(links, { headline: `✨ New discovery · ${TYPE_LABEL[type]}` })),
       components: [linkButton('Open on site', siteUrl(type))],
       allowedMentions: { parse: [] },
     });
@@ -546,7 +549,7 @@ export class DiscordBot {
         if (!channel?.isTextBased())
           throw new Error(`Combat board channel ${board.channelId} is not a text channel`);
         const message = await channel.messages.fetch(board.messageId);
-        await message.edit({ embeds: reply.embeds, components: reply.components });
+        await message.edit({ embeds: branded(reply.embeds), components: reply.components });
         alive.push(board);
       } catch (err) {
         // Someone deleted the message or the channel: expected, stop tracking it.
