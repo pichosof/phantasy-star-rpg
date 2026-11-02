@@ -1,4 +1,8 @@
-import { type SlashCommandBooleanOption, SlashCommandBuilder } from 'discord.js';
+import {
+  type SlashCommandBooleanOption,
+  SlashCommandBuilder,
+  type SlashCommandStringOption,
+} from 'discord.js';
 
 import { ORACLE_CHOICES } from './handlers/dice.js';
 
@@ -172,4 +176,125 @@ export const COMMANDS = [
     .addUserOption((o) => o.setName('user').setDescription('Discord user').setRequired(true)),
 
   new SlashCommandBuilder().setName('links').setDescription('GM: who plays which character'),
+
+  // ── GM: run the combat from Discord (same rules as the site tracker) ──
+  new SlashCommandBuilder()
+    .setName('encounter')
+    .setDescription('GM: act on the running combat')
+    .addSubcommand((s) =>
+      s.setName('next').setDescription('Next turn (starts the combat if needed)'),
+    )
+    .addSubcommand((s) =>
+      s
+        .setName('damage')
+        .setDescription('Deal damage (Stamina first, then HP)')
+        .addStringOption((o) => target(o))
+        .addIntegerOption((o) =>
+          o
+            .setName('amount')
+            .setDescription('Damage')
+            .setRequired(true)
+            .setMinValue(1)
+            .setMaxValue(9999),
+        )
+        .addBooleanOption((o) =>
+          o.setName('hp_only').setDescription('Skip Stamina (straight to HP)'),
+        ),
+    )
+    .addSubcommand((s) =>
+      s
+        .setName('heal')
+        .setDescription('Recover Stamina, HP or Resolve')
+        .addStringOption((o) => target(o))
+        .addStringOption((o) =>
+          o
+            .setName('pool')
+            .setDescription('Which pool')
+            .setRequired(true)
+            .addChoices(
+              { name: 'Stamina', value: 'sp' },
+              { name: 'Hit Points', value: 'hp' },
+              { name: 'Resolve', value: 'rp' },
+            ),
+        )
+        .addIntegerOption((o) =>
+          o
+            .setName('amount')
+            .setDescription('Amount')
+            .setRequired(true)
+            .setMinValue(1)
+            .setMaxValue(9999),
+        ),
+    )
+    .addSubcommand((s) =>
+      s
+        .setName('condition')
+        .setDescription('Add a condition')
+        .addStringOption((o) => target(o))
+        .addStringOption((o) =>
+          o
+            .setName('name')
+            .setDescription('Condition')
+            .setRequired(true)
+            .setAutocomplete(true)
+            .setMaxLength(60),
+        )
+        .addIntegerOption((o) =>
+          o
+            .setName('rounds')
+            .setDescription('Rounds (empty: until removed)')
+            .setMinValue(1)
+            .setMaxValue(99),
+        ),
+    )
+    .addSubcommand((s) =>
+      s
+        .setName('clear')
+        .setDescription('Remove a condition')
+        .addStringOption((o) => target(o))
+        .addStringOption((o) =>
+          o
+            .setName('condition')
+            .setDescription('Condition')
+            .setRequired(true)
+            .setAutocomplete(true),
+        ),
+    )
+    .addSubcommand((s) =>
+      s
+        .setName('out')
+        .setDescription('Take a combatant out of the fight (or back in)')
+        .addStringOption((o) => target(o))
+        .addBooleanOption((o) =>
+          o.setName('out').setDescription('Out of the fight? (false: back in)').setRequired(true),
+        ),
+    ),
+
+  new SlashCommandBuilder()
+    .setName('say')
+    .setDescription('GM: an NPC speaks in this channel, with their name and portrait')
+    .addStringOption((o) =>
+      o.setName('npc').setDescription('Who speaks').setRequired(true).setAutocomplete(true),
+    )
+    .addStringOption((o) =>
+      o.setName('text').setDescription('What they say').setRequired(true).setMaxLength(2000),
+    ),
+
+  new SlashCommandBuilder()
+    .setName('handout')
+    .setDescription('GM: send a private clue to one player (by direct message)')
+    .addUserOption((o) => o.setName('user').setDescription('Who receives it').setRequired(true))
+    .addStringOption((o) =>
+      o
+        .setName('entry')
+        .setDescription('A lore, NPC, city… (hidden ones too)')
+        .setAutocomplete(true)
+        .setMaxLength(100),
+    )
+    .addStringOption((o) => o.setName('note').setDescription('A note or letter').setMaxLength(2000))
+    .addAttachmentOption((o) => o.setName('image').setDescription('A picture, map, document…')),
 ].map((c) => c.toJSON());
+
+function target(o: SlashCommandStringOption) {
+  return o.setName('target').setDescription('Combatant').setRequired(true).setAutocomplete(true);
+}

@@ -28,6 +28,7 @@ import {
   ListDiscordLinks,
   UnlinkDiscordUser,
 } from '../core/use-cases/discord-links/discord-links';
+import { ApplyEncounterAction } from '../core/use-cases/encounters/encounter-actions';
 import {
   CreateEncounter,
   DeleteEncounter,
@@ -240,6 +241,7 @@ export type Registry = {
   getEncounter: GetEncounter;
   saveEncounter: SaveEncounter;
   deleteEncounter: DeleteEncounter;
+  applyEncounterAction: ApplyEncounterAction;
   gmNoteRepo: GmNoteDrizzleRepository;
   linkableRepo: LinkableDrizzleRepository;
   progressRepo: ProgressDrizzleRepository;
@@ -421,6 +423,8 @@ class Container {
     getEncounter: (c) => new GetEncounter(c.resolve('encounterRepo')),
     saveEncounter: (c) => new SaveEncounter(c.resolve('encounterRepo'), entityEvents),
     deleteEncounter: (c) => new DeleteEncounter(c.resolve('encounterRepo')),
+    applyEncounterAction: (c) =>
+      new ApplyEncounterAction(c.resolve('encounterRepo'), c.resolve('saveEncounter')),
     gmNoteRepo: () => new GmNoteDrizzleRepository(),
     linkableRepo: () => new LinkableDrizzleRepository(),
     progressRepo: () => new ProgressDrizzleRepository(),

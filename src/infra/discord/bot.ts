@@ -10,18 +10,31 @@ import {
   type Interaction,
   type InteractionReplyOptions,
   MessageFlags,
+  PermissionFlagsBits,
   RESTJSONErrorCodes,
+  type Webhook,
 } from 'discord.js';
 
 import { entityEvents } from '../../core/events/entity-events.js';
 import type { SaveKey } from '../../core/use-cases/character-sheets/starfinder.js';
 import type { OracleOdds } from '../../core/use-cases/dice/oracle.js';
+import { currentCombatant } from '../../core/use-cases/encounters/combat-engine.js';
+import type { EncounterAction } from '../../core/use-cases/encounters/encounter-actions.js';
+import { encounterStateSchema } from '../../core/use-cases/encounters/encounter-state.js';
 import type { EntityType } from '../../core/use-cases/links/link-text.js';
 import { LinkTargetNotFoundError } from '../../core/use-cases/links/links.js';
 import { container } from '../../di/container.js';
 
 import { COMMANDS } from './commands.js';
-import { type BotReply, discord, errorReply, linkButton, siteUrl, TYPE_LABEL } from './format.js';
+import {
+  type BotReply,
+  COLOR,
+  discord,
+  errorReply,
+  linkButton,
+  siteUrl,
+  TYPE_LABEL,
+} from './format.js';
 import {
   attackReply,
   checkReply,
@@ -40,12 +53,22 @@ import {
 } from './handlers/character.js';
 import { COMBAT_REFRESH_PREFIX, combatReply } from './handlers/combat.js';
 import { oracleReply, parseRerollId, REROLL_PREFIX, rollReply } from './handlers/dice.js';
+import {
+  combatantChoices,
+  conditionChoices,
+  encounterActionReply,
+  handoutEmbeds,
+  npcChoices,
+  npcVoice,
+  playerOfCombatant,
+} from './handlers/gm.js';
 import { itemChoices, itemReply, resolveItemId } from './handlers/item.js';
 import { sessionReply, timelineReply } from './handlers/journal.js';
 import {
   clearEntityCache,
   entityChoices,
   entityEmbeds,
+  type EntityRef,
   resolveRef,
   lookupReply,
 } from './handlers/lookup.js';
@@ -171,7 +194,14 @@ export class DiscordBot {
     const gm = isGM(i.user.id);
     const focused = i.options.getFocused(true);
     const query = String(focused.value);
-    const choices = await this.suggestions(i.commandName, focused.name, query, i.user.id, gm);
+    const choices = await this.suggestions(
+      i.commandName,
+      focused.name,
+      query,
+      i.user.id,
+      gm,
+      (name) => i.options.getString(name),
+    );
     // Suggestions are dropped when the user keeps typing (expired interaction): expected.
     await i.respond(choices).catch((err: unknown) => {
       if (!isDiscordError(err, RESTJSONErrorCodes.UnknownInteraction)) throw err;
@@ -184,6 +214,7 @@ export class DiscordBot {
     query: string,
     userId: string,
     gm: boolean,
+    other: (name: string) => string | null,
   ): Promise<{ name: string; value: string }[]> {
     switch (command) {
       case 'lookup':
@@ -199,6 +230,14 @@ export class DiscordBot {
       case 'link':
         if (!gm) return [];
         return option === 'sheet' ? sheetChoices(query) : playerChoices(query);
+      case 'encounter':
+        if (!gm) return [];
+        if (option === 'target') return combatantChoices(query);
+        return conditionChoices(query, other('target'), option === 'condition');
+      case 'say':
+        return gm ? npcChoices(query) : [];
+      case 'handout':
+        return gm ? entityChoices(query, true, (e) => e.type !== 'item') : [];
       default:
         return [];
     }
@@ -321,9 +360,107 @@ export class DiscordBot {
           ),
         );
       }
+      case 'encounter':
+        if (!gm) return i.reply(toDiscord(errorReply('Only the GM can run the combat.')));
+        return i.reply(toDiscord(await encounterActionReply(encounterAction(i))));
+      case 'say':
+        if (!gm) return i.reply(toDiscord(errorReply('Only the GM can speak as an NPC.')));
+        return i.reply(toDiscord(await this.say(i)));
+      case 'handout':
+        if (!gm) return i.reply(toDiscord(errorReply('Only the GM can send handouts.')));
+        return i.reply(toDiscord(await this.handout(i)));
       default:
         throw new Error(`Unhandled command: ${i.commandName}`);
     }
+  }
+
+  // ── /say: NPCs speak through a channel webhook ──────────────────────────
+
+  /** One webhook per channel, created by the bot the first time an NPC speaks there. */
+  private webhooks = new Map<string, Webhook>();
+
+  private async say(i: ChatInputCommandInteraction): Promise<BotReply> {
+    const voice = await npcVoice(i.options.getString('npc', true));
+    if ('error' in voice) return errorReply(voice.error);
+    const channel = i.channel;
+    if (!channel || !('guild' in channel) || !channel.guild)
+      return errorReply('NPCs can only speak in a server channel.');
+    if (!i.appPermissions?.has(PermissionFlagsBits.ManageWebhooks))
+      return errorReply(
+        'The bot needs the **Manage Webhooks** permission in this channel to speak as NPCs. ' +
+          'Give it in the channel (or server) settings → Permissions → RPG Picho.',
+      );
+    const thread = channel.isThread() ? channel : null;
+    const host = thread ? thread.parent : channel;
+    if (!host || !('fetchWebhooks' in host))
+      return errorReply('NPCs cannot speak in this kind of channel.');
+
+    let webhook = this.webhooks.get(host.id);
+    if (!webhook) {
+      const me = this.client?.user?.id;
+      webhook =
+        (await host.fetchWebhooks()).find((w) => w.owner?.id === me && w.name === WEBHOOK_NAME) ??
+        (await host.createWebhook({ name: WEBHOOK_NAME, reason: 'NPC voices (/say)' }));
+      this.webhooks.set(host.id, webhook);
+    }
+    await webhook.send({
+      content: i.options.getString('text', true),
+      username: voice.username,
+      avatarURL: voice.avatarURL,
+      allowedMentions: { parse: [] },
+      ...(thread ? { threadId: thread.id } : {}),
+    });
+    return {
+      embeds: [
+        {
+          color: COLOR.success,
+          description:
+            `🗣️ Sent as **${voice.username}**.` +
+            (voice.hasPortrait
+              ? ''
+              : ' *(No portrait on the site: Discord shows a default avatar.)*'),
+        },
+      ],
+      ephemeral: true,
+    };
+  }
+
+  // ── /handout: a private clue by DM ──────────────────────────────────────
+
+  private async handout(i: ChatInputCommandInteraction): Promise<BotReply> {
+    const user = i.options.getUser('user', true);
+    if (user.bot) return errorReply('Handouts go to players, not bots.');
+    const entry = i.options.getString('entry');
+    const note = i.options.getString('note');
+    const image = i.options.getAttachment('image');
+    if (!entry && !note?.trim() && !image)
+      return errorReply('Give the handout an entry, a note or an image.');
+
+    let ref: EntityRef | null = null;
+    if (entry) {
+      const found = await resolveRef(entry, true);
+      if ('error' in found) return errorReply(found.error);
+      ref = found.ref;
+    }
+    const embeds = await handoutEmbeds(ref, note);
+    if ('error' in embeds) return errorReply(embeds.error);
+    try {
+      await user.send({
+        ...(embeds.length ? { embeds } : { content: '📜 **Handout from the GM**' }),
+        ...(image ? { files: [{ attachment: image.url, name: image.name }] } : {}),
+      });
+    } catch (e) {
+      if (isDiscordError(e, RESTJSONErrorCodes.CannotSendMessagesToThisUser))
+        return errorReply(
+          `<@${user.id}> does not accept direct messages from this server. ` +
+            "They can allow it in the server's Privacy Settings.",
+        );
+      throw e;
+    }
+    return {
+      embeds: [{ color: COLOR.success, description: `📜 Handout sent to <@${user.id}>.` }],
+      ephemeral: true,
+    };
   }
 
   private async button(i: ButtonInteraction) {
@@ -422,5 +559,72 @@ export class DiscordBot {
       }
     }
     this.boards.set(encounterId, alive);
+    await this.announceTurn(encounterId, alive[alive.length - 1]?.channelId);
+  }
+
+  /** Last announced turn per encounter (`round:combatantId`), so each turn pings once. */
+  private announcedTurns = new Map<number, string>();
+
+  /** "@player, it's your turn" in the board's channel, when a linked PC starts their turn. */
+  private async announceTurn(encounterId: number, channelId: string | undefined) {
+    if (!channelId) return;
+    const encounter = await container.resolve('getEncounter').execute(encounterId);
+    const state = encounterStateSchema.parse(encounter.props.state);
+    const acting = currentCombatant(state);
+    if (!acting || encounter.props.status === 'ended') return;
+    const key = `${state.round}:${acting.id}`;
+    if (this.announcedTurns.get(encounterId) === key) return;
+    this.announcedTurns.set(encounterId, key);
+    const userId = await playerOfCombatant(acting);
+    if (!userId) return;
+    const channel = await this.client?.channels.fetch(channelId);
+    if (!channel?.isSendable())
+      throw new Error(`Combat board channel ${channelId} is not a channel the bot can post in`);
+    await channel.send({
+      content: `🎯 <@${userId}>, it's **${acting.name}**'s turn (round ${state.round}).`,
+      allowedMentions: { users: [userId] },
+    });
+  }
+}
+
+const WEBHOOK_NAME = 'RPG Picho voices';
+
+/** `/encounter <subcommand>` → the action the site tracker would apply. */
+function encounterAction(i: ChatInputCommandInteraction): EncounterAction {
+  const target = () => i.options.getString('target', true);
+  switch (i.options.getSubcommand()) {
+    case 'next':
+      return { type: 'next' };
+    case 'damage':
+      return {
+        type: 'damage',
+        target: target(),
+        amount: i.options.getInteger('amount', true),
+        hpOnly: i.options.getBoolean('hp_only') ?? false,
+      };
+    case 'heal':
+      return {
+        type: 'heal',
+        target: target(),
+        pool: i.options.getString('pool', true) as 'sp' | 'hp' | 'rp',
+        amount: i.options.getInteger('amount', true),
+      };
+    case 'condition':
+      return {
+        type: 'condition',
+        target: target(),
+        name: i.options.getString('name', true),
+        rounds: i.options.getInteger('rounds'),
+      };
+    case 'clear':
+      return {
+        type: 'uncondition',
+        target: target(),
+        conditionId: i.options.getString('condition', true),
+      };
+    case 'out':
+      return { type: 'defeated', target: target(), defeated: i.options.getBoolean('out', true) };
+    default:
+      throw new Error(`Unhandled /encounter subcommand: ${i.options.getSubcommand()}`);
   }
 }
