@@ -117,11 +117,31 @@ export async function resolveRef(
 
 type Links = Awaited<ReturnType<GetEntityLinks['execute']>>;
 
-/** Rich card for any entity: picture, what it is, its text, where it appears. */
-export function entityEmbed(
+/** Discord shows at most 4 pictures as one mosaic. */
+const GRID_MAX = 4;
+
+/**
+ * Rich card for any entity: what it is, its text, where it appears, and its pictures.
+ * Discord merges embeds that share the same `url` into one card with an image mosaic,
+ * so pictures 2–4 ride in image-only embeds pointing to the same page.
+ */
+export function entityEmbeds(
   links: Links,
   opts: { hidden?: boolean; headline?: string } = {},
-): APIEmbed {
+): APIEmbed[] {
+  const main = entityEmbed(links, opts);
+  const extra = links.entity.images
+    .slice(1, GRID_MAX)
+    .map((url): APIEmbed => ({ url: main.url, image: { url: imageUrl(url)! } }));
+  const more = links.entity.images.length - GRID_MAX;
+  if (more > 0) {
+    const text = `📷 +${more} more picture${more === 1 ? '' : 's'} on the site`;
+    main.footer = { text: main.footer ? `${main.footer.text} · ${text}` : text };
+  }
+  return [main, ...extra];
+}
+
+function entityEmbed(links: Links, opts: { hidden?: boolean; headline?: string }): APIEmbed {
   const e = links.entity;
   const fields: APIEmbedField[] = [];
   const subtitleLabel = SUBTITLE_LABEL[e.type];
@@ -189,7 +209,7 @@ export async function lookupReply(
     fullView &&
     !(await knownEntities(true)).find((x) => x.type === ref.type && x.id === ref.id)?.visible;
   return {
-    embeds: [entityEmbed(links, { hidden })],
+    embeds: entityEmbeds(links, { hidden }),
     components: [linkButton('Open on site', siteUrl(ref.type))],
     ephemeral: opts.private,
   };

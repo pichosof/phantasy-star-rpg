@@ -13,6 +13,8 @@ export interface LinkableEntity {
   name: string;
   subtitle?: string | null;
   imageUrl?: string | null;
+  /** Every picture, cover first (= imageUrl). Galleries (cities, dungeons) come before imageUrl. */
+  images?: string[];
   /** Markdown text fields joined (empty when the caller may not read them). */
   text: string;
   /** In-game date label (sessions, timeline). */
@@ -62,6 +64,7 @@ export function visibleTo(all: LinkableEntity[], gm: boolean): LinkableEntity[] 
       ...e,
       text: e.readable ? e.text : '',
       imageUrl: e.discovered === false ? null : e.imageUrl,
+      images: e.discovered === false ? [] : e.images,
     }));
 }
 
@@ -135,6 +138,7 @@ export class GetEntityLinks {
         name: target.name,
         subtitle: target.subtitle ?? null,
         imageUrl: target.imageUrl ?? null,
+        images: target.images ?? [],
         text: target.text,
         date: target.date ?? null,
         readable: target.readable || gm,

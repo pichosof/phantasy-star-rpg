@@ -426,3 +426,45 @@ describe('/api/health/discord', () => {
     }
   });
 });
+
+describe('pictures', () => {
+  it('a city with only a gallery shows its cover plus a mosaic, like the site', async () => {
+    const { db, schema } = await import('../src/infra/db');
+    const id = await createCity('Piata', true);
+    await api.gm({
+      method: 'PATCH',
+      url: `/api/cities/${id}/discovered`,
+      payload: { discovered: true },
+    });
+    const urls = [1, 2, 3, 4, 5, 6].map((n) => `/files/cities/images/${id}-${n}.png`);
+    await db
+      .insert(schema.cityImages)
+      .values(urls.map((url, i) => ({ cityId: id, url, mime: 'image/png', size: 1, position: i })));
+
+    const reply = await lookupReply({ type: 'city', id }, { gm: false, private: false });
+    const embeds = reply.embeds ?? [];
+    expect(embeds).toHaveLength(4);
+    expect(embeds[0].image?.url).toBe(`https://api.test${urls[0]}?w=640`);
+    expect(embeds.slice(1).map((e) => e.image?.url)).toEqual(
+      urls.slice(1, 4).map((u) => `https://api.test${u}?w=640`),
+    );
+    // Same url on every embed: Discord merges them into one card.
+    expect(new Set(embeds.map((e) => e.url)).size).toBe(1);
+    expect(embeds[0].footer?.text).toContain('+2 more pictures');
+  });
+
+  it('undiscovered cities show no pictures to players', async () => {
+    const { db, schema } = await import('../src/infra/db');
+    const id = await createCity('Lost Town', true);
+    await db
+      .insert(schema.cityImages)
+      .values({ cityId: id, url: '/files/x.png', mime: 'image/png', size: 1 });
+    await api.gm({
+      method: 'PATCH',
+      url: `/api/cities/${id}/discovered`,
+      payload: { discovered: false },
+    });
+    const reply = await lookupReply({ type: 'city', id }, { gm: false, private: false });
+    expect(JSON.stringify(reply)).not.toContain('/files/x.png');
+  });
+});

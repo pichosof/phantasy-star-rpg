@@ -1,5 +1,21 @@
+import { asc } from 'drizzle-orm';
+
 import type { LinkableEntity, LinkableRepository } from '../../core/use-cases/links/links.js';
 import { db, schema as s } from '../db/index.js';
+
+/** Gallery URLs per owner id, in the site's order (position, then upload time). */
+function galleryBy<T extends { url: string }>(rows: T[], owner: (r: T) => number) {
+  const map = new Map<number, string[]>();
+  for (const r of rows) map.set(owner(r), [...(map.get(owner(r)) ?? []), r.url]);
+  return map;
+}
+
+/** Same cover rule as the site: gallery first, then the single imageUrl. */
+function pictures(gallery: string[] | undefined, imageUrl?: string | null) {
+  const images = [...(gallery ?? [])];
+  if (imageUrl && !images.includes(imageUrl)) images.push(imageUrl);
+  return { imageUrl: images[0] ?? null, images };
+}
 
 const join = (...parts: Array<string | null | undefined>) => parts.filter(Boolean).join('\n\n');
 
@@ -20,6 +36,8 @@ export class LinkableDrizzleRepository implements LinkableRepository {
       timeline,
       notes,
       items,
+      cityGallery,
+      dungeonGallery,
     ] = await Promise.all([
       db.select().from(s.cities),
       db.select().from(s.npcs),
@@ -34,7 +52,17 @@ export class LinkableDrizzleRepository implements LinkableRepository {
       db.select().from(s.timelineEvents),
       gm ? db.select().from(s.gmNotes) : Promise.resolve([]),
       db.select().from(s.items),
+      db
+        .select()
+        .from(s.cityImages)
+        .orderBy(asc(s.cityImages.position), asc(s.cityImages.createdAt)),
+      db
+        .select()
+        .from(s.dungeonImages)
+        .orderBy(asc(s.dungeonImages.position), asc(s.dungeonImages.createdAt)),
     ]);
+    const cityPics = galleryBy(cityGallery, (r) => r.cityId);
+    const dungeonPics = galleryBy(dungeonGallery, (r) => r.dungeonId);
 
     const out: LinkableEntity[] = [];
     for (const r of cities)
@@ -43,7 +71,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         id: r.id,
         name: r.name,
         subtitle: r.region,
-        imageUrl: r.imageUrl,
+        ...pictures(cityPics.get(r.id), r.imageUrl),
         text: join(r.description),
         visible: r.visible,
         readable: true,
@@ -55,7 +83,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         id: r.id,
         name: r.name,
         subtitle: r.role,
-        imageUrl: r.imageUrl,
+        ...pictures(undefined, r.imageUrl),
         text: join(r.description),
         visible: r.visible,
         readable: true,
@@ -66,7 +94,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         id: r.id,
         name: r.name,
         subtitle: `Level ${r.level}`,
-        imageUrl: r.imageUrl,
+        ...pictures(undefined, r.imageUrl),
         text: join(r.background),
         visible: r.visible,
         readable: true,
@@ -77,6 +105,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         id: r.id,
         name: r.name,
         subtitle: r.type,
+        ...pictures(dungeonPics.get(r.id)),
         text: join(r.description),
         visible: r.visible,
         readable: r.discovered,
@@ -87,7 +116,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         type: 'world',
         id: r.id,
         name: r.name,
-        imageUrl: r.imageUrl,
+        ...pictures(undefined, r.imageUrl),
         text: join(r.description),
         visible: r.visible,
         readable: true,
@@ -108,7 +137,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         id: r.id,
         name: r.title,
         subtitle: r.date,
-        imageUrl: r.imageUrl,
+        ...pictures(undefined, r.imageUrl),
         date: r.date,
         text: join(r.summary),
         visible: r.visible,
@@ -140,7 +169,7 @@ export class LinkableDrizzleRepository implements LinkableRepository {
         id: r.id,
         name: r.name,
         subtitle: r.type,
-        imageUrl: r.imageUrl,
+        ...pictures(undefined, r.imageUrl),
         text: join(r.description, r.habitat, r.weaknesses),
         visible: r.visible,
         readable: r.discovered,

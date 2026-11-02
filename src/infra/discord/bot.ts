@@ -28,7 +28,7 @@ import { sessionReply, timelineReply } from './handlers/journal.js';
 import {
   clearEntityCache,
   entityChoices,
-  entityEmbed,
+  entityEmbeds,
   resolveRef,
   lookupReply,
 } from './handlers/lookup.js';
@@ -283,7 +283,7 @@ export class DiscordBot {
       throw new Error(`Announce channel ${channelId} is not a channel the bot can post in`);
     this.announced.set(key, Date.now());
     await channel.send({
-      embeds: [entityEmbed(links, { headline: `✨ New discovery · ${TYPE_LABEL[type]}` })],
+      embeds: entityEmbeds(links, { headline: `✨ New discovery · ${TYPE_LABEL[type]}` }),
       components: [linkButton('Open on site', siteUrl(type))],
       allowedMentions: { parse: [] },
     });
