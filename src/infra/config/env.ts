@@ -38,6 +38,10 @@ export const env = {
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? '',
   ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL ?? 'claude-haiku-5-5',
 
+  /** Commit this process runs (set by the deploy); health reports it so the deploy can tell
+   *  the new revision from the old one. Empty locally. */
+  APP_VERSION: process.env.APP_VERSION ?? '',
+
   // ── Discord bot: off without DISCORD_TOKEN; with it, the rest is required (no defaults) ──
   DISCORD: readDiscordConfig(process.env),
 };

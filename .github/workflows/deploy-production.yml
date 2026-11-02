@@ -188,6 +188,7 @@ jobs:
               CLIENT_SECRET="secretref:${CLIENT_SECRET_NAME}" \
               JWT_SECRET="secretref:${JWT_SECRET_NAME}" \
               JWT_EXPIRES_IN="${JWT_EXPIRES_IN}" \
+              APP_VERSION="${GITHUB_SHA}" \
               "${discord_set[@]}" \
             "${discord_remove[@]}" \
             --output none
@@ -197,15 +198,18 @@ jobs:
         env:
           API_HEALTH_URL: ${{ secrets.API_HEALTH_URL }}
         run: |
-          for attempt in {1..18}; do
-            if curl --fail --silent --output /dev/null "${API_HEALTH_URL}"; then
+          # Wait for THIS commit: during the swap the old revision still answers healthy.
+          for attempt in {1..36}; do
+            version="$(curl --fail --silent "${API_HEALTH_URL}" | jq -r '.version // empty' 2>/dev/null || true)"
+            if [ "${version}" = "${GITHUB_SHA}" ]; then
+              echo "API is serving ${GITHUB_SHA}"
               exit 0
             fi
-            echo "API not ready yet (${attempt}/18). Retrying in 10s..."
+            echo "API serves '${version:-unknown}', waiting for ${GITHUB_SHA} (${attempt}/36)..."
             sleep 10
           done
 
-          echo "API health check failed after deployment."
+          echo "::error::The new revision (${GITHUB_SHA}) never started serving."
           exit 1
 
       - name: Discord bot check
@@ -219,7 +223,8 @@ jobs:
           for attempt in {1..18}; do
             body="$(curl --silent "${API_HEALTH_URL}/discord" || true)"
             state="$(echo "${body}" | jq -r '.state // empty' 2>/dev/null || true)"
-            if [ "${state}" = "${expected}" ]; then
+            version="$(echo "${body}" | jq -r '.version // empty' 2>/dev/null || true)"
+            if [ "${state}" = "${expected}" ] && [ "${version}" = "${GITHUB_SHA}" ]; then
               echo "Discord bot: ${state}"
               exit 0
             fi

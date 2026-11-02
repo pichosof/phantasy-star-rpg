@@ -206,14 +206,19 @@ export async function buildServer() {
   );
 
   // ── Health check (no rate limit applied — exempt via low cost) ───────────────
-  app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
+  // `version` = deployed commit: the deploy waits for its own commit, not any healthy revision.
+  app.get('/api/health', async () => ({
+    ok: true,
+    version: env.APP_VERSION,
+    ts: new Date().toISOString(),
+  }));
   // Discord bot, separate from /api/health: the startup probe must not depend on Discord.
   // 200 when ready or deliberately off (no DISCORD_TOKEN); 503 with the reason otherwise.
   app.get('/api/health/discord', async (_req, reply) => {
     const { state, error, since } = botStatus;
     return reply
       .code(state === 'ready' || state === 'off' ? 200 : 503)
-      .send({ state, error, since: since.toISOString() });
+      .send({ state, error, version: env.APP_VERSION, since: since.toISOString() });
   });
 
   // ── Error → JSON mapper: must be registered before any route to apply to it ──

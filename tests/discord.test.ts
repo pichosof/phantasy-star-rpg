@@ -421,6 +421,7 @@ describe('/api/health/discord', () => {
       const res = await api.app.inject({ method: 'GET', url: '/api/health/discord' });
       expect(res.statusCode).toBe(503);
       expect(res.json()).toMatchObject({ state: 'error', error: 'An invalid token was provided.' });
+      expect(res.json()).toHaveProperty('version');
     } finally {
       setBotStatus('off');
     }
