@@ -125,7 +125,44 @@ jobs:
           MAX_UPLOAD_MB: ${{ secrets.MAX_UPLOAD_MB }}
           NODE_ENV: ${{ secrets.NODE_ENV }}
           UPLOADS_LOCAL_DIR: ${{ secrets.UPLOADS_LOCAL_DIR }}
+          # Discord bot: repository variable DISCORD_ENABLED must be exactly 'true' or 'false'.
+          DISCORD_ENABLED: ${{ vars.DISCORD_ENABLED }}
+          DISCORD_TOKEN_SECRET_NAME: ${{ secrets.DISCORD_TOKEN_SECRET_NAME }}
+          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          DISCORD_GM_USER_IDS: ${{ secrets.DISCORD_GM_USER_IDS }}
+          DISCORD_ANNOUNCE_CHANNEL_ID: ${{ secrets.DISCORD_ANNOUNCE_CHANNEL_ID }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
         run: |
+          discord_set=()
+          discord_remove=()
+          case "${DISCORD_ENABLED}" in
+            true)
+              for name in DISCORD_TOKEN_SECRET_NAME DISCORD_GUILD_ID DISCORD_GM_USER_IDS SITE_URL PUBLIC_API_URL; do
+                if [ -z "${!name}" ]; then
+                  echo "::error::DISCORD_ENABLED=true but the ${name} secret is empty."
+                  exit 1
+                fi
+              done
+              # DISCORD_ANNOUNCE_CHANNEL_ID may be empty on purpose (announcements off).
+              discord_set=(
+                DISCORD_TOKEN="secretref:${DISCORD_TOKEN_SECRET_NAME}"
+                DISCORD_GUILD_ID="${DISCORD_GUILD_ID}"
+                DISCORD_GM_USER_IDS="${DISCORD_GM_USER_IDS}"
+                DISCORD_ANNOUNCE_CHANNEL_ID="${DISCORD_ANNOUNCE_CHANNEL_ID}"
+                SITE_URL="${SITE_URL}"
+                PUBLIC_API_URL="${PUBLIC_API_URL}"
+              )
+              ;;
+            false)
+              discord_remove=(--remove-env-vars DISCORD_TOKEN DISCORD_GUILD_ID DISCORD_GM_USER_IDS DISCORD_ANNOUNCE_CHANNEL_ID SITE_URL PUBLIC_API_URL)
+              ;;
+            *)
+              echo "::error::Repository variable DISCORD_ENABLED must be 'true' or 'false' (got '${DISCORD_ENABLED}')."
+              exit 1
+              ;;
+          esac
+
           az containerapp update \
             --name "${CONTAINER_APP_NAME}" \
             --resource-group "${AZURE_RESOURCE_GROUP}" \
@@ -145,6 +182,8 @@ jobs:
               CLIENT_SECRET="secretref:${CLIENT_SECRET_NAME}" \
               JWT_SECRET="secretref:${JWT_SECRET_NAME}" \
               JWT_EXPIRES_IN="${JWT_EXPIRES_IN}" \
+              "${discord_set[@]}" \
+            "${discord_remove[@]}" \
             --output none
 
       - name: Health check
@@ -161,4 +200,26 @@ jobs:
           done
 
           echo "API health check failed after deployment."
+          exit 1
+
+      - name: Discord bot check
+        shell: bash
+        env:
+          API_HEALTH_URL: ${{ secrets.API_HEALTH_URL }}
+          DISCORD_ENABLED: ${{ vars.DISCORD_ENABLED }}
+        run: |
+          # The deploy step already rejected any value other than 'true' / 'false'.
+          if [ "${DISCORD_ENABLED}" = true ]; then expected=ready; else expected=off; fi
+          for attempt in {1..18}; do
+            body="$(curl --silent "${API_HEALTH_URL}/discord" || true)"
+            state="$(echo "${body}" | jq -r '.state // empty' 2>/dev/null || true)"
+            if [ "${state}" = "${expected}" ]; then
+              echo "Discord bot: ${state}"
+              exit 0
+            fi
+            echo "Discord bot is '${state:-unknown}', expected '${expected}' (${attempt}/18): ${body}"
+            sleep 10
+          done
+
+          echo "::error::Discord bot did not reach '${expected}': ${body}"
           exit 1

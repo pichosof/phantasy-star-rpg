@@ -162,33 +162,46 @@ Pre-commit hook runs `lint-staged` (ESLint + Prettier on touched files).
 
 Read at boot from `.env` via `src/infra/config/env.ts`. Treated as required unless a default is provided:
 
-| Variable                          | Default            | Purpose                                                            |
-| --------------------------------- | ------------------ | ------------------------------------------------------------------ |
-| `PORT`                            | `3010`             | HTTP port.                                                         |
-| `NODE_ENV`                        | `development`      | `development` / `production` / `test`. Drives logging + behaviour. |
-| `DATABASE_URL`                    | `./data/app.db`    | Path to the SQLite file.                                           |
-| `CORS_ORIGIN`                     | `*`                | Origin allow-list.                                                 |
-| `FILE_STORAGE_DRIVER`             | `local`            | `local` or `azure-blob`.                                           |
-| `UPLOADS_LOCAL_DIR`               | `./data/uploads`   | Path used when driver is `local`.                                  |
-| `AZURE_STORAGE_CONNECTION_STRING` | empty              | Required when driver is `azure-blob`.                              |
-| `AZURE_STORAGE_CONTAINER`         | `uploads`          | Blob container name.                                               |
-| `AZURE_STORAGE_ACCESS_TIER`       | `Cool`             | `Hot` / `Cool` / `Archive`.                                        |
-| `MAX_UPLOAD_MB`                   | `30`               | Multipart cap; mirrored as `VITE_UPLOAD_MAX_MB` on the frontend.   |
-| `GM_API_KEY`                      | —                  | Long random string. Source of the GM unlock secret.                |
-| `CLIENT_SECRET`                   | —                  | Shared with the frontend (`VITE_CLIENT_SECRET`).                   |
-| `JWT_SECRET`                      | —                  | Signs the GM JWTs.                                                 |
-| `JWT_EXPIRES_IN`                  | `8h`               | JWT TTL.                                                           |
-| `BACKUP_ENABLED`                  | prod only          | Periodic SQLite backups (boot, every interval, and on SIGTERM).    |
-| `BACKUP_INTERVAL_HOURS`           | `6`                | Interval between backups while the process is up.                  |
-| `BACKUP_RETENTION`                | `30`               | Number of backups kept; older ones are pruned.                     |
-| `AZURE_BACKUP_CONTAINER`          | `db-backups`       | **Private** Blob container (never served by `/files/*`).           |
-| `BACKUP_LOCAL_DIR`                | `./data/backups`   | Backup target when the storage driver is `local`.                  |
-| `ANTHROPIC_API_KEY`               | empty              | Enables the AI session-diary summary (GM). Empty = feature off.    |
-| `ANTHROPIC_MODEL`                 | `claude-haiku-5-5` | Model used for the session-diary summary.                          |
+| Variable                          | Default            | Purpose                                                             |
+| --------------------------------- | ------------------ | ------------------------------------------------------------------- |
+| `PORT`                            | `3010`             | HTTP port.                                                          |
+| `NODE_ENV`                        | `development`      | `development` / `production` / `test`. Drives logging + behaviour.  |
+| `DATABASE_URL`                    | `./data/app.db`    | Path to the SQLite file.                                            |
+| `CORS_ORIGIN`                     | `*`                | Origin allow-list.                                                  |
+| `FILE_STORAGE_DRIVER`             | `local`            | `local` or `azure-blob`.                                            |
+| `UPLOADS_LOCAL_DIR`               | `./data/uploads`   | Path used when driver is `local`.                                   |
+| `AZURE_STORAGE_CONNECTION_STRING` | empty              | Required when driver is `azure-blob`.                               |
+| `AZURE_STORAGE_CONTAINER`         | `uploads`          | Blob container name.                                                |
+| `AZURE_STORAGE_ACCESS_TIER`       | `Cool`             | `Hot` / `Cool` / `Archive`.                                         |
+| `MAX_UPLOAD_MB`                   | `30`               | Multipart cap; mirrored as `VITE_UPLOAD_MAX_MB` on the frontend.    |
+| `GM_API_KEY`                      | —                  | Long random string. Source of the GM unlock secret.                 |
+| `CLIENT_SECRET`                   | —                  | Shared with the frontend (`VITE_CLIENT_SECRET`).                    |
+| `JWT_SECRET`                      | —                  | Signs the GM JWTs.                                                  |
+| `JWT_EXPIRES_IN`                  | `8h`               | JWT TTL.                                                            |
+| `BACKUP_ENABLED`                  | prod only          | Periodic SQLite backups (boot, every interval, and on SIGTERM).     |
+| `BACKUP_INTERVAL_HOURS`           | `6`                | Interval between backups while the process is up.                   |
+| `BACKUP_RETENTION`                | `30`               | Number of backups kept; older ones are pruned.                      |
+| `AZURE_BACKUP_CONTAINER`          | `db-backups`       | **Private** Blob container (never served by `/files/*`).            |
+| `BACKUP_LOCAL_DIR`                | `./data/backups`   | Backup target when the storage driver is `local`.                   |
+| `ANTHROPIC_API_KEY`               | empty              | Enables the AI session-diary summary (GM). Empty = feature off.     |
+| `ANTHROPIC_MODEL`                 | `claude-haiku-5-5` | Model used for the session-diary summary.                           |
+| `DISCORD_TOKEN`                   | empty              | Discord bot token. Empty = bot off. Set = every row below required. |
+| `DISCORD_GUILD_ID`                | — (bot on)         | Server where the slash commands are registered.                     |
+| `DISCORD_GM_USER_IDS`             | — (bot on)         | Comma-separated Discord user ids with GM powers in the bot.         |
+| `DISCORD_ANNOUNCE_CHANNEL_ID`     | — (bot on)         | Channel for reveal announcements; set it empty to turn them off.    |
+| `SITE_URL`                        | — (bot on)         | Front-end URL for "Open on site" links.                             |
+| `PUBLIC_API_URL`                  | — (bot on)         | Public API URL, to make uploaded `/files/...` images absolute.      |
 
 `CORS_ORIGIN` is a comma-separated allow-list (e.g. `https://rpg.picho.org`); it also drives the Origin/Referer check in `client-auth` for state-changing requests in production.
 
 GM endpoints for the database: `GET /api/gm/database/download` (streams a fresh snapshot) and `POST /api/gm/database/backup` (backs up now; skipped if unchanged). Implementation: [src/infra/backup/](src/infra/backup/).
+
+**Discord bot** ([src/infra/discord/](src/infra/discord/)): a driving adapter in the API process (needs `minReplicas=1`). Slash commands `/roll`, `/oracle`, `/lookup`, `/item`, `/session`, `/timeline`, `/combat`, `/reveal` (GM). Rules:
+
+- Reads go through the same use-cases as the site and `visibleTo`; public answers always use the **player view**, even for the GM (the full view is ephemeral, `private: True`).
+- No guessing: typed names must match exactly and uniquely (otherwise the user picks a suggestion); only _expected_ errors are caught (not found, expired interaction, deleted message), everything else surfaces.
+- Domain events ([src/core/events/entity-events.ts](src/core/events/entity-events.ts)): `SetVisibility(visible=true)` publishes `revealed` (announced after 30 s if still visible); `SaveEncounter` publishes `encounterSaved` (live `/combat` boards). Handlers are plain functions returning Discord API JSON, tested in `tests/discord.test.ts`.
+- `GET /api/health/discord`: 200 when `ready` or deliberately `off`, 503 with the reason otherwise. `/api/health` (startup probe) never depends on Discord; the deploy checks both, driven by the repository variable `DISCORD_ENABLED` (`true`/`false`, no default).
 
 ---
 

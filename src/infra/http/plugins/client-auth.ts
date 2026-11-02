@@ -30,7 +30,7 @@ import fp from 'fastify-plugin';
 import { env } from '../../config/env.js';
 import { safeCompare } from '../../security/safe-compare.js';
 
-const EXEMPT_PATHS = new Set(['/api/health']);
+const EXEMPT_PATHS = new Set(['/api/health', '/api/health/discord']);
 const EXEMPT_PREFIX = '/files/';
 
 export const clientAuthPlugin = fp(async (app: FastifyInstance) => {

@@ -37,4 +37,48 @@ export const env = {
   // ── AI session diary (optional: without a key the feature is simply off) ──
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? '',
   ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL ?? 'claude-haiku-5-5',
+
+  // ── Discord bot: off without DISCORD_TOKEN; with it, the rest is required (no defaults) ──
+  DISCORD: readDiscordConfig(process.env),
 };
+
+export type DiscordConfig = NonNullable<ReturnType<typeof readDiscordConfig>>;
+
+/** Null when DISCORD_TOKEN is empty (bot off). Otherwise every setting is required: no defaults. */
+export function readDiscordConfig(source: Record<string, string | undefined>) {
+  const token = source.DISCORD_TOKEN ?? '';
+  if (!token) return null;
+  const need = (name: string) => {
+    const value = source[name]?.trim();
+    if (!value) throw new Error(`Missing env var: ${name} (required when DISCORD_TOKEN is set)`);
+    return value;
+  };
+  const url = (name: string) => {
+    const value = need(name);
+    const parsed = new URL(value); // throws on a malformed URL
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:')
+      throw new Error(`${name} must be an http(s) URL`);
+    return value.replace(/\/$/, '');
+  };
+  const announce = source.DISCORD_ANNOUNCE_CHANNEL_ID;
+  if (announce === undefined)
+    throw new Error(
+      'Missing env var: DISCORD_ANNOUNCE_CHANNEL_ID (set it empty to turn announcements off)',
+    );
+  return {
+    token,
+    /** Server whose slash commands are registered. */
+    guildId: need('DISCORD_GUILD_ID'),
+    /** Discord user ids with GM powers in the bot. */
+    gmUserIds: need('DISCORD_GM_USER_IDS')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    /** Channel for reveal announcements; explicitly empty = announcements off. */
+    announceChannelId: announce.trim(),
+    /** Front-end URL for "Open on site" links. */
+    siteUrl: url('SITE_URL'),
+    /** Public URL of this API, to turn uploaded `/files/...` images into absolute links. */
+    publicApiUrl: url('PUBLIC_API_URL'),
+  };
+}

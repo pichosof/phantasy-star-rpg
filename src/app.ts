@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { sqliteBackup } from './infra/backup/sqlite-backup.service.js';
 import { env } from './infra/config/env.js';
+import { DiscordBot } from './infra/discord/bot.js';
 import { buildServer } from './infra/http/server.js';
 
 // keep data/ structure stable for sqlite + static files
@@ -18,6 +19,12 @@ async function main() {
 
   if (env.BACKUP_ENABLED) sqliteBackup.start();
 
+  // Optional Discord bot, in this same process (needs the always-on replica). A bot that
+  // fails to start is logged and reported as 503 by /api/health/discord (the deploy checks it);
+  // the site itself stays up, since the startup probe only looks at /api/health.
+  const bot = env.DISCORD ? new DiscordBot(app.log) : null;
+  await bot?.start().catch((err: unknown) => app.log.error(err, '[discord] failed to start'));
+
   // Container Apps sends SIGTERM on scale-to-zero / new revision (30s grace).
   // Take a last backup so the session that just ended is captured.
   let shuttingDown = false;
@@ -25,6 +32,8 @@ async function main() {
     if (shuttingDown) return;
     shuttingDown = true;
     app.log.info(`[shutdown] ${signal} received`);
+    // Leave Discord first: during a revision swap the new replica takes over the commands.
+    await bot?.stop().catch((err: unknown) => app.log.error(err, '[discord] stop failed'));
     sqliteBackup.stop();
     if (env.BACKUP_ENABLED) {
       const timeout = new Promise((resolve) => setTimeout(resolve, 20_000));

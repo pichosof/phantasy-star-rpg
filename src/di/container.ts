@@ -1,3 +1,4 @@
+import { entityEvents } from '../core/events/entity-events';
 import { CreateMonster } from '../core/use-cases/bestiary/create-monster';
 import { DeleteMonster } from '../core/use-cases/bestiary/delete-monster';
 import { ListMonsters } from '../core/use-cases/bestiary/list-monsters';
@@ -43,6 +44,7 @@ import {
   ListItems,
   UpdateItem,
 } from '../core/use-cases/items/items';
+import type { EntityType } from '../core/use-cases/links/link-text';
 import { GetEntityLinks, GetLinkIndex } from '../core/use-cases/links/links';
 import { SearchEntities } from '../core/use-cases/links/search';
 import { CreateLore } from '../core/use-cases/lore/create-lore';
@@ -124,6 +126,9 @@ import { TagsDrizzleRepository } from '../infra/repositories/tags.drizzle.reposi
 import { TimelineDrizzleRepository } from '../infra/repositories/timeline.drizzle.repository';
 import { WikiPageDrizzleRepository } from '../infra/repositories/wiki-page.drizzle.repository';
 import { WorldDrizzleRepository } from '../infra/repositories/world.drizzle.repository';
+
+/** Visibility toggles of these types announce reveals (Discord bot). */
+const reveal = (type: EntityType) => ({ type, events: entityEvents });
 
 // ----- Tipos do container
 export type Registry = {
@@ -307,7 +312,7 @@ class Container {
     updatePlayer: (c) => new UpdatePlayer(c.resolve('playerRepo')),
     updatePlayerImage: (c) => new UpdatePlayerImage(c.resolve('playerRepo')),
     updatePlayerSheet: (c) => new UpdatePlayerSheet(c.resolve('playerRepo')),
-    setPlayerVisibility: (c) => new SetVisibility(c.resolve('playerRepo')),
+    setPlayerVisibility: (c) => new SetVisibility(c.resolve('playerRepo'), reveal('player')),
 
     // Quest
     questRepo: () => new QuestDrizzleRepository(),
@@ -323,7 +328,7 @@ class Container {
     deleteNpc: (c) => new DeleteNpc(c.resolve('npcRepo')),
     updateNpcImage: (c) => new UpdateNpcImage(c.resolve('npcRepo')),
     updateNpc: (c) => new UpdateNpc(c.resolve('npcRepo')),
-    setNpcVisibility: (c) => new SetVisibility(c.resolve('npcRepo')),
+    setNpcVisibility: (c) => new SetVisibility(c.resolve('npcRepo'), reveal('npc')),
 
     // Sessions
     sessionRepo: () => new SessionDrizzleRepository(),
@@ -331,7 +336,7 @@ class Container {
     listSessions: (c) => new ListSessions(c.resolve('sessionRepo')),
     deleteSession: (c) => new DeleteSession(c.resolve('sessionRepo')),
     updateSession: (c) => new UpdateSession(c.resolve('sessionRepo')),
-    setSessionVisibility: (c) => new SetVisibility(c.resolve('sessionRepo')),
+    setSessionVisibility: (c) => new SetVisibility(c.resolve('sessionRepo'), reveal('session')),
 
     // Lore
     loreRepo: () => new LoreDrizzleRepository(),
@@ -339,7 +344,7 @@ class Container {
     listLores: (c) => new ListLores(c.resolve('loreRepo')),
     deleteLore: (c) => new DeleteLore(c.resolve('loreRepo')),
     updateLore: (c) => new UpdateLore(c.resolve('loreRepo')),
-    setLoreVisibility: (c) => new SetVisibility(c.resolve('loreRepo')),
+    setLoreVisibility: (c) => new SetVisibility(c.resolve('loreRepo'), reveal('lore')),
 
     // Cities
     cityRepo: () => new CityDrizzleRepository(),
@@ -349,7 +354,7 @@ class Container {
     deleteCity: (c) => new DeleteCity(c.resolve('cityRepo')),
     updateCity: (c) => new UpdateCity(c.resolve('cityRepo')),
     updateCityImage: (c) => new UpdateCityImage(c.resolve('cityRepo')),
-    setCityVisibility: (c) => new SetVisibility(c.resolve('cityRepo')),
+    setCityVisibility: (c) => new SetVisibility(c.resolve('cityRepo'), reveal('city')),
 
     // Bestiary
     monsterRepo: () => new MonsterDrizzleRepository(),
@@ -359,7 +364,7 @@ class Container {
     updateMonster: (c) => new UpdateMonster(c.resolve('monsterRepo')),
     updateMonsterImage: (c) => new UpdateMonsterImage(c.resolve('monsterRepo')),
     deleteMonster: (c) => new DeleteMonster(c.resolve('monsterRepo')),
-    setMonsterVisibility: (c) => new SetVisibility(c.resolve('monsterRepo')),
+    setMonsterVisibility: (c) => new SetVisibility(c.resolve('monsterRepo'), reveal('beast')),
 
     // Map Markers
     mapMarkerRepo: () => new MapMarkerDrizzleRepository(),
@@ -375,7 +380,7 @@ class Container {
     listWikiPages: (c) => new ListWikiPages(c.resolve('wikiRepo')),
     updateWikiPage: (c) => new UpdateWikiPage(c.resolve('wikiRepo')),
     deleteWikiPage: (c) => new DeleteWikiPage(c.resolve('wikiRepo')),
-    setWikiPageVisibility: (c) => new SetVisibility(c.resolve('wikiRepo')),
+    setWikiPageVisibility: (c) => new SetVisibility(c.resolve('wikiRepo'), reveal('wiki')),
 
     // Timeline
     timelineRepo: () => new TimelineDrizzleRepository(),
@@ -383,7 +388,7 @@ class Container {
     listTimelineEvents: (c) => new ListTimelineEvents(c.resolve('timelineRepo')),
     deleteTimelineEvent: (c) => new DeleteTimelineEvent(c.resolve('timelineRepo')),
     updateTimelineEvent: (c) => new UpdateTimelineEvent(c.resolve('timelineRepo')),
-    setTimelineVisibility: (c) => new SetVisibility(c.resolve('timelineRepo')),
+    setTimelineVisibility: (c) => new SetVisibility(c.resolve('timelineRepo'), reveal('timeline')),
 
     // World
     worldRepo: () => new WorldDrizzleRepository(),
@@ -391,15 +396,14 @@ class Container {
     listWorlds: (c) => new ListWorlds(c.resolve('worldRepo')),
     updateWorldImage: (c) => new UpdateWorldImage(c.resolve('worldRepo')),
     updateWorld: (c) => new UpdateWorld(c.resolve('worldRepo')),
-    setWorldVisibility: (c) =>
-      new SetVisibility(c.resolve('worldRepo' /* CORRIGE: 'worldRepo' se tiver */)),
+    setWorldVisibility: (c) => new SetVisibility(c.resolve('worldRepo'), reveal('world')),
 
     // GM Notes
     encounterRepo: () => new EncounterDrizzleRepository(),
     createEncounter: (c) => new CreateEncounter(c.resolve('encounterRepo')),
     listEncounters: (c) => new ListEncounters(c.resolve('encounterRepo')),
     getEncounter: (c) => new GetEncounter(c.resolve('encounterRepo')),
-    saveEncounter: (c) => new SaveEncounter(c.resolve('encounterRepo')),
+    saveEncounter: (c) => new SaveEncounter(c.resolve('encounterRepo'), entityEvents),
     deleteEncounter: (c) => new DeleteEncounter(c.resolve('encounterRepo')),
     gmNoteRepo: () => new GmNoteDrizzleRepository(),
     linkableRepo: () => new LinkableDrizzleRepository(),

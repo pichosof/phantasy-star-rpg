@@ -5,6 +5,7 @@ import rateLimit from '@fastify/rate-limit';
 import Fastify from 'fastify';
 
 import { env } from '../config/env';
+import { botStatus } from '../discord/status';
 import { decodeStorageKey, parseRangeHeader } from '../storage/file-storage.utils.js';
 import { parseThumbWidth } from '../storage/image-thumbnails.js';
 import { fileStorage, imageThumbnails } from '../storage/index.js';
@@ -206,6 +207,14 @@ export async function buildServer() {
 
   // ── Health check (no rate limit applied — exempt via low cost) ───────────────
   app.get('/api/health', async () => ({ ok: true, ts: new Date().toISOString() }));
+  // Discord bot, separate from /api/health: the startup probe must not depend on Discord.
+  // 200 when ready or deliberately off (no DISCORD_TOKEN); 503 with the reason otherwise.
+  app.get('/api/health/discord', async (_req, reply) => {
+    const { state, error, since } = botStatus;
+    return reply
+      .code(state === 'ready' || state === 'off' ? 200 : 503)
+      .send({ state, error, since: since.toISOString() });
+  });
 
   // ── Error → JSON mapper: must be registered before any route to apply to it ──
   await app.register(errorHandlerPlugin);

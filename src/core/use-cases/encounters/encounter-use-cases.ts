@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { Encounter } from '../../entities/encounter.js';
+import type { EntityEvents } from '../../events/entity-events.js';
 
 import { emptyEncounterState, encounterStateSchema } from './encounter-state.js';
 import type { EncounterRepository } from './encounter.repository.js';
@@ -57,7 +58,10 @@ export class GetEncounter {
 
 /** Saves with optimistic concurrency so two devices never silently overwrite each other. */
 export class SaveEncounter {
-  constructor(private repo: EncounterRepository) {}
+  constructor(
+    private repo: EncounterRepository,
+    private events?: EntityEvents,
+  ) {}
   async execute(id: number, input: SaveEncounterInput) {
     const { version, force, ...changes } = saveEncounterInput.parse(input);
     const current = await this.repo.findById(id);
@@ -69,6 +73,7 @@ export class SaveEncounter {
       const latest = await this.repo.findById(id);
       throw new EncounterConflictError(latest?.props.version ?? expected);
     }
+    this.events?.encounterSaved.emit({ id });
     return saved;
   }
 }
