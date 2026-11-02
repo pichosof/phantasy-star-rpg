@@ -387,7 +387,7 @@ describe('no guessing', () => {
 describe('discord config', () => {
   const full = {
     DISCORD_TOKEN: 't',
-    DISCORD_GUILD_ID: 'g',
+    DISCORD_GUILD_IDS: 'g',
     DISCORD_GM_USER_IDS: 'u1, u2',
     DISCORD_ANNOUNCE_CHANNEL_ID: '',
     SITE_URL: 'https://rpg.example/',
@@ -401,7 +401,7 @@ describe('discord config', () => {
       announceChannelId: '',
       siteUrl: 'https://rpg.example',
     });
-    for (const key of ['DISCORD_GUILD_ID', 'DISCORD_GM_USER_IDS', 'SITE_URL', 'PUBLIC_API_URL'])
+    for (const key of ['DISCORD_GUILD_IDS', 'DISCORD_GM_USER_IDS', 'SITE_URL', 'PUBLIC_API_URL'])
       expect(() => readDiscordConfig({ ...full, [key]: '' }), key).toThrow(key);
     const noAnnounce: Record<string, string | undefined> = { ...full };
     delete noAnnounce.DISCORD_ANNOUNCE_CHANNEL_ID;

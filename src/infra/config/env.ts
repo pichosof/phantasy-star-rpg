@@ -71,8 +71,11 @@ export function readDiscordConfig(source: Record<string, string | undefined>) {
     );
   return {
     token,
-    /** Server whose slash commands are registered. */
-    guildId: need('DISCORD_GUILD_ID'),
+    /** Servers where the slash commands are registered (comma-separated). */
+    guildIds: need('DISCORD_GUILD_IDS')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
     /** Discord user ids with GM powers in the bot. */
     gmUserIds: need('DISCORD_GM_USER_IDS')
       .split(',')

@@ -20,7 +20,7 @@ export default defineConfig({
       JWT_SECRET: 'test-jwt-secret-0123456789-abcdef',
       // Discord bot config (the bot itself is never started by tests).
       DISCORD_TOKEN: 'test-discord-token',
-      DISCORD_GUILD_ID: 'test-guild',
+      DISCORD_GUILD_IDS: 'test-guild',
       DISCORD_GM_USER_IDS: 'gm-user',
       DISCORD_ANNOUNCE_CHANNEL_ID: '',
       SITE_URL: 'https://site.test',

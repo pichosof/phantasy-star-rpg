@@ -135,13 +135,18 @@ export class DiscordBot {
 
     const ready = new Promise<void>((resolve, reject) => {
       client.once(Events.ClientReady, (c) => {
-        c.guilds
-          .fetch(cfg.guildId)
-          .then((guild) => guild.commands.set(COMMANDS))
-          .then(() => {
+        // Every configured server must accept the commands: one failing stops the bot (503).
+        Promise.all(
+          cfg.guildIds.map(async (id) => {
+            const guild = await c.guilds.fetch(id);
+            await guild.commands.set(COMMANDS);
+            return guild.name;
+          }),
+        )
+          .then((names) => {
             setBotStatus('ready');
             this.log.info(
-              `[discord] ready as ${c.user.tag}; ${COMMANDS.length} commands registered`,
+              `[discord] ready as ${c.user.tag}; ${COMMANDS.length} commands registered in ${names.join(', ')}`,
             );
             resolve();
           })

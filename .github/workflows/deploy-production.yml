@@ -129,7 +129,7 @@ jobs:
           DISCORD_ENABLED: ${{ vars.DISCORD_ENABLED }}
           # The bot token lives in this GitHub secret; the deploy copies it into the Container App.
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-          DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
+          DISCORD_GUILD_IDS: ${{ secrets.DISCORD_GUILD_IDS }}
           DISCORD_GM_USER_IDS: ${{ secrets.DISCORD_GM_USER_IDS }}
           DISCORD_ANNOUNCE_CHANNEL_ID: ${{ secrets.DISCORD_ANNOUNCE_CHANNEL_ID }}
           SITE_URL: ${{ secrets.SITE_URL }}
@@ -139,7 +139,7 @@ jobs:
           discord_remove=()
           case "${DISCORD_ENABLED}" in
             true)
-              for name in DISCORD_TOKEN DISCORD_GUILD_ID DISCORD_GM_USER_IDS SITE_URL PUBLIC_API_URL; do
+              for name in DISCORD_TOKEN DISCORD_GUILD_IDS DISCORD_GM_USER_IDS SITE_URL PUBLIC_API_URL; do
                 if [ -z "${!name}" ]; then
                   echo "::error::DISCORD_ENABLED=true but the ${name} secret is empty."
                   exit 1
@@ -153,7 +153,7 @@ jobs:
               # DISCORD_ANNOUNCE_CHANNEL_ID may be empty on purpose (announcements off).
               discord_set=(
                 DISCORD_TOKEN="secretref:discord-token"
-                DISCORD_GUILD_ID="${DISCORD_GUILD_ID}"
+                DISCORD_GUILD_IDS="${DISCORD_GUILD_IDS}"
                 DISCORD_GM_USER_IDS="${DISCORD_GM_USER_IDS}"
                 DISCORD_ANNOUNCE_CHANNEL_ID="${DISCORD_ANNOUNCE_CHANNEL_ID}"
                 SITE_URL="${SITE_URL}"
@@ -161,7 +161,7 @@ jobs:
               )
               ;;
             false)
-              discord_remove=(--remove-env-vars DISCORD_TOKEN DISCORD_GUILD_ID DISCORD_GM_USER_IDS DISCORD_ANNOUNCE_CHANNEL_ID SITE_URL PUBLIC_API_URL)
+              discord_remove=(--remove-env-vars DISCORD_TOKEN DISCORD_GUILD_IDS DISCORD_GM_USER_IDS DISCORD_ANNOUNCE_CHANNEL_ID SITE_URL PUBLIC_API_URL)
               ;;
             *)
               echo "::error::Repository variable DISCORD_ENABLED must be 'true' or 'false' (got '${DISCORD_ENABLED}')."

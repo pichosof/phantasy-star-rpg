@@ -368,7 +368,7 @@ Required GitHub Actions secrets:
 | `AZURE_STORAGE_ACCESS_TIER`   | Blob access tier.                                                                    |
 | `MAX_UPLOAD_MB`               | Upload cap in MB.                                                                    |
 | `DISCORD_TOKEN`               | Discord bot token (copied into the Container Apps secret `discord-token` on deploy). |
-| `DISCORD_GUILD_ID`            | Discord server where the slash commands are registered.                              |
+| `DISCORD_GUILD_IDS`           | Discord servers where the slash commands are registered (comma-separated).           |
 | `DISCORD_GM_USER_IDS`         | Discord user ids with GM powers (comma-separated).                                   |
 | `DISCORD_ANNOUNCE_CHANNEL_ID` | Reveal announcements channel (empty = off).                                          |
 | `SITE_URL`                    | Front-end URL for the bot's "Open on site" links.                                    |

@@ -186,7 +186,7 @@ Read at boot from `.env` via `src/infra/config/env.ts`. Treated as required unle
 | `ANTHROPIC_API_KEY`               | empty              | Enables the AI session-diary summary (GM). Empty = feature off.     |
 | `ANTHROPIC_MODEL`                 | `claude-haiku-5-5` | Model used for the session-diary summary.                           |
 | `DISCORD_TOKEN`                   | empty              | Discord bot token. Empty = bot off. Set = every row below required. |
-| `DISCORD_GUILD_ID`                | — (bot on)         | Server where the slash commands are registered.                     |
+| `DISCORD_GUILD_IDS`               | — (bot on)         | Servers where the slash commands are registered (comma-separated).  |
 | `DISCORD_GM_USER_IDS`             | — (bot on)         | Comma-separated Discord user ids with GM powers in the bot.         |
 | `DISCORD_ANNOUNCE_CHANNEL_ID`     | — (bot on)         | Channel for reveal announcements; set it empty to turn them off.    |
 | `SITE_URL`                        | — (bot on)         | Front-end URL for "Open on site" links.                             |
