@@ -127,7 +127,8 @@ jobs:
           UPLOADS_LOCAL_DIR: ${{ secrets.UPLOADS_LOCAL_DIR }}
           # Discord bot: repository variable DISCORD_ENABLED must be exactly 'true' or 'false'.
           DISCORD_ENABLED: ${{ vars.DISCORD_ENABLED }}
-          DISCORD_TOKEN_SECRET_NAME: ${{ secrets.DISCORD_TOKEN_SECRET_NAME }}
+          # The bot token lives in this GitHub secret; the deploy copies it into the Container App.
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           DISCORD_GUILD_ID: ${{ secrets.DISCORD_GUILD_ID }}
           DISCORD_GM_USER_IDS: ${{ secrets.DISCORD_GM_USER_IDS }}
           DISCORD_ANNOUNCE_CHANNEL_ID: ${{ secrets.DISCORD_ANNOUNCE_CHANNEL_ID }}
@@ -138,15 +139,20 @@ jobs:
           discord_remove=()
           case "${DISCORD_ENABLED}" in
             true)
-              for name in DISCORD_TOKEN_SECRET_NAME DISCORD_GUILD_ID DISCORD_GM_USER_IDS SITE_URL PUBLIC_API_URL; do
+              for name in DISCORD_TOKEN DISCORD_GUILD_ID DISCORD_GM_USER_IDS SITE_URL PUBLIC_API_URL; do
                 if [ -z "${!name}" ]; then
                   echo "::error::DISCORD_ENABLED=true but the ${name} secret is empty."
                   exit 1
                 fi
               done
+              az containerapp secret set \
+                --name "${CONTAINER_APP_NAME}" \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --secrets "discord-token=${DISCORD_TOKEN}" \
+                --output none
               # DISCORD_ANNOUNCE_CHANNEL_ID may be empty on purpose (announcements off).
               discord_set=(
-                DISCORD_TOKEN="secretref:${DISCORD_TOKEN_SECRET_NAME}"
+                DISCORD_TOKEN="secretref:discord-token"
                 DISCORD_GUILD_ID="${DISCORD_GUILD_ID}"
                 DISCORD_GM_USER_IDS="${DISCORD_GM_USER_IDS}"
                 DISCORD_ANNOUNCE_CHANNEL_ID="${DISCORD_ANNOUNCE_CHANNEL_ID}"
