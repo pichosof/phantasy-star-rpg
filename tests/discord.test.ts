@@ -484,3 +484,25 @@ describe('branding', () => {
     ]);
   });
 });
+
+describe('/help', () => {
+  it('documents every registered command and subcommand', async () => {
+    const { COMMANDS } = await import('../src/infra/discord/commands');
+    const { HELP_TOPICS } = await import('../src/infra/discord/handlers/help');
+    const documented = new Set(HELP_TOPICS.flatMap((t) => t.entries.flatMap((e) => e.covers)));
+    const registered = COMMANDS.flatMap((c) => [
+      c.name,
+      ...(c.options ?? []).filter((o) => o.type === 1).map((o) => `${c.name} ${o.name}`),
+    ]);
+    expect(registered.filter((name) => !documented.has(name))).toEqual([]);
+    expect([...documented].filter((name) => !registered.includes(name))).toEqual([]);
+  });
+
+  it('players never get the GM topic', async () => {
+    const { helpReply } = await import('../src/infra/discord/handlers/help');
+    const player = helpReply(null, false);
+    expect(JSON.stringify(player)).not.toContain('Game master');
+    expect(helpReply('gm', false).embeds?.[0].description).toContain('for the GM');
+    expect(JSON.stringify(helpReply('gm', true))).toContain('/encounter');
+  });
+});

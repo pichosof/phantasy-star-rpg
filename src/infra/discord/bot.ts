@@ -12,6 +12,7 @@ import {
   MessageFlags,
   PermissionFlagsBits,
   RESTJSONErrorCodes,
+  type StringSelectMenuInteraction,
   type Webhook,
 } from 'discord.js';
 
@@ -63,6 +64,7 @@ import {
   npcVoice,
   playerOfCombatant,
 } from './handlers/gm.js';
+import { HELP_SELECT_ID, helpReply } from './handlers/help.js';
 import { itemChoices, itemReply, resolveItemId } from './handlers/item.js';
 import { sessionReply, timelineReply } from './handlers/journal.js';
 import {
@@ -182,6 +184,7 @@ export class DiscordBot {
       if (i.isAutocomplete()) return await this.autocomplete(i);
       if (i.isChatInputCommand()) return await this.command(i);
       if (i.isButton()) return await this.button(i);
+      if (i.isStringSelectMenu()) return await this.select(i);
     } catch (err) {
       this.log.error(err, '[discord] interaction failed');
       if (i.isRepliable() && !i.replied && !i.deferred)
@@ -361,6 +364,8 @@ export class DiscordBot {
           ),
         );
       }
+      case 'help':
+        return i.reply(toDiscord(helpReply(i.options.getString('topic'), gm)));
       case 'encounter':
         if (!gm) return i.reply(toDiscord(errorReply('Only the GM can run the combat.')));
         return i.reply(toDiscord(await encounterActionReply(encounterAction(i))));
@@ -464,6 +469,14 @@ export class DiscordBot {
       embeds: [{ color: COLOR.success, description: `📜 Handout sent to <@${user.id}>.` }],
       ephemeral: true,
     };
+  }
+
+  private async select(i: StringSelectMenuInteraction) {
+    if (i.customId === HELP_SELECT_ID) {
+      const reply = helpReply(i.values[0], isGM(i.user.id));
+      return i.update({ embeds: branded(reply.embeds), components: reply.components });
+    }
+    throw new Error(`Unhandled select menu: ${i.customId}`);
   }
 
   private async button(i: ButtonInteraction) {

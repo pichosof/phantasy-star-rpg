@@ -1,4 +1,9 @@
-import type { APIActionRowComponent, APIButtonComponent, APIEmbed } from 'discord.js';
+import type {
+  APIActionRowComponent,
+  APIButtonComponent,
+  APIComponentInMessageActionRow,
+  APIEmbed,
+} from 'discord.js';
 
 import type { EntityType } from '../../core/use-cases/links/link-text.js';
 import { type DiscordConfig, env } from '../config/env.js';
@@ -7,7 +12,7 @@ import { type DiscordConfig, env } from '../config/env.js';
 export interface BotReply {
   content?: string;
   embeds?: APIEmbed[];
-  components?: APIActionRowComponent<APIButtonComponent>[];
+  components?: APIActionRowComponent<APIComponentInMessageActionRow>[];
   /** Only the caller sees it. */
   ephemeral?: boolean;
 }

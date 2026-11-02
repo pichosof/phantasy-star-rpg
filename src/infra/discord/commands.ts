@@ -5,12 +5,23 @@ import {
 } from 'discord.js';
 
 import { ORACLE_CHOICES } from './handlers/dice.js';
+import { HELP_TOPIC_CHOICES } from './handlers/help.js';
 
 const privateOption = (description: string) => (o: SlashCommandBooleanOption) =>
   o.setName('private').setDescription(description);
 
 /** Slash commands, registered on the configured server when the bot starts. */
 export const COMMANDS = [
+  new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('How to use the bot: dice, the world, your character, GM tools')
+    .addStringOption((o) =>
+      o
+        .setName('topic')
+        .setDescription('Jump to a topic')
+        .addChoices(...HELP_TOPIC_CHOICES),
+    ),
+
   new SlashCommandBuilder()
     .setName('roll')
     .setDescription('Roll dice: 1d20+5, 2d6-1, 4d6kh3, 2d20kl1…')
