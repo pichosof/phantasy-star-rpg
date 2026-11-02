@@ -14,6 +14,7 @@ import {
 } from 'discord.js';
 
 import { entityEvents } from '../../core/events/entity-events.js';
+import type { SaveKey } from '../../core/use-cases/character-sheets/starfinder.js';
 import type { OracleOdds } from '../../core/use-cases/dice/oracle.js';
 import type { EntityType } from '../../core/use-cases/links/link-text.js';
 import { LinkTargetNotFoundError } from '../../core/use-cases/links/links.js';
@@ -21,6 +22,22 @@ import { container } from '../../di/container.js';
 
 import { COMMANDS } from './commands.js';
 import { type BotReply, discord, errorReply, linkButton, siteUrl, TYPE_LABEL } from './format.js';
+import {
+  attackReply,
+  checkReply,
+  initiativeReply,
+  linkReply,
+  linksReply,
+  meReply,
+  playerChoices,
+  progressReply,
+  questsReply,
+  saveReply,
+  sheetChoices,
+  skillChoices,
+  unlinkReply,
+  weaponChoices,
+} from './handlers/character.js';
 import { COMBAT_REFRESH_PREFIX, combatReply } from './handlers/combat.js';
 import { oracleReply, parseRerollId, REROLL_PREFIX, rollReply } from './handlers/dice.js';
 import { itemChoices, itemReply, resolveItemId } from './handlers/item.js';
@@ -152,19 +169,39 @@ export class DiscordBot {
 
   private async autocomplete(i: AutocompleteInteraction) {
     const gm = isGM(i.user.id);
-    const query = String(i.options.getFocused());
-    const choices =
-      i.commandName === 'lookup'
-        ? await entityChoices(query, gm, (e) => e.type !== 'item')
-        : i.commandName === 'item'
-          ? await itemChoices(query, gm)
-          : i.commandName === 'reveal' && gm
-            ? await revealChoices(query)
-            : [];
+    const focused = i.options.getFocused(true);
+    const query = String(focused.value);
+    const choices = await this.suggestions(i.commandName, focused.name, query, i.user.id, gm);
     // Suggestions are dropped when the user keeps typing (expired interaction): expected.
     await i.respond(choices).catch((err: unknown) => {
       if (!isDiscordError(err, RESTJSONErrorCodes.UnknownInteraction)) throw err;
     });
+  }
+
+  private async suggestions(
+    command: string,
+    option: string,
+    query: string,
+    userId: string,
+    gm: boolean,
+  ): Promise<{ name: string; value: string }[]> {
+    switch (command) {
+      case 'lookup':
+        return entityChoices(query, gm, (e) => e.type !== 'item');
+      case 'item':
+        return itemChoices(query, gm);
+      case 'reveal':
+        return gm ? revealChoices(query) : [];
+      case 'check':
+        return skillChoices(userId, query);
+      case 'attack':
+        return weaponChoices(userId, query);
+      case 'link':
+        if (!gm) return [];
+        return option === 'sheet' ? sheetChoices(query) : playerChoices(query);
+      default:
+        return [];
+    }
   }
 
   private async command(i: ChatInputCommandInteraction) {
@@ -235,6 +272,57 @@ export class DiscordBot {
           toDiscord('ref' in found ? await revealReply(found.ref) : errorReply(found.error)),
         );
       }
+      case 'me':
+        return i.reply(toDiscord(await meReply(i.user.id)));
+      case 'check':
+        return i.reply(
+          toDiscord(
+            await checkReply(
+              i.user.id,
+              i.options.getString('skill', true),
+              i.options.getBoolean('secret') ?? false,
+            ),
+          ),
+        );
+      case 'save':
+        return i.reply(
+          toDiscord(
+            await saveReply(
+              i.user.id,
+              i.options.getString('type', true) as SaveKey,
+              i.options.getBoolean('secret') ?? false,
+            ),
+          ),
+        );
+      case 'init':
+        return i.reply(toDiscord(await initiativeReply(i.user.id)));
+      case 'attack':
+        return i.reply(
+          toDiscord(await attackReply(i.user.id, i.options.getString('weapon', true))),
+        );
+      case 'progress':
+        return i.reply(toDiscord(await progressReply(i.user.id)));
+      case 'quests':
+        return i.reply(toDiscord(await questsReply(i.user.id)));
+      case 'link':
+      case 'unlink':
+      case 'links': {
+        if (!gm) return i.reply(toDiscord(errorReply('Only the GM can manage links.')));
+        if (i.commandName === 'links') return i.reply(toDiscord(await linksReply()));
+        const user = i.options.getUser('user', true);
+        if (i.commandName === 'unlink') return i.reply(toDiscord(await unlinkReply(user.id)));
+        return i.reply(
+          toDiscord(
+            await linkReply(
+              user.id,
+              i.options.getString('player', true),
+              i.options.getString('sheet'),
+            ),
+          ),
+        );
+      }
+      default:
+        throw new Error(`Unhandled command: ${i.commandName}`);
     }
   }
 

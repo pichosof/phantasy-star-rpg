@@ -196,7 +196,7 @@ Read at boot from `.env` via `src/infra/config/env.ts`. Treated as required unle
 
 GM endpoints for the database: `GET /api/gm/database/download` (streams a fresh snapshot) and `POST /api/gm/database/backup` (backs up now; skipped if unchanged). Implementation: [src/infra/backup/](src/infra/backup/).
 
-**Discord bot** ([src/infra/discord/](src/infra/discord/)): a driving adapter in the API process (needs `minReplicas=1`). Slash commands `/roll`, `/oracle`, `/lookup`, `/item`, `/session`, `/timeline`, `/combat`, `/reveal` (GM). Rules:
+**Discord bot** ([src/infra/discord/](src/infra/discord/)): a driving adapter in the API process (needs `minReplicas=1`). Slash commands `/roll`, `/oracle`, `/lookup`, `/item`, `/session`, `/timeline`, `/combat`, `/reveal` (GM); per character `/me`, `/check`, `/save`, `/init`, `/attack`, `/progress`, `/quests`, linked by the GM with `/link` (`discord_links` table: Discord user → player + Starfinder sheet). Sheet math lives in [src/core/use-cases/character-sheets/starfinder.ts](src/core/use-cases/character-sheets/starfinder.ts) and mirrors the front-end `starfinder-calc.ts` (change both together); a value a roll needs that is missing from the sheet is an error, never an assumed 10/0. Rules:
 
 - Reads go through the same use-cases as the site and `visibleTo`; public answers always use the **player view**, even for the GM (the full view is ephemeral, `private: True`).
 - No guessing: typed names must match exactly and uniquely (otherwise the user picks a suggestion); only _expected_ errors are caught (not found, expired interaction, deleted message), everything else surfaces.

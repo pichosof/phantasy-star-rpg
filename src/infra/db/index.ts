@@ -85,6 +85,12 @@ export function ensureRuntimeTables() {
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   );
+  CREATE TABLE IF NOT EXISTS discord_links (
+    discord_user_id TEXT PRIMARY KEY NOT NULL,
+    player_id INTEGER NOT NULL REFERENCES players(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+    sheet_id INTEGER REFERENCES character_sheets(id) ON UPDATE NO ACTION ON DELETE SET NULL,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
 `);
 }
 

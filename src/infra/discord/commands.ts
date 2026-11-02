@@ -98,4 +98,78 @@ export const COMMANDS = [
         .setAutocomplete(true)
         .setMaxLength(100),
     ),
+
+  // ── Your character (needs a /link by the GM) ──
+  new SlashCommandBuilder()
+    .setName('me')
+    .setDescription('Your character: pools, defenses, saves, weapons (only you see it)'),
+
+  new SlashCommandBuilder()
+    .setName('check')
+    .setDescription('Roll a skill check with the bonus from your sheet')
+    .addStringOption((o) =>
+      o.setName('skill').setDescription('Skill').setRequired(true).setAutocomplete(true),
+    )
+    .addBooleanOption((o) => o.setName('secret').setDescription('Only you see the result')),
+
+  new SlashCommandBuilder()
+    .setName('save')
+    .setDescription('Roll a saving throw with the bonus from your sheet')
+    .addStringOption((o) =>
+      o
+        .setName('type')
+        .setDescription('Which save')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Fortitude', value: 'fort' },
+          { name: 'Reflex', value: 'ref' },
+          { name: 'Will', value: 'will' },
+        ),
+    )
+    .addBooleanOption((o) => o.setName('secret').setDescription('Only you see the result')),
+
+  new SlashCommandBuilder()
+    .setName('init')
+    .setDescription('Roll initiative with the bonus from your sheet'),
+
+  new SlashCommandBuilder()
+    .setName('attack')
+    .setDescription('Attack with a weapon from your sheet (attack + damage)')
+    .addStringOption((o) =>
+      o.setName('weapon').setDescription('Weapon').setRequired(true).setAutocomplete(true),
+    ),
+
+  new SlashCommandBuilder()
+    .setName('progress')
+    .setDescription('Your XP and credits per session (only you see it)'),
+
+  new SlashCommandBuilder()
+    .setName('quests')
+    .setDescription('Quests assigned to your character (only you see it)'),
+
+  // ── GM: who plays whom ──
+  new SlashCommandBuilder()
+    .setName('link')
+    .setDescription('GM: link a Discord user to a player character and sheet')
+    .addUserOption((o) => o.setName('user').setDescription('Discord user').setRequired(true))
+    .addStringOption((o) =>
+      o
+        .setName('player')
+        .setDescription('Player character')
+        .setRequired(true)
+        .setAutocomplete(true),
+    )
+    .addStringOption((o) =>
+      o
+        .setName('sheet')
+        .setDescription('Starfinder sheet for rolls (leave empty: no rolls)')
+        .setAutocomplete(true),
+    ),
+
+  new SlashCommandBuilder()
+    .setName('unlink')
+    .setDescription('GM: remove the link of a Discord user')
+    .addUserOption((o) => o.setName('user').setDescription('Discord user').setRequired(true)),
+
+  new SlashCommandBuilder().setName('links').setDescription('GM: who plays which character'),
 ].map((c) => c.toJSON());

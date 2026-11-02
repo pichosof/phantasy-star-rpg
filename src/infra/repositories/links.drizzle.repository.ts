@@ -65,6 +65,21 @@ export class LinksDrizzleRepository {
     return rowsMap;
   }
 
+  /** Quests assigned to a player, with the player's own status; players only get visible ones. */
+  async listQuestsByPlayerId(playerId: number, opts: { includeHidden: boolean }) {
+    const rows = await db
+      .select({ quest: s.quests, assignment: s.playerQuests.status })
+      .from(s.playerQuests)
+      .innerJoin(s.quests, eq(s.playerQuests.questId, s.quests.id))
+      .where(
+        opts.includeHidden
+          ? eq(s.playerQuests.playerId, playerId)
+          : and(eq(s.playerQuests.playerId, playerId), eq(s.quests.visible, true)),
+      )
+      .orderBy(s.quests.id);
+    return rows.map((r) => ({ ...r.quest, assignment: r.assignment }));
+  }
+
   async listCitiesByQuestId(questId: number) {
     const rows = await db
       .select({ city: s.cities })

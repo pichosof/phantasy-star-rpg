@@ -23,6 +23,12 @@ import { UpdateCity } from '../core/use-cases/cities/update-city';
 import { UpdateCityImage } from '../core/use-cases/cities/update-city-image';
 import { SetVisibility } from '../core/use-cases/common/set-visibility';
 import {
+  GetDiscordLink,
+  LinkDiscordUser,
+  ListDiscordLinks,
+  UnlinkDiscordUser,
+} from '../core/use-cases/discord-links/discord-links';
+import {
   CreateEncounter,
   DeleteEncounter,
   GetEncounter,
@@ -65,6 +71,7 @@ import { UpdateNpcImage } from '../core/use-cases/npc/update-npc-image';
 import { AssignQuestToPlayer } from '../core/use-cases/player/assign-quest-to-player';
 import { CreatePlayer } from '../core/use-cases/player/create-player';
 import { ListPlayers } from '../core/use-cases/player/list-players';
+import { ListQuestsByPlayerId } from '../core/use-cases/player/list-quests-by-player-id';
 import { SetPlayerQuestStatus } from '../core/use-cases/player/set-player-quest-status';
 import { UpdatePlayer } from '../core/use-cases/player/update-player';
 import { UpdatePlayerImage } from '../core/use-cases/player/update-player-image';
@@ -104,6 +111,7 @@ import { UpdateWorldImage } from '../core/use-cases/world/update-world-image';
 import { AnthropicDiarySummarizer } from '../infra/ai/anthropic-diary-summarizer';
 import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
 import { CityDrizzleRepository } from '../infra/repositories/city.drizzle.repository';
+import { DiscordLinkDrizzleRepository } from '../infra/repositories/discord-link.drizzle.repository';
 import { DungeonDrizzleRepository } from '../infra/repositories/dungeon.drizzle.repository';
 import { EncounterDrizzleRepository } from '../infra/repositories/encounter.drizzle.repository';
 import { GmImageDrizzleRepository } from '../infra/repositories/gm-image.drizzle.repository';
@@ -297,6 +305,14 @@ export type Registry = {
   // List Pivots
   listLoresByCityId: ListLoresByCityId;
   listQuestsByCityId: ListQuestsByCityId;
+  listQuestsByPlayerId: ListQuestsByPlayerId;
+
+  // Discord links
+  discordLinkRepo: DiscordLinkDrizzleRepository;
+  linkDiscordUser: LinkDiscordUser;
+  getDiscordLink: GetDiscordLink;
+  listDiscordLinks: ListDiscordLinks;
+  unlinkDiscordUser: UnlinkDiscordUser;
 };
 
 class Container {
@@ -482,6 +498,14 @@ class Container {
     //list
     listLoresByCityId: (c) => new ListLoresByCityId(c.resolve('linksRepo')),
     listQuestsByCityId: (c) => new ListQuestsByCityId(c.resolve('linksRepo')),
+    listQuestsByPlayerId: (c) => new ListQuestsByPlayerId(c.resolve('linksRepo')),
+
+    // Discord links
+    discordLinkRepo: () => new DiscordLinkDrizzleRepository(),
+    linkDiscordUser: (c) => new LinkDiscordUser(c.resolve('discordLinkRepo')),
+    getDiscordLink: (c) => new GetDiscordLink(c.resolve('discordLinkRepo')),
+    listDiscordLinks: (c) => new ListDiscordLinks(c.resolve('discordLinkRepo')),
+    unlinkDiscordUser: (c) => new UnlinkDiscordUser(c.resolve('discordLinkRepo')),
   };
 
   resolve<K extends keyof Registry>(key: K): Registry[K] {

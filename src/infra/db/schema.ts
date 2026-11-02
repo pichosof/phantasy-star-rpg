@@ -547,3 +547,15 @@ export const items = sqliteTable('items', {
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
 });
+
+/** Discord user → player character (and the sheet their bot rolls use). Set by the GM. */
+export const discordLinks = sqliteTable('discord_links', {
+  discordUserId: text('discord_user_id').primaryKey(),
+  playerId: integer('player_id')
+    .notNull()
+    .references(() => players.id, { onDelete: 'cascade' }),
+  sheetId: integer('sheet_id').references(() => characterSheets.id, { onDelete: 'set null' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
