@@ -1,7 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 
 import { ImageFocusDrizzleRepository } from '../../repositories/image-focus.drizzle.repository.js';
-import { extractStorageKeyFromUrl, normalizeStorageKey } from '../../storage/file-storage.utils.js';
+import {
+  extractStorageKeyFromUrl,
+  isSafeStorageKey,
+  normalizeStorageKey,
+} from '../../storage/file-storage.utils.js';
 
 const MAX_KEYS = 200;
 
@@ -9,8 +13,8 @@ const MAX_KEYS = 200;
 function toKey(value: string): string | null {
   const v = value.trim();
   if (!v) return null;
-  const key = v.startsWith('/files/') ? extractStorageKeyFromUrl(v) : normalizeStorageKey(v);
-  return key && !key.includes('..') ? key : null;
+  if (v.startsWith('/files/')) return extractStorageKeyFromUrl(v);
+  return isSafeStorageKey(v) ? normalizeStorageKey(v) : null;
 }
 
 export async function imageFocusRoutes(app: FastifyInstance) {

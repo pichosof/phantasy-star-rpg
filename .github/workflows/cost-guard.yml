@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Azure login
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -45,10 +45,19 @@ jobs:
           CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
         run: |
           scope="subscriptions/${SUBSCRIPTION_ID}/resourceGroups/${AZURE_RESOURCE_GROUP}"
-          cost="$(az rest --method post \
-            --url "https://management.azure.com/${scope}/providers/Microsoft.CostManagement/query?api-version=2023-03-01" \
-            --body '{"type":"ActualCost","timeframe":"MonthToDate","dataset":{"granularity":"None","aggregation":{"c":{"name":"Cost","function":"Sum"}}}}' \
-            --query 'properties.rows[0][0]' --output tsv)"
+          # Cost Management throttles hard (429). Retry only that, with backoff; any other error fails.
+          for attempt in 1 2 3 4 5; do
+            if cost="$(az rest --method post \
+              --url "https://management.azure.com/${scope}/providers/Microsoft.CostManagement/query?api-version=2023-03-01" \
+              --body '{"type":"ActualCost","timeframe":"MonthToDate","dataset":{"granularity":"None","aggregation":{"c":{"name":"Cost","function":"Sum"}}}}' \
+              --query 'properties.rows[0][0]' --output tsv 2>/tmp/cost.err)"; then
+              break
+            fi
+            cat /tmp/cost.err >&2
+            if ! grep -q 'Too Many Requests' /tmp/cost.err || [ "${attempt}" = 5 ]; then exit 1; fi
+            echo "Cost query throttled; retrying in $((attempt * 60))s (attempt ${attempt}/5)."
+            sleep $((attempt * 60))
+          done
           cost="${cost:-0}"
 
           want="$(awk -v c="${cost}" -v b="${BUDGET_BRL}" -v m="${MARGIN_BRL}" 'BEGIN { print (c >= b - m) ? 0 : 1 }')"

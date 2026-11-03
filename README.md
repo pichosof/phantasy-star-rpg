@@ -43,7 +43,7 @@ This repository hosts the **HTTP API** and persistence layer of [Picho-RPG](http
 
 | Layer         | Tech                                                                                                       |
 | ------------- | ---------------------------------------------------------------------------------------------------------- |
-| Runtime       | Node.js 20 (`type: module`)                                                                                |
+| Runtime       | Node.js 22 (`type: module`)                                                                                |
 | Web framework | Fastify 5 + `@fastify/cors`, `helmet`, `multipart`, `rate-limit`, `static`, `swagger`, `swagger-ui`, `jwt` |
 | Validation    | Zod 3 + `fastify-type-provider-zod` + `zod-to-json-schema`                                                 |
 | ORM           | Drizzle ORM (`drizzle-orm` + `drizzle-kit`)                                                                |
@@ -294,7 +294,7 @@ phantasy-star-rpg
 │   └── migrate-dungeons-tags.js
 ├── tests/                              Vitest suites + setup
 ├── deploy/azure/                       Bicep / azd manifests
-├── Dockerfile                          Multi-stage build (Node 20 slim)
+├── Dockerfile                          Multi-stage build (Node 22 slim)
 ├── drizzle.config.ts                   Drizzle Kit config
 ├── eslint.config.cjs                   Flat ESLint config
 ├── tsconfig.json

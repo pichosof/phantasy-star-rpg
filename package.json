@@ -35,9 +35,9 @@
     "@fastify/jwt": "^10.0.0",
     "@fastify/multipart": "^10.0.0",
     "@fastify/rate-limit": "^10.3.0",
-    "@fastify/static": "^9.1.3",
+    "@fastify/static": "^10.1.8",
     "@fastify/swagger": "^9.7.0",
-    "@fastify/swagger-ui": "^5.2.6",
+    "@fastify/swagger-ui": "^6.1.2",
     "better-sqlite3": "^12.9.0",
     "discord.js": "^14.28.0",
     "dotenv": "^17.4.2",
@@ -45,7 +45,7 @@
     "fastify": "^5.8.5",
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3",
-    "sharp": "^0.34.4",
+    "sharp": "^0.35.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -54,7 +54,7 @@
     "@types/node": "^25.6.0",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.59.0",
-    "@vitest/coverage-v8": "^4.1.5",
+    "@vitest/coverage-v8": "^4.1.12",
     "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.4",
@@ -67,7 +67,7 @@
     "prettier": "^3.8.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.12",
     "zod-to-json-schema": "^3.25.2"
   },
   "lint-staged": {
@@ -79,5 +79,8 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "vite": "~8.1.6"
   }
 }

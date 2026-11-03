@@ -7,7 +7,26 @@ import type { ByteRange } from './file-storage.port.js';
 
 const FILES_PREFIX = '/files/';
 
+export class UnsafeStorageKeyError extends Error {
+  readonly statusCode = 400;
+  constructor() {
+    super('Invalid storage key');
+    this.name = 'UnsafeStorageKeyError';
+  }
+}
+
+/** A key may never climb out of the storage root: no empty, `.` or `..` segments, no NUL. */
+export function isSafeStorageKey(key: string): boolean {
+  const k = key.replace(/\\/g, '/').replace(/^\/+/, '');
+  return (
+    k.length > 0 &&
+    !k.includes('\0') &&
+    k.split('/').every((s) => s !== '' && s !== '.' && s !== '..')
+  );
+}
+
 export function normalizeStorageKey(key: string): string {
+  if (!isSafeStorageKey(key)) throw new UnsafeStorageKeyError();
   return key.replace(/\\/g, '/').replace(/^\/+/, '');
 }
 
@@ -27,15 +46,26 @@ export function encodeStorageKey(key: string): string {
     .join('/');
 }
 
-export function decodeStorageKey(value: string): string {
-  return value
-    .split('/')
-    .map((segment) => decodeURIComponent(segment))
-    .join('/');
+/** Decodes a /files/ path into a storage key; null when it is malformed or climbs out of the root. */
+export function decodeStorageKey(value: string): string | null {
+  let key: string;
+  try {
+    key = value
+      .split('/')
+      .map((segment) => decodeURIComponent(segment))
+      .join('/');
+  } catch (err) {
+    if (err instanceof URIError) return null;
+    throw err;
+  }
+  return isSafeStorageKey(key) ? normalizeStorageKey(key) : null;
 }
 
 export function resolveLocalStoragePath(key: string): string {
-  return path.resolve(env.UPLOADS_LOCAL_DIR, ...normalizeStorageKey(key).split('/'));
+  const root = path.resolve(env.UPLOADS_LOCAL_DIR);
+  const full = path.resolve(root, ...normalizeStorageKey(key).split('/'));
+  if (!full.startsWith(root + path.sep)) throw new UnsafeStorageKeyError();
+  return full;
 }
 
 export class SizeLimitTransform extends Transform {

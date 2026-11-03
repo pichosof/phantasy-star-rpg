@@ -44,7 +44,7 @@ Picho-RPG is a tabletop RPG companion app. This repo is the **HTTP API** and per
 
 | Layer         | Tech                                                                                           |
 | ------------- | ---------------------------------------------------------------------------------------------- |
-| Runtime       | Node.js 20 (`type: module`)                                                                    |
+| Runtime       | Node.js 22 (`type: module`)                                                                    |
 | Web framework | Fastify 5                                                                                      |
 | Plugins       | `@fastify/cors`, `helmet`, `multipart`, `rate-limit`, `static`, `swagger`, `swagger-ui`, `jwt` |
 | Validation    | Zod 3 + `fastify-type-provider-zod` + `zod-to-json-schema`                                     |
