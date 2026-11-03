@@ -50,6 +50,9 @@ function redactUndiscovered(shape: Obj, kind: Kind): Obj {
   return out;
 }
 
+/** Fields only the GM may read, wherever the entity appears (lists, tag pages…). */
+const GM_ONLY_FIELDS = ['gmSecret'] as const;
+
 const KIND_BY_KEY: Record<string, Kind> = { beasts: 'beast', dungeons: 'dungeon', cities: 'city' };
 
 function kindForRoute(url: string | undefined): Kind {
@@ -73,6 +76,11 @@ function sanitizeItem(item: unknown, kind: Kind): unknown {
   let out: Obj = shape;
   if (kind && shape.discovered === false) {
     out = redactUndiscovered(shape, kind);
+    changed = true;
+  }
+  if (GM_ONLY_FIELDS.some((k) => k in out)) {
+    out = { ...out };
+    for (const k of GM_ONLY_FIELDS) delete out[k];
     changed = true;
   }
   for (const [key, value] of Object.entries(out)) {

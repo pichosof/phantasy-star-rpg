@@ -10,6 +10,8 @@ export const createNpcInput = z.object({
   location: z.string().nullable().optional(),
   /** As the generators name it (e.g. "Motaviano"); picks the portrait profile. */
   race: z.string().trim().min(1).max(40).nullable().optional(),
+  /** GM-only (players never receive it). */
+  gmSecret: z.string().trim().max(2000).nullable().optional(),
 });
 export type CreateNpcInput = z.input<typeof createNpcInput>;
 

@@ -106,6 +106,48 @@ describe('NPC race', () => {
   });
 });
 
+describe('NPC GM secret', () => {
+  it('reaches the GM only: never the player list, tag pages or search', async () => {
+    const id = await createNpc({
+      name: 'Zorvek Secretkeeper',
+      gmSecret: 'owes a debt to a dezolian',
+    });
+    await api.gm({
+      method: 'PATCH',
+      url: `/api/npcs/${id}/visibility`,
+      payload: { visible: true },
+    });
+    const tag = (
+      await api.gm({ method: 'POST', url: '/api/tags', payload: { name: 'secret-test' } })
+    ).json() as { id: number };
+    await api.gm({
+      method: 'PUT',
+      url: `/api/entity-tags/npc/${id}`,
+      payload: { tagIds: [tag.id] },
+    });
+
+    type Row = { id: number; gmSecret?: string | null };
+    const find = (rows: Row[]) => rows.find((n) => n.id === id);
+    const gmList = (await api.gm({ method: 'GET', url: '/api/npcs' })).json() as Row[];
+    expect(find(gmList)?.gmSecret).toBe('owes a debt to a dezolian');
+
+    const playerList = (await api.player({ method: 'GET', url: '/api/npcs' })).json() as Row[];
+    expect(find(playerList)).toBeDefined();
+    expect(find(playerList)).not.toHaveProperty('gmSecret');
+
+    const tagPage = await api.player({ method: 'GET', url: `/api/tags/${tag.id}/entities` });
+    expect(tagPage.body).toContain('Zorvek');
+    expect(tagPage.body).not.toContain('dezolian');
+
+    const search = await api.player({ method: 'GET', url: '/api/search?q=dezolian' });
+    expect(search.body).not.toContain('Zorvek');
+
+    await api.gm({ method: 'PATCH', url: `/api/npcs/${id}`, payload: { gmSecret: '' } });
+    const cleared = (await api.gm({ method: 'GET', url: '/api/npcs' })).json() as Row[];
+    expect(find(cleared)?.gmSecret).toBeNull();
+  });
+});
+
 describe('Portrait profiles and draft', () => {
   it('are GM only', async () => {
     expect((await api.player({ method: 'GET', url: '/api/gm/portrait-profiles' })).statusCode).toBe(

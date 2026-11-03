@@ -5,6 +5,8 @@ export interface NpcProps {
   description?: string | null;
   location?: string | null;
   race?: string | null;
+  /** GM-only; stripped from every player response. */
+  gmSecret?: string | null;
   visible?: boolean;
   imageUrl?: string | null;
   imageAlt?: string | null;

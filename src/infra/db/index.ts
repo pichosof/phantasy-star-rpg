@@ -114,6 +114,7 @@ export function ensureRuntimeTables() {
   );
 `);
   addColumnIfMissing('npcs', 'race', 'TEXT');
+  addColumnIfMissing('npcs', 'gm_secret', 'TEXT');
 }
 
 /** Adds a column to a migration-managed table that exists (a fresh DB gets it after migrating). */

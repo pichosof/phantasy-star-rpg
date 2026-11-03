@@ -55,6 +55,8 @@ export const npcs = sqliteTable('npcs', {
   location: text('location'), // cidade/local atual
   /** Race as the generators name it (e.g. "Motaviano"); picks the portrait profile. Runtime column. */
   race: text('race'),
+  /** GM-only secret; never sent to players (see visibility-filter). Runtime column. */
+  gmSecret: text('gm_secret'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
