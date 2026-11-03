@@ -8,6 +8,8 @@ export const createNpcInput = z.object({
   role: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
+  /** As the generators name it (e.g. "Motaviano"); picks the portrait profile. */
+  race: z.string().trim().min(1).max(40).nullable().optional(),
 });
 export type CreateNpcInput = z.input<typeof createNpcInput>;
 

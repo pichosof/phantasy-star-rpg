@@ -129,6 +129,11 @@ export class NpcController {
     const current = await repo.findById(id);
     await deleteStoredFileByUrl(current?.imageUrl);
     await deleteStoredFileByUrl(current?.sheetUrl);
+    // Generated portraits (their rows go with the NPC; the files would stay behind).
+    for (const job of await container.resolve('portraitJobRepo').listByNpc(id)) {
+      if (job.imageUrl && job.imageUrl !== current?.imageUrl)
+        await deleteStoredFileByUrl(job.imageUrl);
+    }
 
     await container.resolve('deleteNpc').execute({ id });
     return reply.code(204).send();

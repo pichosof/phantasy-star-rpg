@@ -4,6 +4,7 @@ export interface NpcProps {
   role?: string | null;
   description?: string | null;
   location?: string | null;
+  race?: string | null;
   visible?: boolean;
   imageUrl?: string | null;
   imageAlt?: string | null;

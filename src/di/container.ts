@@ -78,6 +78,18 @@ import { UpdatePlayer } from '../core/use-cases/player/update-player';
 import { UpdatePlayerImage } from '../core/use-cases/player/update-player-image';
 import { UpdatePlayerSheet } from '../core/use-cases/player/update-player-sheet';
 import {
+  ApplyPortrait,
+  CheckPortraitJob,
+  CompletePortraitJob,
+  DeletePortraitJob,
+  DeletePortraitProfile,
+  DraftNpcPortrait,
+  GenerateNpcPortrait,
+  ListNpcPortraits,
+  ListPortraitProfiles,
+  SavePortraitProfile,
+} from '../core/use-cases/portraits/portraits';
+import {
   GetPlayerProgress,
   GetSessionRewards,
   SetSessionRewards,
@@ -110,6 +122,7 @@ import { ListWorlds } from '../core/use-cases/world/list-worlds';
 import { UpdateWorld } from '../core/use-cases/world/update-world';
 import { UpdateWorldImage } from '../core/use-cases/world/update-world-image';
 import { AnthropicDiarySummarizer } from '../infra/ai/anthropic-diary-summarizer';
+import { FotorPortraitGenerator } from '../infra/ai/fotor-portrait-generator';
 import { CharacterSheetDrizzleRepository } from '../infra/repositories/character-sheet.drizzle.repository';
 import { CityDrizzleRepository } from '../infra/repositories/city.drizzle.repository';
 import { DiscordLinkDrizzleRepository } from '../infra/repositories/discord-link.drizzle.repository';
@@ -126,6 +139,12 @@ import { MapMarkerDrizzleRepository } from '../infra/repositories/map-marker.dri
 import { MonsterDrizzleRepository } from '../infra/repositories/monster.drizzle.repository';
 import { NpcDrizzleRepository } from '../infra/repositories/npc.drizzle.repository';
 import { PlayerDrizzleRepository } from '../infra/repositories/player.drizzle.repository';
+import {
+  PortraitJobDrizzleRepository,
+  PortraitNpcsDrizzle,
+  PortraitProfileDrizzleRepository,
+  PortraitStorageFiles,
+} from '../infra/repositories/portrait.drizzle.repository';
 import { ProgressDrizzleRepository } from '../infra/repositories/progress.drizzle.repository';
 import { QuestDrizzleRepository } from '../infra/repositories/quest.drizzle.repository';
 import { SessionDiaryDrizzleRepository } from '../infra/repositories/session-diary.drizzle.repository';
@@ -315,6 +334,22 @@ export type Registry = {
   getDiscordLink: GetDiscordLink;
   listDiscordLinks: ListDiscordLinks;
   unlinkDiscordUser: UnlinkDiscordUser;
+
+  portraitProfileRepo: PortraitProfileDrizzleRepository;
+  portraitJobRepo: PortraitJobDrizzleRepository;
+  portraitNpcs: PortraitNpcsDrizzle;
+  portraitFiles: PortraitStorageFiles;
+  portraitGenerator: FotorPortraitGenerator;
+  listPortraitProfiles: ListPortraitProfiles;
+  savePortraitProfile: SavePortraitProfile;
+  deletePortraitProfile: DeletePortraitProfile;
+  draftNpcPortrait: DraftNpcPortrait;
+  generateNpcPortrait: GenerateNpcPortrait;
+  listNpcPortraits: ListNpcPortraits;
+  completePortraitJob: CompletePortraitJob;
+  checkPortraitJob: CheckPortraitJob;
+  applyPortrait: ApplyPortrait;
+  deletePortraitJob: DeletePortraitJob;
 };
 
 class Container {
@@ -510,6 +545,43 @@ class Container {
     getDiscordLink: (c) => new GetDiscordLink(c.resolve('discordLinkRepo')),
     listDiscordLinks: (c) => new ListDiscordLinks(c.resolve('discordLinkRepo')),
     unlinkDiscordUser: (c) => new UnlinkDiscordUser(c.resolve('discordLinkRepo')),
+
+    // NPC portraits (Fotor)
+    portraitProfileRepo: () => new PortraitProfileDrizzleRepository(),
+    portraitJobRepo: () => new PortraitJobDrizzleRepository(),
+    portraitNpcs: () => new PortraitNpcsDrizzle(),
+    portraitFiles: () => new PortraitStorageFiles(),
+    portraitGenerator: () => new FotorPortraitGenerator(),
+    listPortraitProfiles: (c) => new ListPortraitProfiles(c.resolve('portraitProfileRepo')),
+    savePortraitProfile: (c) => new SavePortraitProfile(c.resolve('portraitProfileRepo')),
+    deletePortraitProfile: (c) => new DeletePortraitProfile(c.resolve('portraitProfileRepo')),
+    draftNpcPortrait: (c) =>
+      new DraftNpcPortrait(c.resolve('portraitNpcs'), c.resolve('portraitProfileRepo')),
+    generateNpcPortrait: (c) =>
+      new GenerateNpcPortrait(
+        c.resolve('portraitNpcs'),
+        c.resolve('portraitJobRepo'),
+        c.resolve('portraitGenerator'),
+      ),
+    listNpcPortraits: (c) =>
+      new ListNpcPortraits(c.resolve('portraitNpcs'), c.resolve('portraitJobRepo')),
+    completePortraitJob: (c) =>
+      new CompletePortraitJob(
+        c.resolve('portraitJobRepo'),
+        c.resolve('portraitNpcs'),
+        c.resolve('portraitGenerator'),
+        c.resolve('portraitFiles'),
+      ),
+    checkPortraitJob: (c) =>
+      new CheckPortraitJob(c.resolve('portraitJobRepo'), c.resolve('completePortraitJob')),
+    applyPortrait: (c) =>
+      new ApplyPortrait(c.resolve('portraitJobRepo'), c.resolve('portraitNpcs')),
+    deletePortraitJob: (c) =>
+      new DeletePortraitJob(
+        c.resolve('portraitJobRepo'),
+        c.resolve('portraitNpcs'),
+        c.resolve('portraitFiles'),
+      ),
   };
 
   resolve<K extends keyof Registry>(key: K): Registry[K] {

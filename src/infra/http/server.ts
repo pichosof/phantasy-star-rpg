@@ -35,6 +35,7 @@ import { npcRoutes } from './routes/npc.routes';
 import { playerNotesRoutes } from './routes/player-notes.routes';
 import { playerQuestRoutes } from './routes/player-quest.routes';
 import { playerRoutes } from './routes/player.routes';
+import { portraitRoutes } from './routes/portraits.routes';
 import { progressRoutes } from './routes/progress.routes';
 import { questCityRoutes } from './routes/quest-city.routes';
 import { questRoutes } from './routes/quest.routes';
@@ -257,6 +258,7 @@ export async function buildServer() {
   await app.register(gmNotesRoutes);
   await app.register(encountersRoutes);
   await app.register(linksRoutes);
+  await app.register(portraitRoutes);
   await app.register(progressRoutes);
   await app.register(itemsRoutes);
   await app.register(statBlocksRoutes);

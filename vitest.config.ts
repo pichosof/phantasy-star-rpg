@@ -25,6 +25,9 @@ export default defineConfig({
       DISCORD_ANNOUNCE_CHANNEL_ID: '',
       SITE_URL: 'https://site.test',
       PUBLIC_API_URL: 'https://api.test',
+      // NPC portraits: on, but tests never reach Fotor (the generator is faked where it matters).
+      FOTOR_API_KEY: 'test-fotor-key',
+      FOTOR_WEBHOOK_SECRET: 'test-fotor-webhook-secret-0123456789',
     },
     // SQLite file locking: one file at a time.
     fileParallelism: false,

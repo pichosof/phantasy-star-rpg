@@ -134,6 +134,10 @@ jobs:
           DISCORD_ANNOUNCE_CHANNEL_ID: ${{ secrets.DISCORD_ANNOUNCE_CHANNEL_ID }}
           SITE_URL: ${{ secrets.SITE_URL }}
           PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
+          # NPC portraits (Fotor): repository variable FOTOR_ENABLED must be exactly 'true' or 'false'.
+          FOTOR_ENABLED: ${{ vars.FOTOR_ENABLED }}
+          FOTOR_API_KEY: ${{ secrets.FOTOR_API_KEY }}
+          FOTOR_WEBHOOK_SECRET: ${{ secrets.FOTOR_WEBHOOK_SECRET }}
         run: |
           discord_set=()
           discord_remove=()
@@ -157,17 +161,56 @@ jobs:
                 DISCORD_GM_USER_IDS="${DISCORD_GM_USER_IDS}"
                 DISCORD_ANNOUNCE_CHANNEL_ID="${DISCORD_ANNOUNCE_CHANNEL_ID}"
                 SITE_URL="${SITE_URL}"
-                PUBLIC_API_URL="${PUBLIC_API_URL}"
               )
               ;;
             false)
-              discord_remove=(--remove-env-vars DISCORD_TOKEN DISCORD_GUILD_IDS DISCORD_GM_USER_IDS DISCORD_ANNOUNCE_CHANNEL_ID SITE_URL PUBLIC_API_URL)
+              discord_remove=(DISCORD_TOKEN DISCORD_GUILD_IDS DISCORD_GM_USER_IDS DISCORD_ANNOUNCE_CHANNEL_ID SITE_URL)
               ;;
             *)
               echo "::error::Repository variable DISCORD_ENABLED must be 'true' or 'false' (got '${DISCORD_ENABLED}')."
               exit 1
               ;;
           esac
+
+          fotor_set=()
+          fotor_remove=()
+          case "${FOTOR_ENABLED}" in
+            true)
+              for name in FOTOR_API_KEY FOTOR_WEBHOOK_SECRET PUBLIC_API_URL; do
+                if [ -z "${!name}" ]; then
+                  echo "::error::FOTOR_ENABLED=true but the ${name} secret is empty."
+                  exit 1
+                fi
+              done
+              az containerapp secret set \
+                --name "${CONTAINER_APP_NAME}" \
+                --resource-group "${AZURE_RESOURCE_GROUP}" \
+                --secrets "fotor-api-key=${FOTOR_API_KEY}" "fotor-webhook-secret=${FOTOR_WEBHOOK_SECRET}" \
+                --output none
+              fotor_set=(
+                FOTOR_API_KEY="secretref:fotor-api-key"
+                FOTOR_WEBHOOK_SECRET="secretref:fotor-webhook-secret"
+              )
+              ;;
+            false)
+              fotor_remove=(FOTOR_API_KEY FOTOR_WEBHOOK_SECRET)
+              ;;
+            *)
+              echo "::error::Repository variable FOTOR_ENABLED must be 'true' or 'false' (got '${FOTOR_ENABLED}')."
+              exit 1
+              ;;
+          esac
+
+          # PUBLIC_API_URL is shared by both features: removed only when neither is on.
+          shared_set=()
+          remove=("${discord_remove[@]}" "${fotor_remove[@]}")
+          if [ "${DISCORD_ENABLED}" = true ] || [ "${FOTOR_ENABLED}" = true ]; then
+            shared_set=(PUBLIC_API_URL="${PUBLIC_API_URL}")
+          else
+            remove+=(PUBLIC_API_URL)
+          fi
+          remove_args=()
+          if [ ${#remove[@]} -gt 0 ]; then remove_args=(--remove-env-vars "${remove[@]}"); fi
 
           az containerapp update \
             --name "${CONTAINER_APP_NAME}" \
@@ -190,7 +233,9 @@ jobs:
               JWT_EXPIRES_IN="${JWT_EXPIRES_IN}" \
               APP_VERSION="${GITHUB_SHA}" \
               "${discord_set[@]}" \
-            "${discord_remove[@]}" \
+              "${fotor_set[@]}" \
+              "${shared_set[@]}" \
+            "${remove_args[@]}" \
             --output none
 
       - name: Health check

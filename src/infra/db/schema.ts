@@ -53,6 +53,8 @@ export const npcs = sqliteTable('npcs', {
   sheetSize: integer('sheet_size'),
   description: text('description'),
   location: text('location'), // cidade/local atual
+  /** Race as the generators name it (e.g. "Motaviano"); picks the portrait profile. Runtime column. */
+  race: text('race'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
@@ -558,4 +560,37 @@ export const discordLinks = sqliteTable('discord_links', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch('now') * 1000)`),
+});
+
+/** GM portrait guidance: the 'style' row applies to every portrait, the others are per race. */
+export const portraitProfiles = sqliteTable('portrait_profiles', {
+  key: text('key').primaryKey(),
+  prompt: text('prompt').notNull(),
+  /** JSON array of image URLs (`/files/...` or https) sent to the generator as references. */
+  references: text('refs').notNull().default('[]'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+});
+
+/** One portrait generation request (Fotor task) for an NPC. */
+export const portraitJobs = sqliteTable('portrait_jobs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  npcId: integer('npc_id')
+    .notNull()
+    .references(() => npcs.id, { onDelete: 'cascade' }),
+  taskId: text('task_id').notNull().unique(),
+  profile: text('profile'),
+  prompt: text('prompt').notNull(),
+  references: text('refs').notNull().default('[]'),
+  /** pending | done | failed */
+  status: text('status').notNull().default('pending'),
+  error: text('error'),
+  imageUrl: text('image_url'),
+  imageMime: text('image_mime'),
+  imageSize: integer('image_size'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch('now') * 1000)`),
+  finishedAt: integer('finished_at', { mode: 'timestamp_ms' }),
 });

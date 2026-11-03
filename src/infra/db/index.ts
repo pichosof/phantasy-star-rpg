@@ -91,7 +91,36 @@ export function ensureRuntimeTables() {
     sheet_id INTEGER REFERENCES character_sheets(id) ON UPDATE NO ACTION ON DELETE SET NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
   );
+  CREATE TABLE IF NOT EXISTS portrait_profiles (
+    key TEXT PRIMARY KEY NOT NULL,
+    prompt TEXT NOT NULL,
+    refs TEXT NOT NULL DEFAULT '[]',
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000)
+  );
+  CREATE TABLE IF NOT EXISTS portrait_jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    npc_id INTEGER NOT NULL REFERENCES npcs(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+    task_id TEXT NOT NULL UNIQUE,
+    profile TEXT,
+    prompt TEXT NOT NULL,
+    refs TEXT NOT NULL DEFAULT '[]',
+    status TEXT NOT NULL DEFAULT 'pending',
+    error TEXT,
+    image_url TEXT,
+    image_mime TEXT,
+    image_size INTEGER,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now') * 1000),
+    finished_at INTEGER
+  );
 `);
+  addColumnIfMissing('npcs', 'race', 'TEXT');
+}
+
+/** Adds a column to a migration-managed table that exists (a fresh DB gets it after migrating). */
+function addColumnIfMissing(table: string, column: string, type: string) {
+  const columns = sqlite.prepare(`PRAGMA table_info("${table}")`).all() as { name: string }[];
+  if (columns.length === 0 || columns.some((c) => c.name === column)) return;
+  sqlite.exec(`ALTER TABLE "${table}" ADD COLUMN "${column}" ${type}`);
 }
 
 /**

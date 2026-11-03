@@ -191,6 +191,8 @@ Read at boot from `.env` via `src/infra/config/env.ts`. Treated as required unle
 | `DISCORD_ANNOUNCE_CHANNEL_ID`     | — (bot on)         | Channel for reveal announcements; set it empty to turn them off.    |
 | `SITE_URL`                        | — (bot on)         | Front-end URL for "Open on site" links.                             |
 | `PUBLIC_API_URL`                  | — (bot on)         | Public API URL, to make uploaded `/files/...` images absolute.      |
+| `FOTOR_API_KEY`                   | empty              | Fotor OpenAPI key for NPC portraits. Empty = feature off.           |
+| `FOTOR_WEBHOOK_SECRET`            | — (Fotor on)       | 24+ chars; last segment of the webhook `/hooks/fotor/<secret>`.     |
 
 `CORS_ORIGIN` is a comma-separated allow-list (e.g. `https://rpg.picho.org`); it also drives the Origin/Referer check in `client-auth` for state-changing requests in production.
 
@@ -202,6 +204,8 @@ GM endpoints for the database: `GET /api/gm/database/download` (streams a fresh 
 - No guessing: typed names must match exactly and uniquely (otherwise the user picks a suggestion); only _expected_ errors are caught (not found, expired interaction, deleted message), everything else surfaces.
 - Domain events ([src/core/events/entity-events.ts](src/core/events/entity-events.ts)): `SetVisibility(visible=true)` publishes `revealed` (announced after 30 s if still visible); `SaveEncounter` publishes `encounterSaved` (live `/combat` boards). Handlers are plain functions returning Discord API JSON, tested in `tests/discord.test.ts`.
 - `GET /api/health/discord`: 200 when `ready` or deliberately `off`, 503 with the reason otherwise. `/api/health` (startup probe) never depends on Discord; the deploy checks both, driven by the repository variable `DISCORD_ENABLED` (`true`/`false`, no default).
+
+**NPC portraits** ([src/core/use-cases/portraits/portraits.ts](src/core/use-cases/portraits/portraits.ts), adapter [src/infra/ai/fotor-portrait-generator.ts](src/infra/ai/fotor-portrait-generator.ts), routes [src/infra/http/routes/portraits.routes.ts](src/infra/http/routes/portraits.routes.ts)): the GM drafts a prompt from the `style` profile + the NPC's race profile (`portrait_profiles`: prompt + reference images) + the NPC text (GM-only `>` quotes left out), edits it and generates with Fotor (`seedream-4-0-250828`, 3:4, fixed: a model change is a code change). Each request is a `portrait_jobs` row. Fotor calls `POST /hooks/fotor/<FOTOR_WEBHOOK_SECRET>` (outside `/api`, no client secret) for every task of the account; the hook only says "look at task X": we ask Fotor with our key, so unknown or forged task ids do nothing. The finished image is copied into our storage (Fotor results expire after 90 days) and becomes the portrait; earlier pictures stay in the job history (`apply` to switch back). A storage failure is recorded and `check` retries it without paying for a new image. Profiles and references are campaign data: they live in the database, never in the repo. `npcs.race` and both tables are runtime DDL in `src/infra/db/index.ts`.
 
 ---
 

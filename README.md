@@ -350,31 +350,35 @@ For Azure Container Apps:
 
 Required GitHub Actions secrets:
 
-| Secret name                   | Purpose                                                                              |
-| ----------------------------- | ------------------------------------------------------------------------------------ |
-| `AZURE_CLIENT_ID`             | OIDC-enabled Azure identity client ID.                                               |
-| `AZURE_TENANT_ID`             | Azure tenant ID.                                                                     |
-| `AZURE_SUBSCRIPTION_ID`       | Azure subscription ID.                                                               |
-| `AZURE_RESOURCE_GROUP`        | Resource group that owns the API resources.                                          |
-| `AZURE_CONTAINER_APP_NAME`    | Azure Container Apps API resource name.                                              |
-| `API_HEALTH_URL`              | Production health-check URL.                                                         |
-| `API_PORT`                    | API container port.                                                                  |
-| `NODE_ENV`                    | Runtime environment name.                                                            |
-| `DATABASE_URL`                | Database path/URL used by the container.                                             |
-| `CORS_ORIGIN`                 | Allowed production frontend origin.                                                  |
-| `FILE_STORAGE_DRIVER`         | Upload storage driver.                                                               |
-| `UPLOADS_LOCAL_DIR`           | Local upload mount path used by the container.                                       |
-| `AZURE_STORAGE_CONTAINER`     | Blob container name.                                                                 |
-| `AZURE_STORAGE_ACCESS_TIER`   | Blob access tier.                                                                    |
-| `MAX_UPLOAD_MB`               | Upload cap in MB.                                                                    |
-| `DISCORD_TOKEN`               | Discord bot token (copied into the Container Apps secret `discord-token` on deploy). |
-| `DISCORD_GUILD_IDS`           | Discord servers where the slash commands are registered (comma-separated).           |
-| `DISCORD_GM_USER_IDS`         | Discord user ids with GM powers (comma-separated).                                   |
-| `DISCORD_ANNOUNCE_CHANNEL_ID` | Reveal announcements channel (empty = off).                                          |
-| `SITE_URL`                    | Front-end URL for the bot's "Open on site" links.                                    |
-| `PUBLIC_API_URL`              | Public API URL, for the bot's image links.                                           |
+| Secret name                   | Purpose                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `AZURE_CLIENT_ID`             | OIDC-enabled Azure identity client ID.                                                   |
+| `AZURE_TENANT_ID`             | Azure tenant ID.                                                                         |
+| `AZURE_SUBSCRIPTION_ID`       | Azure subscription ID.                                                                   |
+| `AZURE_RESOURCE_GROUP`        | Resource group that owns the API resources.                                              |
+| `AZURE_CONTAINER_APP_NAME`    | Azure Container Apps API resource name.                                                  |
+| `API_HEALTH_URL`              | Production health-check URL.                                                             |
+| `API_PORT`                    | API container port.                                                                      |
+| `NODE_ENV`                    | Runtime environment name.                                                                |
+| `DATABASE_URL`                | Database path/URL used by the container.                                                 |
+| `CORS_ORIGIN`                 | Allowed production frontend origin.                                                      |
+| `FILE_STORAGE_DRIVER`         | Upload storage driver.                                                                   |
+| `UPLOADS_LOCAL_DIR`           | Local upload mount path used by the container.                                           |
+| `AZURE_STORAGE_CONTAINER`     | Blob container name.                                                                     |
+| `AZURE_STORAGE_ACCESS_TIER`   | Blob access tier.                                                                        |
+| `MAX_UPLOAD_MB`               | Upload cap in MB.                                                                        |
+| `DISCORD_TOKEN`               | Discord bot token (copied into the Container Apps secret `discord-token` on deploy).     |
+| `DISCORD_GUILD_IDS`           | Discord servers where the slash commands are registered (comma-separated).               |
+| `DISCORD_GM_USER_IDS`         | Discord user ids with GM powers (comma-separated).                                       |
+| `DISCORD_ANNOUNCE_CHANNEL_ID` | Reveal announcements channel (empty = off).                                              |
+| `SITE_URL`                    | Front-end URL for the bot's "Open on site" links.                                        |
+| `PUBLIC_API_URL`              | Public API URL, for the bot's image links and the portrait references.                   |
+| `FOTOR_API_KEY`               | Fotor OpenAPI key (copied into the Container Apps secret `fotor-api-key`).               |
+| `FOTOR_WEBHOOK_SECRET`        | Secret path segment of the Fotor webhook (Container Apps secret `fotor-webhook-secret`). |
 
 Required repository **variable** `DISCORD_ENABLED` (`true` or `false`, no default): `true` passes the `DISCORD_*` settings (all required) and waits for `/api/health/discord` to be `ready`; `false` removes them and expects `off`.
+
+Required repository **variable** `FOTOR_ENABLED` (`true` or `false`, no default): `true` passes `FOTOR_API_KEY`, `FOTOR_WEBHOOK_SECRET` and `PUBLIC_API_URL` (all required); `false` removes them.
 | `JWT_EXPIRES_IN` | GM JWT expiration window. |
 | `AZURE_STORAGE_CONNECTION_SECRET_NAME` | Container App secret name for the storage connection. |
 | `CLIENT_SECRET_NAME` | Container App secret name for the frontend client secret. |

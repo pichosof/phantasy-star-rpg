@@ -44,17 +44,20 @@ export const env = {
 
   // ── Discord bot: off without DISCORD_TOKEN; with it, the rest is required (no defaults) ──
   DISCORD: readDiscordConfig(process.env),
+
+  // ── NPC portraits (Fotor): off without FOTOR_API_KEY; with it, the rest is required ──
+  FOTOR: readFotorConfig(process.env),
 };
 
 export type DiscordConfig = NonNullable<ReturnType<typeof readDiscordConfig>>;
 
-/** Null when DISCORD_TOKEN is empty (bot off). Otherwise every setting is required: no defaults. */
-export function readDiscordConfig(source: Record<string, string | undefined>) {
-  const token = source.DISCORD_TOKEN ?? '';
-  if (!token) return null;
+type Source = Record<string, string | undefined>;
+
+/** Readers for a feature switched on by `switchName`: every other setting is required. */
+function settings(source: Source, switchName: string) {
   const need = (name: string) => {
     const value = source[name]?.trim();
-    if (!value) throw new Error(`Missing env var: ${name} (required when DISCORD_TOKEN is set)`);
+    if (!value) throw new Error(`Missing env var: ${name} (required when ${switchName} is set)`);
     return value;
   };
   const url = (name: string) => {
@@ -64,6 +67,14 @@ export function readDiscordConfig(source: Record<string, string | undefined>) {
       throw new Error(`${name} must be an http(s) URL`);
     return value.replace(/\/$/, '');
   };
+  return { need, url };
+}
+
+/** Null when DISCORD_TOKEN is empty (bot off). Otherwise every setting is required: no defaults. */
+export function readDiscordConfig(source: Source) {
+  const token = source.DISCORD_TOKEN ?? '';
+  if (!token) return null;
+  const { need, url } = settings(source, 'DISCORD_TOKEN');
   const announce = source.DISCORD_ANNOUNCE_CHANNEL_ID;
   if (announce === undefined)
     throw new Error(
@@ -86,6 +97,25 @@ export function readDiscordConfig(source: Record<string, string | undefined>) {
     /** Front-end URL for "Open on site" links. */
     siteUrl: url('SITE_URL'),
     /** Public URL of this API, to turn uploaded `/files/...` images into absolute links. */
+    publicApiUrl: url('PUBLIC_API_URL'),
+  };
+}
+
+export type FotorConfig = NonNullable<ReturnType<typeof readFotorConfig>>;
+
+/** Null when FOTOR_API_KEY is empty (portraits off). Otherwise every setting is required. */
+export function readFotorConfig(source: Source) {
+  const apiKey = source.FOTOR_API_KEY ?? '';
+  if (!apiKey) return null;
+  const { need, url } = settings(source, 'FOTOR_API_KEY');
+  const webhookSecret = need('FOTOR_WEBHOOK_SECRET');
+  if (webhookSecret.length < 24)
+    throw new Error('FOTOR_WEBHOOK_SECRET must be at least 24 characters (it guards the webhook)');
+  return {
+    apiKey,
+    /** Path segment of the completion webhook: /hooks/fotor/<secret>. */
+    webhookSecret,
+    /** Public URL of this API: Fotor fetches the reference images from `/files/...` there. */
     publicApiUrl: url('PUBLIC_API_URL'),
   };
 }

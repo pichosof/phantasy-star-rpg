@@ -16,6 +16,7 @@ export class NpcDrizzleRepository {
         role: p.role ?? null,
         description: p.description ?? null,
         location: p.location ?? null,
+        race: p.race ?? null,
         imageUrl: p.imageUrl ?? null,
         imageAlt: p.imageAlt ?? null,
         imageMime: p.imageMime ?? null,
@@ -37,6 +38,7 @@ export class NpcDrizzleRepository {
       role?: string | null;
       description?: string | null;
       location?: string | null;
+      race?: string | null;
     },
   ) {
     await db
@@ -46,6 +48,7 @@ export class NpcDrizzleRepository {
         ...(data.role !== undefined ? { role: data.role } : {}),
         ...(data.description !== undefined ? { description: data.description } : {}),
         ...(data.location !== undefined ? { location: data.location } : {}),
+        ...(data.race !== undefined ? { race: data.race } : {}),
         updatedAt: new Date(),
       })
       .where(eq(schema.npcs.id, id));
